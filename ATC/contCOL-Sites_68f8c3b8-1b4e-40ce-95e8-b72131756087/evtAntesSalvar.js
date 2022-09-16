@@ -2,24 +2,65 @@ var onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 var urlPost = `${mtdOnergy.GetBaseOnergyUrl()}Analytics/SaveDataByTemplateRule`;
 
 let mainMethod = async () => {
-    await atualizarClientesSitio();
-    await atualizaInformacoesConta();
-    await atualizarInformacoesTecnicas();
+    if (!(await validarAssetNumber())) {
+        return;
+    }
+    if (!(await validarSiteName())) {
+        return;
+    }
 
-    debugger;
+    //! Campo usado para bloquear edição de outros campos
+    let registroSalvo = mtdOnergy.JsEvtGetItemValue('registro_salvo');
+    if (!registroSalvo || registroSalvo == 'nao') {
+        mtdOnergy.JsEvtSetItemValue('registro_salvo', 'sim');
+    }
+    //!
+
+    let resultClienteSitio = await atualizarClientesSitio();
+    let resultInformacoesConta = await atualizaInformacoesConta();
+    let resultInformacoesTecnicas = await atualizarInformacoesTecnicas();
+
+    if (resultClienteSitio || resultInformacoesConta || resultInformacoesTecnicas) {
+        mtdOnergy.JsEvtSetItemValue('pode_apagar', 'nao');
+    } else {
+        mtdOnergy.JsEvtSetItemValue('pode_apagar', 'sim');
+    }
+
+    mtdOnergy.JsEvtSubmitForm();
+};
+
+let validarAssetNumber = async () => {
+    let sitiosID = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
     let cms = mtdOnergy.JsEvtGetItemValue('asset_number');
     let objCms = await mtdOnergy.JsEvtGetFeedData({
-        fdtID: 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4',
+        fdtID: sitiosID,
         filter: gerarFiltro('asset_number', cms),
     });
     if (objCms.length > 0 && cms == objCms[0].urlJsonContext.asset_number) {
         if (onergyCtx.fedid != objCms[0].id) {
             mtdOnergy.JsEvtShowMessage('error', 'Asset Number ya informado');
             mtdOnergy.JsEvtShowHideLoading(false);
-            return;
+            return false;
         }
     }
-    mtdOnergy.JsEvtSubmitForm();
+    return true;
+};
+
+let validarSiteName = async () => {
+    let sitiosID = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
+    let cms = mtdOnergy.JsEvtGetItemValue('site_name');
+    let objCms = await mtdOnergy.JsEvtGetFeedData({
+        fdtID: sitiosID,
+        filter: gerarFiltro('site_name', cms),
+    });
+    if (objCms.length > 0 && cms == objCms[0].urlJsonContext.asset_number) {
+        if (onergyCtx.fedid != objCms[0].id) {
+            mtdOnergy.JsEvtShowMessage('error', 'Apelido do Site ya informado');
+            mtdOnergy.JsEvtShowHideLoading(false);
+            return false;
+        }
+    }
+    return true;
 };
 
 let atualizarClientesSitio = async () => {
@@ -49,7 +90,9 @@ let atualizarClientesSitio = async () => {
             };
             await mtdOnergy.JsEvtAjaxCallData(urlPost, postData, 'post', false);
         }
+        return true;
     }
+    return false;
 };
 
 let atualizaInformacoesConta = async () => {
@@ -75,7 +118,9 @@ let atualizaInformacoesConta = async () => {
             };
             await mtdOnergy.JsEvtAjaxCallData(urlPost, postData, 'post', false);
         }
+        return true;
     }
+    return false;
 };
 
 let atualizarInformacoesTecnicas = async () => {
@@ -104,7 +149,9 @@ let atualizarInformacoesTecnicas = async () => {
             };
             await mtdOnergy.JsEvtAjaxCallData(urlPost, postData, 'post', false);
         }
+        return true;
     }
+    return false;
 };
 
 const gerarFiltro = (fielNameP, valueP) => {
