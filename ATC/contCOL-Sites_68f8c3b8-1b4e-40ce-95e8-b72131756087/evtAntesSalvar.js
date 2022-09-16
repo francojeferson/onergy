@@ -53,9 +53,9 @@ let validarSiteName = async () => {
         fdtID: sitiosID,
         filter: gerarFiltro('site_name', cms),
     });
-    if (objCms.length > 0 && cms == objCms[0].urlJsonContext.asset_number) {
+    if (objCms.length > 0 && cms == objCms[0].urlJsonContext.site_name) {
         if (onergyCtx.fedid != objCms[0].id) {
-            mtdOnergy.JsEvtShowMessage('error', 'Apelido do Site ya informado');
+            mtdOnergy.JsEvtShowMessage('error', 'Nombre del Sitio ya informado');
             mtdOnergy.JsEvtShowHideLoading(false);
             return false;
         }
