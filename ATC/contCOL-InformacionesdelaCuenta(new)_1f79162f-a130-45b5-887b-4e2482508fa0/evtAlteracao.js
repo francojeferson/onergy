@@ -2,17 +2,14 @@ let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 
 let mainMethod = async () => {
     debugger;
-    let tipoContaID = '84ca5970-7a49-4192-a2c8-030031503a1a';
-    let cms = mtdOnergy.JsEvtGetItemValue('TC_tipo_de_conta_valor');
-    let objCms = await mtdOnergy.JsEvtGetFeedData({
-        fdtID: tipoContaID,
-        filter: gerarFiltro('TC_tipo_de_conta_valor', cms),
-    });
-    if (objCms.length > 0 && cms == objCms[0].urlJsonContext.TC_tipo_de_conta_valor) {
-        if (onergyCtx.fedid != objCms[0].id) {
-            mtdOnergy.JsEvtShowMessage('error', 'Asset Number ya informado');
-            mtdOnergy.JsEvtShowHideLoading(false);
-        }
+    let cms = mtdOnergy.JsEvtGetItemValue('asset_number');
+    mtdOnergy.JsEvtSetItemValue('asset_number_cache', cms);
+    let tipoConta = mtdOnergy.JsEvtGetItemValue('TCTC_tipo_de_conta__TC_tipo_de_conta_valor');
+    if (tipoConta == 'P') {
+        mtdOnergy.JsEvtSetItemValue('asset_number', '');
+    } else {
+        let cms_cache = mtdOnergy.JsEvtGetItemValue('asset_number_cache');
+        mtdOnergy.JsEvtSetItemValue('asset_number', cms_cache);
     }
 };
 
