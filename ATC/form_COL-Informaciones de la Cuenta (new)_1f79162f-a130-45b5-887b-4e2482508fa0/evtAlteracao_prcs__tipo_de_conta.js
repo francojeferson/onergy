@@ -1,5 +1,5 @@
 let mainMethod = async () => {
-    await validarTipoConta();
+    await validarContaPai();
 };
 
 // Valida o tipo de conta e seta o valor do campo asset_number
