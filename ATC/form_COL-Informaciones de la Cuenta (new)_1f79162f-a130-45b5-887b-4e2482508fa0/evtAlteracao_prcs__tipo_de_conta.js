@@ -14,9 +14,7 @@ let validarTipoConta = async () => {
         let tipoContaValue = mtdOnergy.JsEvtGetItemValue('TCTC_tipo_de_conta__TC_tipo_de_conta_valor');
         mtdOnergy.JsEvtSetItemValue('prcs__tipo_de_conta_cache', tipoConta, null, null, true);
 
-        // Verifica se o tipo de conta é P (Padre) e se for, limpa o campo 
-        // asset_number, caso contrário, seta o valor do campo 
-        // asset_number_cache no campo asset_number
+        // Verifica se o tipo de conta é P (Padre) e se for, limpa o campo asset_number, caso contrário, seta o valor do campo asset_number_cache no campo asset_number
         if (tipoContaValue == 'P') {
             mtdOnergy.JsEvtSetItemValue('asset_number_IDC', '');
         } else {
