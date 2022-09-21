@@ -1,5 +1,3 @@
-let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
-
 let mainMethod = async () => {
     await validarNomeProvedor();
 };
