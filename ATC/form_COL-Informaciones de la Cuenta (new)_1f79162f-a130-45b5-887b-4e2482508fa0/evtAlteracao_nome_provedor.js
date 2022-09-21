@@ -14,16 +14,14 @@ let validarNomeProvedor = async () => {
     if (nomeProvedor != nomeProvedorCache) {
         mtdOnergy.JsEvtSetItemValue('nome_provedor_id_cache', nomeProvedor);
 
-        // Verifica se o nome do provedor foi informado e se foi, busca o 
-        // provedor no grid provedores
+        // Verifica se o nome do provedor foi informado e se foi, busca o provedor no grid provedores
         if (nomeProvedor) {
             let objProvedor = await mtdOnergy.JsEvtGetFeedData({
                 fdtID: provedorID,
                 filter: gerarFiltro('_id', nomeProvedor),
             });
 
-            // Verifica se o provedor foi encontrado, se sim, atualiza o dia 
-            // de pagamento com o valor encontrado no provedor
+            // Verifica se o provedor foi encontrado, se sim, atualiza o dia de pagamento com o valor encontrado no provedor
             if (objProvedor && objProvedor.length > 0) {
                 mtdOnergy.JsEvtSetItemValue('prcs__dia_de_pagamento', objProvedor[0].urlJsonContext.dia_de_vencimento);
             }
