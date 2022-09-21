@@ -1,5 +1,3 @@
-let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
-
 let mainMethod = async () => {
     await validarTipoConta();
 };
@@ -22,18 +20,6 @@ let validarTipoConta = async () => {
             mtdOnergy.JsEvtSetItemValue('asset_number_IDC', assetNumber);
         }
     }
-};
-
-// Cria um filtro para o campo informado e retorna o filtro
-const gerarFiltro = (fielNameP, valueP) => {
-    return JSON.stringify([
-        {
-            FielName: fielNameP,
-            Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            Value1: valueP,
-        },
-    ]);
 };
 
 mainMethod();
