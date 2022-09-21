@@ -1,5 +1,5 @@
 let mainMethod = async () => {
-    await blockFieldEdition();
+    await condSomenteLeitura();
     await limiteDiaPago();
 
     // Envia o submit do formulário
@@ -7,7 +7,7 @@ let mainMethod = async () => {
 };
 
 // Bloqueia a edição de campos que não podem ser editados pelo usuário
-let blockFieldEdition = async () => {
+let condSomenteLeitura = async () => {
     let registroSalvo = mtdOnergy.JsEvtGetItemValue('registro_salvo_');
 
     // Se registro_salvo_ for igual a nao ou null, seta registro_salvo_ para sim e cfgCondicionais altera para somente leitura os campos que não podem ser editados pelo usuário
