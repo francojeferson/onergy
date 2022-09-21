@@ -1,5 +1,3 @@
-let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
-
 let mainMethod = async () => {
     await blockFieldEdition();
     await limiteDiaPago();
@@ -29,18 +27,6 @@ let limiteDiaPago = async () => {
         return false;
     }
     return true;
-};
-
-// Cria um filtro para o campo informado e retorna o filtro
-const gerarFiltro = (fielNameP, valueP) => {
-    return JSON.stringify([
-        {
-            FielName: fielNameP,
-            Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            Value1: valueP,
-        },
-    ]);
 };
 
 mainMethod();
