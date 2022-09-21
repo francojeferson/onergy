@@ -1,7 +1,7 @@
 let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 
 let mainMethod = async () => {
-    await validarNomeProvedor();
+    await validarTipoConta();
 };
 
 // Valida o tipo de conta e seta o valor do campo asset_number
