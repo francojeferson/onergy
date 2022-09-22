@@ -43,7 +43,7 @@ let validarContaPai = async () => {
         // Verifica se Tipo de Cuenta é H (Hija) e se for, Cuenta Interna NIC deve ser diferente de prcs__conta_pai
         else if (tipoContaValue == 'H') {
             // Verifica se Cuenta Interna NIC é diferente de prcs__conta_pai, se for, exibe mensagem de erro e retorna false
-            if (contaPai == contaInternaNIC) {
+            if (contaPai.length > 0 && contaPai == contaInternaNIC) {
                 mtdOnergy.JsEvtShowMessage('error', 'Cuenta Padre no puede ser igual a Cuenta Interna NIC para Tipo de Cuenta Hija');
                 mtdOnergy.JsEvtSetItemValue('prcs__conta_pai', '');
                 mtdOnergy.JsEvtShowHideLoading(false);
