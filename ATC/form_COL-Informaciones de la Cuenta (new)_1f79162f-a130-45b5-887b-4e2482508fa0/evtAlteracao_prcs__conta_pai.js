@@ -28,7 +28,9 @@ let validarContaPai = async () => {
                 mtdOnergy.JsEvtShowHideLoading(false);
                 return false;
             }
-            mtdOnergy.JsEvtSetItemValue('prcs__conta_pai', '');
+            if (!contaPai) {
+                mtdOnergy.JsEvtSetItemValue('prcs__conta_pai', '');
+            }
         }
         return true;
     }
