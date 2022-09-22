@@ -16,14 +16,10 @@
 - [ ] Condicional por valor do Formulário
 - [ ] Condicional por tela de acesso
 
-- Campo relação condicional nome: Tipo de Conta / `TC_tipo_de_conta_valor`
-- Condição: diferente de
-- Valor esperado: `I`
-- Operação: E
-
-> campo `prcs__conta_pai` é obrigatório quando o `TC_tipo_de_conta_valor` for diferente de `I`
-
-> obs: quando o `TC_tipo_de_conta_valor` for igual a `H` ou `HH` ou `P`, o campo `prcs__conta_pai` não é obrigatório
+- Campo relação condicional nome: 
+- Condição: 
+- Valor esperado: 
+- Operação: 
 
 ## Somente Leitura
 
