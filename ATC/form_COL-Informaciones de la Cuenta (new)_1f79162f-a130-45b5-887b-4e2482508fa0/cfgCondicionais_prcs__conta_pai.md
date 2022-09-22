@@ -47,31 +47,17 @@
 - Campo relação condicional nome: registro_salvo / `registro_salvo_`
 - Condição: igual a
 - Valor esperado: `sim`
-- Operação: E
+- Operação: OU
 
 > campo `prcs__conta_pai` é somente leitura quando o `registro_salvo_` for igual a `sim`
 
 > obs: quando o `registro_salvo_` for igual a `nao`, o campo `prcs__conta_pai` não é somente leitura
 
 - Campo relação condicional nome: Tipo de Conta / `TC_tipo_de_conta_valor`
-- Condição: igual a
-- Valor esperado: `I`
-- Operação: E
+- Condição: diferente de
+- Valor esperado: `H`
+- Operação: OU
 
-> campo `prcs__conta_pai` é somente leitura quando o `TC_tipo_de_conta_valor` for igual a `I`
+> campo `prcs__conta_pai` é somente leitura quando o `TC_tipo_de_conta_valor` for diferente de `H`
 
-- Campo relação condicional nome: Tipo de Conta / `TC_tipo_de_conta_valor`
-- Condição: igual a
-- Valor esperado: `P`
-- Operação: E
-
-> campo `prcs__conta_pai` é somente leitura quando o `TC_tipo_de_conta_valor` for igual a `P`
-
-- Campo relação condicional nome: Tipo de Conta / `TC_tipo_de_conta_valor`
-- Condição: igual a
-- Valor esperado: `HH`
-- Operação: E
-
-> campo `prcs__conta_pai` é somente leitura quando o `TC_tipo_de_conta_valor` for igual a `HH`
-
-> obs: quando o `TC_tipo_de_conta_valor` for igual a `H`, o campo `prcs__conta_pai` não é somente leitura
+> obs: quando o `TC_tipo_de_conta_valor` for igual a `HH` ou `P` ou `I`, o campo `prcs__conta_pai` não é somente leitura
