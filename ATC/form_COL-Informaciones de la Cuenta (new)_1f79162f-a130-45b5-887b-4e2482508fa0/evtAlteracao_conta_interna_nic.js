@@ -28,8 +28,8 @@ let validarContaPai = async () => {
                 mtdOnergy.JsEvtShowHideLoading(false);
                 return false;
             }
+            mtdOnergy.JsEvtSetItemValue('prcs__conta_pai', '');
         }
-        mtdOnergy.JsEvtShowHideLoading(true);
         return true;
     }
 };
