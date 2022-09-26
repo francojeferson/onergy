@@ -1,3 +1,10 @@
+const onergy = require('../../onergy/onergy-client');
+
+async function onergy_get(args) {
+    let r = await onergy.onergy_get(args);
+    return JSON.stringify(r);
+}
+
 let fdtidDoCardDeBusca = '';
 
 let strFiltro = JSON.stringify([{ FielName: 'campo_de_busca', Type: 'string', FixedType: 'string', Value1: valor_do_filtro }]);
@@ -27,5 +34,5 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
             keepSearching = false;
         }
     }
-    return await result;
+    return result;
 }
