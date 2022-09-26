@@ -7,7 +7,7 @@
 const { date } = require('assert-plus');
 const { type } = require('os');
 const { formatDate } = require('tough-cookie');
-var onergy = require('../Mitre/NodeTryJS/onergy/onergy-client');
+const onergy = require('../../onergy/onergy-client');
 
 replaceAll = function (content, needle, replacement) {
     return content.split(needle).join(replacement);
@@ -21,7 +21,7 @@ async function ReadTextPdf(args) {
     return await onergy.ReadTextPdf(args);
 }
 async function onergy_get(args) {
-    var r = await onergy.onergy_get(args);
+    let r = await onergy.onergy_get(args);
 
     return JSON.stringify(r);
 }
@@ -89,7 +89,7 @@ async function DeletarRegistro(data, usrid, fedid) {
     );
 }
 
-function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup) {
+async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup) {
     let onergySaveData = {
         fdtid: templateid,
         assid: assid,
@@ -111,7 +111,7 @@ function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkT
         onergySaveData.addCfgViewGroup = addCfgViewGroup;
     }
 
-    return onergy_save(onergySaveData);
+    await onergy_save(onergySaveData);
 }
 
 function SetObjectResponse(cond, json, WaitingWebHook, UsrID, GrpID) {
@@ -159,7 +159,7 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
             keepSearching = false;
         }
     }
-    return await result;
+    return result;
 }
 
 let obj = {};
