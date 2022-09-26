@@ -1,3 +1,9 @@
+const onergy = require('../../onergy/onergy-client');
+
+async function onergy_save(args) {
+    return await onergy.onergy_save(args);
+}
+
 // Criar um registro no onergy
 
 let cadUsr = '32008998-ac8b-4cda-a98e-1a6efb61c08e';
