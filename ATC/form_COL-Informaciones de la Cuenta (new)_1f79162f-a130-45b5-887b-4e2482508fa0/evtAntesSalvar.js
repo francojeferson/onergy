@@ -36,8 +36,8 @@ let limiteDiaPago = async () => {
 let validarNicEProvedorETipoConta = async () => {
     let informacoesContaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
     let nic = mtdOnergy.JsEvtGetItemValue('conta_interna_nic');
-    let provedor = mtdOnergy.JsEvtGetItemValue('nome_provedor');
-    let tipoConta = mtdOnergy.JsEvtGetItemValue('prcs__tipo_de_conta');
+    let provedor = mtdOnergy.JsEvtGetItemValue('nome_comercial');
+    let tipoConta = mtdOnergy.JsEvtGetItemValue('TC_tipo_de_conta_valor');
     let strFiltro = JSON.stringify([
         {
             FielName: 'conta_interna_nic',
@@ -45,12 +45,12 @@ let validarNicEProvedorETipoConta = async () => {
             Conditional: 'or',
         },
         {
-            FielName: 'nome_provedor',
+            FielName: 'nome_comercial',
             Value1: provedor,
             Conditional: 'or',
         },
         {
-            FielName: 'prcs__tipo_de_conta',
+            FielName: 'TC_tipo_de_conta_valor',
             Value1: tipoConta,
             Conditional: 'or',
         },
