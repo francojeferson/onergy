@@ -1,7 +1,7 @@
 // FUnção para movimentar o registro entre cards do processo
 
 function avançarCard(json) {
-    var data = JSON.parse(json);
+    let data = JSON.parse(json);
 
     //return true;
     // (Avança pro sim ou não, dados do registro, fina na tela?)
@@ -11,7 +11,7 @@ function avançarCard(json) {
 function SetObjectResponse(cond, json, WaitingWebHook) {
     if (WaitingWebHook === undefined) WaitingWebHook = false;
 
-    var obj = {
+    let obj = {
         cond: cond,
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
@@ -23,7 +23,7 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
 
 // Mandar o registro para um outro processo
 function enviarParaOutroProcesso(json) {
-    var data = JSON.parse(json);
+    let data = JSON.parse(json);
 
     //return true;
     // (Avança pro sim ou não, dados do registro, fina na tela?, ID do processo)
@@ -33,7 +33,7 @@ function enviarParaOutroProcesso(json) {
 function SetObjectResponse(cond, json, WaitingWebHook, goToProcess) {
     if (WaitingWebHook === undefined) WaitingWebHook = false;
 
-    var obj = {
+    let obj = {
         cond: cond,
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
@@ -50,7 +50,7 @@ function SetObjectResponse(cond, json, WaitingWebHook, goToProcess) {
 // Criar grupos
 
 function init(json) {
-    var data = JSON.parse(json);
+    let data = JSON.parse(json);
 
     let groupName = data.cpfcnpj_agente;
     let parentTeamName = 'Administradores';
@@ -146,7 +146,7 @@ function CreateGRP(assid, grp_name, grp_id, parent_grp_id, parent_grp_name) {
 function SetObjectResponse(cond, json, WaitingWebHook, groupID, removeGroupID) {
     if (WaitingWebHook === undefined) WaitingWebHook = false;
 
-    var obj = {
+    let obj = {
         cond: cond,
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
