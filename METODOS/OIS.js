@@ -1,5 +1,5 @@
-function init(json) {
-    var data = JSON.parse(json);
+async function init(json) {
+    let data = JSON.parse(json);
     let queueName = 'bruno-queue-exec';
     let mainDirEnvio = 'C:\\Users\\MatheusSantos\\Desktop\\ios_chamada\\enviado\\';
     let mainDirRetorno = 'C:\\Users\\MatheusSantos\\Desktop\\ios_chamada\\retorno\\';
