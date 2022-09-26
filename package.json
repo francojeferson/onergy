@@ -6,9 +6,9 @@
   "dependencies": {
     "axios": "^0.21.2",
     "md5": "^2.3.0",
+    "node-modules": "^0.0.1",
     "request": "^2.88.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "jest"
   },
