@@ -3,6 +3,7 @@ let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 let mainMethod = async () => {
     await condSomenteLeitura();
     await limiteDiaPago();
+    await validarNicEProvedorETipoConta();
 
     // Envia o submit do formulário
     mtdOnergy.JsEvtSubmitForm();
