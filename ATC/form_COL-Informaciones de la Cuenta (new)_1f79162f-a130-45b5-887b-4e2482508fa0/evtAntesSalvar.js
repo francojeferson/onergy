@@ -1,9 +1,13 @@
 let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 
 let mainMethod = async () => {
+    // Se NIC e Provedor e TipoConta retornar false, não salva o registro
+    if (!(await validarNicEProvedorETipoConta())) {
+        return;
+    }
+
     await condSomenteLeitura();
     await limiteDiaPago();
-    await validarNicEProvedorETipoConta();
 
     // Envia o submit do formulário
     mtdOnergy.JsEvtSubmitForm();
