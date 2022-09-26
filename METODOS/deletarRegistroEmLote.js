@@ -8,6 +8,7 @@ const { date } = require('assert-plus');
 const { type } = require('os');
 const { formatDate } = require('tough-cookie');
 const onergy = require('../../onergy/onergy-client');
+const axios = require('axios');
 
 replaceAll = function (content, needle, replacement) {
     return content.split(needle).join(replacement);
