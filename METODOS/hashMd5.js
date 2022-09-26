@@ -7,7 +7,7 @@
 const { date } = require('assert-plus');
 const { type } = require('os');
 const { formatDate } = require('tough-cookie');
-var onergy = require('./onergy/onergy-client');
+const onergy = require('../../onergy/onergy-client');
 
 replaceAll = function (content, needle, replacement) {
     return content.split(needle).join(replacement);
@@ -83,7 +83,7 @@ async function initBefore(json) {
 function SetObjectResponse(cond, json, WaitingWebHook) {
     if (WaitingWebHook === undefined) WaitingWebHook = false;
 
-    var obj = {
+    let obj = {
         cond: cond,
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
@@ -95,7 +95,7 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
 // autal -  82017ab8818075f8529af1dfe3b62ceb
 
 async function init(json) {
-    var data = JSON.parse(json);
+    let data = JSON.parse(json);
 
     // passar os campos que deseja verificar se estao alterados
     let jsonValid = JSON.stringify({
@@ -149,7 +149,7 @@ function initDelete(json) {
 function SetObjectResponse(cond, json, WaitingWebHook) {
     if (WaitingWebHook === undefined) WaitingWebHook = false;
 
-    var obj = {
+    let obj = {
         cond: cond,
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
