@@ -7,7 +7,7 @@
 const { date } = require('assert-plus');
 const { type } = require('os');
 const { formatDate } = require('tough-cookie');
-var onergy = require('./onergy/onergy-client');
+const onergy = require('../../onergy/onergy-client');
 
 replaceAll = function (content, needle, replacement) {
     return content.split(needle).join(replacement);
@@ -19,7 +19,7 @@ async function ReadTextPdf(args) {
     return await onergy.ReadTextPdf(args);
 }
 async function onergy_get(args) {
-    var r = await onergy.onergy_get(args);
+    let r = await onergy.onergy_get(args);
 
     return JSON.stringify(r);
 }
@@ -44,7 +44,7 @@ function getusermail() {
 
 */
 async function init(json) {
-    var data = JSON.parse(json);
+    let data = JSON.parse(json);
 
     // fltro para excluir o registro em Log de atividades se for Supervisor
     let fdtLogDPO = 'bf48ca5e-c503-4140-8f0d-76f9da0048e0';
@@ -139,7 +139,7 @@ function initDelete(json) {
 function SetObjectResponse(cond, json, WaitingWebHook) {
     if (WaitingWebHook === undefined) WaitingWebHook = false;
 
-    var obj = {
+    let obj = {
         cond: cond,
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
@@ -170,7 +170,7 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
             keepSearching = false;
         }
     }
-    return await result;
+    return result;
 }
 // obj que estamos simulando a compra
 let obj = {
