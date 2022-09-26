@@ -1,3 +1,5 @@
+let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
+
 let mainMethod = async () => {
     await condSomenteLeitura();
     await limiteDiaPago();
@@ -25,6 +27,53 @@ let limiteDiaPago = async () => {
         mtdOnergy.JsEvtShowMessage('error', 'Día de Pago inválido');
         mtdOnergy.JsEvtShowHideLoading(false);
         return false;
+    }
+    return true;
+};
+
+// Valida se o asset_number já foi informado
+let validarNicEProvedorETipoConta = async () => {
+    let informacoesContaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
+    let nic = mtdOnergy.JsEvtGetItemValue('conta_interna_nic');
+    let provedor = mtdOnergy.JsEvtGetItemValue('nome_provedor');
+    let tipoConta = mtdOnergy.JsEvtGetItemValue('prcs__tipo_de_conta');
+    let strFiltro = JSON.stringify([
+        {
+            FielName: 'conta_interna_nic',
+            Value1: nic,
+            Conditional: 'or',
+        },
+        {
+            FielName: 'nome_provedor',
+            Value1: provedor,
+            Conditional: 'or',
+        },
+        {
+            FielName: 'prcs__tipo_de_conta',
+            Value1: tipoConta,
+            Conditional: 'or',
+        },
+    ]);
+    let obj = await mtdOnergy.JsEvtGetFeedData({
+        fdtID: informacoesContaID,
+        filter: strFiltro,
+    });
+
+    // Se a junção dos campos já foi registrado, exibe uma mensagem de erro
+    if (
+        obj.length > 0 &&
+        nic == obj[0].urlJsonContext.conta_interna_nic &&
+        provedor == obj[0].urlJsonContext.nome_provedor &&
+        tipoConta == obj[0].urlJsonContext.prcs__tipo_de_conta
+    ) {
+        // Se o Tipo de Conta for igual a I, H ou HH, exibe uma mensagem de erro
+        if (tipoConta == 'I' || tipoConta == 'H' || tipoConta == 'HH') {
+            if (onergyCtx.fedid != obj[0].id) {
+                mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) y Proveedor ya informado para este tipo de cuenta');
+                mtdOnergy.JsEvtShowHideLoading(false);
+                return false;
+            }
+        }
     }
     return true;
 };
