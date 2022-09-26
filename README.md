@@ -2,7 +2,7 @@
 
 ## Clonagem
 
-Efetue a clonagem deste repositório dentro de um diretório local (ex: C:/Users/usuario/Documentos/) para que possa instalar node_modules.
+Efetue a clonagem deste repositório dentro de um diretório local (ex: `C:/Users/usuario/Documentos/`) para que possa instalar `node_modules`.
 
 ## Instalação
 
@@ -14,7 +14,7 @@ npm i node_modules
 
 ## Execução
 
-Com node_modules instalado, feche o VSCode e mova a pasta do projeto para qualquer diretório nuvem de sua preferência (ex: Google Drive, OneDrive, Dropbox, etc). Após isso, abra o VSCode e abra a pasta do projeto.
+Com `node_modules` instalado, feche o VSCode e mova a pasta do projeto para qualquer diretório nuvem de sua preferência (ex: Google Drive, OneDrive, Dropbox, etc). Após isso, abra o VSCode e abra a pasta do projeto.
 
 ===
 
