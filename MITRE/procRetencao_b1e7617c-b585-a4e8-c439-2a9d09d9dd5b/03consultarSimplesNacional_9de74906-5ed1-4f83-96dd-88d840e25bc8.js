@@ -7,7 +7,6 @@ const { resolve } = require('path');
 const { type } = require('os');
 const axios = require('axios');
 const fs = require('fs');
-const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
 const utils = require('../../onergy/onergy-utils');
 replaceAll = function (content, needle, replacement) {
