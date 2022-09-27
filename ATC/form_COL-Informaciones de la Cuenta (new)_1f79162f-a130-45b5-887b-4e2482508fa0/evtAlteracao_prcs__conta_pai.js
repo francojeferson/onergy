@@ -14,8 +14,8 @@ let validarContaPai = async () => {
             mtdOnergy.JsEvtSetItemValue('prcs__conta_pai', 'NO');
         }
 
-        // Verifica se Tipo de Cuenta é P (Padre) ou HH (Hija Hibrida) e se for, seta Cuenta Interna NIC em campo prcs__conta_pai
-        else if (tipoContaValue == 'P' || tipoContaValue == 'HH') {
+        // Verifica se Tipo de Cuenta é PH (Padre Hibrida) ou P (Padre) ou HH (Hija Hibrida) e se for, seta Cuenta Interna NIC em campo prcs__conta_pai
+        else if (tipoContaValue == 'PH' || tipoContaValue == 'P' || tipoContaValue == 'HH') {
             mtdOnergy.JsEvtSetItemValue('prcs__conta_pai', contaInternaNIC);
         }
 
