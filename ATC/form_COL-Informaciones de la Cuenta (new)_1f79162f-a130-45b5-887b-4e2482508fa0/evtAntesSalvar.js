@@ -1,8 +1,8 @@
 let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 
 let mainMethod = async () => {
-    // Se NIC e Provedor e TipoConta retornar false, não salva o registro
-    if (!(await validarNicEProvedorETipoConta())) {
+    // Se NIC retornar false, não salva o registro
+    if (!(await validarNic())) {
         return;
     }
 
@@ -36,38 +36,21 @@ let limiteDiaPago = async () => {
     return true;
 };
 
-// Valida se o NIC e Provedor já foi informado para o tipo de conta
-let validarNicEProvedorETipoConta = async () => {
+// Valida se Cuenta Interna (NIC) já foi informada
+let validarNic = async () => {
     let informacoesContaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
     let nic = mtdOnergy.JsEvtGetItemValue('conta_interna_nic');
-    let provedor = mtdOnergy.JsEvtGetItemValue('prvd_id');
-    let tipoConta = mtdOnergy.JsEvtGetItemValue('TCTC_tipo_de_conta__TC_tipo_de_conta_valor');
-    if (nic && provedor && tipoConta) {
-        let objInformacoesConta = await mtdOnergy.JsEvtGetFeedData({
-            fdtID: informacoesContaID,
-            filter: gerarFiltro('conta_interna_nic', nic),
-        });
+    let objNic = await mtdOnergy.JsEvtGetFeedData({
+        fdtID: informacoesContaID,
+        filter: gerarFiltro('conta_interna_nic', nic),
+    });
 
-        if (objInformacoesConta && objInformacoesConta.length > 0) {
-            let objInformacoesContaFiltrado = await mtdOnergy.JsEvtGetFeedData({
-                fdtID: informacoesContaID,
-                filter: gerarFiltro('prvd_id', provedor),
-            });
-
-            if (objInformacoesContaFiltrado && objInformacoesContaFiltrado.length > 0) {
-                let objInformacoesContaFiltradoTipoConta = await mtdOnergy.JsEvtGetFeedData({
-                    fdtID: informacoesContaID,
-                    filter: gerarFiltro('TCTC_tipo_de_conta__TC_tipo_de_conta_valor', tipoConta),
-                });
-
-                if (objInformacoesContaFiltradoTipoConta && objInformacoesContaFiltradoTipoConta.length > 0) {
-                    if (tipoConta == 'I' || tipoConta == 'H' || tipoConta == 'HH') {
-                        mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) y Proveedor ya informado para este tipo de cuenta');
-                        mtdOnergy.JsEvtShowHideLoading(false);
-                        return false;
-                    }
-                }
-            }
+    // Se o conta_interna_nic já foi informado, exibe uma mensagem de erro
+    if (objNic.length > 0 && nic == objNic[0].urlJsonContext.conta_interna_nic) {
+        if (onergyCtx.fedid != objNic[0].id) {
+            mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) ya informada');
+            mtdOnergy.JsEvtShowHideLoading(false);
+            return false;
         }
     }
     return true;
