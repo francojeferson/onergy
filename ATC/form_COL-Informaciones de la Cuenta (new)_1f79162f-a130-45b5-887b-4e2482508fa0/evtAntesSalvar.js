@@ -6,6 +6,11 @@ let mainMethod = async () => {
         return;
     }
 
+    // Se Nome do Provedor + Conta Pai + Tipo de Conta retornar false, não salva o registro
+    if (!(await validarNomeProvedorContaPaiTipoConta())) {
+        return;
+    }
+
     await condSomenteLeitura();
     await limiteDiaPago();
 
@@ -54,6 +59,42 @@ let validarNic = async () => {
         }
     }
     return true;
+};
+
+// Valida o nome do provedor + conta pai + tipo de conta
+let validarNomeProvedorContaPaiTipoConta = async () => {
+    let informacoesContaID = "1e6d6595-083f-4bb8-b82c-e9054e9dc8f3";
+    let nomeProvedor = mtdOnergy.JsEvtGetItemValue("prvd_id");
+    let contaPai = mtdOnergy.JsEvtGetItemValue("prcs__conta_pai");
+    let tipoContaValue = mtdOnergy.JsEvtGetItemValue("TCTC_tipo_de_conta__TC_tipo_de_conta_valor");
+
+    let objNomeProvedor = await mtdOnergy.JsEvtGetFeedData({
+        fdtID: informacoesContaID,
+        filter: gerarFiltro("prvd_id", nomeProvedor),
+    });
+
+    if (objNomeProvedor && objNomeProvedor.length > 0) {
+        let objContaPai = await mtdOnergy.JsEvtGetFeedData({
+            fdtID: informacoesContaID,
+            filter: gerarFiltro("prcs__conta_pai", contaPai),
+        });
+
+        if (objContaPai && objContaPai.length > 0) {
+            let objTipoConta = await mtdOnergy.JsEvtGetFeedData({
+                fdtID: informacoesContaID,
+                filter: gerarFiltro("TCTC_tipo_de_conta__TC_tipo_de_conta_valor", tipoContaValue),
+            });
+
+            if (objTipoConta && objTipoConta.length > 0) {
+                if (onergyCtx.fedid != objNomeProvedor[0].id && onergyCtx.fedid != objContaPai[0].id && onergyCtx.fedid != objTipoConta[0].id) {
+                    mtdOnergy.JsEvtShowMessage("error", "Nombre del Proveedor + Cuenta Padre + Tipo de Cuenta ya informado");
+                    mtdOnergy.JsEvtShowHideLoading(false);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 };
 
 // Cria um filtro para o campo informado e retorna o filtro
