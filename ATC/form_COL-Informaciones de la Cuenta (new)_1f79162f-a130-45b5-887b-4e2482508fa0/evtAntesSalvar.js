@@ -11,7 +11,7 @@ let mainMethod = async () => {
 
     await condSomenteLeitura();
 
-    let resultNaoApagarContaPai = await naoApagarContaPai();
+    let resultNaoApagarContaPai = await naoApagarNit();
 
     if (resultNaoApagarContaPai) {
         mtdOnergy.JsEvtSetItemValue('idc_pode_apagar', 'sim');
