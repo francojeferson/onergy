@@ -13,6 +13,14 @@ let mainMethod = async () => {
         return;
     }
 
+    let resultNaoApagarNit = await naoApagarNit();
+
+    if (resultNaoApagarNit) {
+        mtdOnergy.JsEvtSetItemValue('COLC_pode_apagar', 'sim');
+    } else {
+        mtdOnergy.JsEvtSetItemValue('COLC_pode_apagar', 'nao');
+    }
+
     mtdOnergy.JsEvtSubmitForm();
 };
 
@@ -63,6 +71,25 @@ let validarCodigoCliente = async () => {
     if (objcod.length > 0 && cod == objcod[0].urlJsonContext.COLC_codigo_cliente) {
         if (onergyCtx.fedid != objcod[0].id) {
             mtdOnergy.JsEvtShowMessage('error', 'Código del Cliente ya informado');
+            mtdOnergy.JsEvtShowHideLoading(false);
+            return false;
+        }
+    }
+    return true;
+};
+
+let naoApagarNit = async () => {
+    let clientesID = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
+    let nit = mtdOnergy.JsEvtGetItemValue('COLC_nit_cliente');
+    let objNit = await mtdOnergy.JsEvtGetFeedData({
+        fdtID: clientesID,
+        filter: gerarFiltro('COLC_nit_cliente', nit),
+    });
+
+    if (objNit && objNit.length > 0) {
+        let objRegNit = await objNit.filter((item) => item.urlJsonContext.COLCCOLC_nit_cliente == nit);
+
+        if (objRegNit && objRegNit.length > 0) {
             mtdOnergy.JsEvtShowHideLoading(false);
             return false;
         }
