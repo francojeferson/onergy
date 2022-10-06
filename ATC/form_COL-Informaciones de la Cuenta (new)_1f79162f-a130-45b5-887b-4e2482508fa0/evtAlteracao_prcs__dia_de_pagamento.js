@@ -1,18 +1,53 @@
 let mainMethod = async () => {
-    await limiteDiaPago();
+    let resultFrequenciaPagto = await validarFrequenciaPagto();
+    let resultDiaPagto = await validarDiaPagto();
+
+    if (resultFrequenciaPagto && resultDiaPagto) {
+        mtdOnergy.JsEvtSetItemValue('prcs__ocultar_campo', 'nao');
+    } else {
+        mtdOnergy.JsEvtSetItemValue('prcs__ocultar_campo', 'sim');
+    }
 };
 
-// Valida o limite de dia de pagamento
-let limiteDiaPago = async () => {
+let validarFrequenciaPagto = async () => {
+    let frequenciaID = '2d4edce3-7131-413a-98e5-35d328daef7f';
+    let frequenciaPagto = mtdOnergy.JsEvtGetItemValue('frequencia_de_pagamento');
+    let frequenciaPagtoCache = mtdOnergy.JsEvtGetItemValue('prcs__frequencia_pagamento_cache');
+
+    if (frequenciaPagto != frequenciaPagtoCache) {
+        mtdOnergy.JsEvtSetItemValue('prcs__frequencia_pagamento_cache', frequenciaPagto);
+
+        if (frequenciaPagto) {
+            let objFrequencia = await mtdOnergy.JsEvtGetFeedData({
+                fdtID: frequenciaID,
+                filter: gerarFiltro('_id', frequenciaPagto),
+            });
+
+            if (objFrequencia && objFrequencia.length > 0) {
+                mtdOnergy.JsEvtSetItemValue('frequencia_de_pagamento', objFrequencia[0].urlJsonContext.frequencia_de_pagamento);
+            }
+        }
+    }
+};
+
+let validarDiaPagto = async () => {
     let diaPago = mtdOnergy.JsEvtGetItemValue('prcs__dia_de_pagamento');
 
-    // Verifica se o dia de pagamento é maior que 31 e menor que 1 e se for, envia uma mensagem de erro durante alteração
     if (diaPago < 1 || diaPago > 31) {
-        mtdOnergy.JsEvtShowMessage('error', 'Día de Pago inválido');
-        mtdOnergy.JsEvtShowHideLoading(false);
         return false;
     }
     return true;
+};
+
+const gerarFiltro = (fielNameP, valueP) => {
+    return JSON.stringify([
+        {
+            FielName: fielNameP,
+            Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
+            FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
+            Value1: valueP,
+        },
+    ]);
 };
 
 mainMethod();
