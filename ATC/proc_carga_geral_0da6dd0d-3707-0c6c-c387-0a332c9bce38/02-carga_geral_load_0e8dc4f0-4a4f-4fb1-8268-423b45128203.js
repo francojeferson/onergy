@@ -464,6 +464,11 @@ function gerarFiltro(fielNameP, valueP) {
                             arrayPost[y].tp_acces_tipo_de_acesso = retornoTipoAcesso[0] ? retornoTipoAcesso[0].UrlJsonContext.tipo_de_acesso : '';
                             arrayPost[y].tp_acces_id = retornoTipoAcesso[0] ? retornoTipoAcesso[0].ID : '';
                         }
+
+                        let duplicadorApelidoProvedor = gridDestino.filter((j) => j.UrlJsonContext.apelido_provedor == arrayPost[y].apodo_proveedor);
+                        if (!duplicadorApelidoProvedor || data.em_caso_de_duplicidade == '1') {
+                            arrayPost[y].apelido_provedor = arrayPost[y].apodo_proveedor;
+                        }
                         let duplicadorLinkWeb = gridDestino.filter((j) => j.UrlJsonContext.link_web == arrayPost[y].link_web);
                         if (!duplicadorLinkWeb || data.em_caso_de_duplicidade == '1') {
                             arrayPost[y].link_web = arrayPost[y].link_web;
@@ -642,13 +647,9 @@ function gerarFiltro(fielNameP, valueP) {
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorTipoConta = gridDestino.filter(
-                            (j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == arrayPost[y].tipo_cuenta
-                        );
+                        let duplicadorTipoConta = gridDestino.filter((j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == arrayPost[y].tipo_cuenta);
                         if (!duplicadorTipoConta || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].TCTC_tipo_de_conta__prcs__tipo_de_conta = retornoTipoConta[0]
-                                ? retornoTipoConta[0].UrlJsonContext.TC_tipo_de_conta
-                                : '';
+                            arrayPost[y].TCTC_tipo_de_conta__prcs__tipo_de_conta = retornoTipoConta[0] ? retornoTipoConta[0].UrlJsonContext.TC_tipo_de_conta : '';
                             arrayPost[y].TC_tipo_de_conta_id = retornoTipoConta[0] ? retornoTipoConta[0].ID : '';
                         }
 
@@ -707,6 +708,7 @@ function gerarFiltro(fielNameP, valueP) {
                             arrayPost[y].prvd_nit_provedor = retornoProvedores[0] ? retornoProvedores[0].nit_provedor : '';
                             arrayPost[y].prvd_nit_beneficiario = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.nit_beneficiario : '';
                             arrayPost[y].prvd_beneficiario = retornoProvedores[0] ? retornoProvedores[0].beneficiario : '';
+                            arrayPost[y].prvd_apelido_provedor = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.apelido_provedor : '';
                             arrayPost[y].prvd_link_web = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.link_web : '';
                             arrayPost[y].prvd_usuario = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.usuario : '';
                             arrayPost[y].prvd_senha = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.senha : '';
@@ -738,19 +740,13 @@ function gerarFiltro(fielNameP, valueP) {
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorSujeitoPassivo = gridDestino.filter(
-                            (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == arrayPost[y].sujeto_pasivo
-                        );
+                        let duplicadorSujeitoPassivo = gridDestino.filter((j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == arrayPost[y].sujeto_pasivo);
                         if (!duplicadorSujeitoPassivo || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = retornoSujeitoPassivo[0]
-                                ? retornoSujeitoPassivo[0].UrlJsonContext.sujeito
-                                : '';
+                            arrayPost[y].suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = retornoSujeitoPassivo[0] ? retornoSujeitoPassivo[0].UrlJsonContext.sujeito : '';
                             arrayPost[y].suj_pa_sujeito_id = retornoSujeitoPassivo[0] ? retornoSujeitoPassivo[0].ID : '';
                         }
 
-                        let duplicadorAcordoResolucao = gridDestino.filter(
-                            (j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == arrayPost[y].acuerdo_resolucion
-                        );
+                        let duplicadorAcordoResolucao = gridDestino.filter((j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == arrayPost[y].acuerdo_resolucion);
                         if (!duplicadorAcordoResolucao || data.em_caso_de_duplicidade == '1') {
                             arrayPost[y].prcs__acuerdo_resolucion_alumbrado_publico = arrayPost[y].acuerdo_resolucion;
                         }
@@ -765,13 +761,9 @@ function gerarFiltro(fielNameP, valueP) {
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorTipoCobranca = gridDestino.filter(
-                            (j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__prcs__tipo_cobro_alumbrado_publico == arrayPost[y].tipo_cobro
-                        );
+                        let duplicadorTipoCobranca = gridDestino.filter((j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__prcs__tipo_cobro_alumbrado_publico == arrayPost[y].tipo_cobro);
                         if (!duplicadorTipoCobranca || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].tipo_cobr_tipos_cobrancas__prcs__tipo_cobro_alumbrado_publico = retornoTipoCobranca[0]
-                                ? retornoTipoCobranca[0].UrlJsonContext.tipos_cobrancas
-                                : '';
+                            arrayPost[y].tipo_cobr_tipos_cobrancas__prcs__tipo_cobro_alumbrado_publico = retornoTipoCobranca[0] ? retornoTipoCobranca[0].UrlJsonContext.tipos_cobrancas : '';
                             arrayPost[y].tipo_cobr_tipos_cobrancas_id = retornoTipoCobranca[0] ? retornoTipoCobranca[0].ID : '';
                         }
 
@@ -790,13 +782,9 @@ function gerarFiltro(fielNameP, valueP) {
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorFrequenciaPagamento = gridDestino.filter(
-                            (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == arrayPost[y].frecuencia_pago
-                        );
+                        let duplicadorFrequenciaPagamento = gridDestino.filter((j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == arrayPost[y].frecuencia_pago);
                         if (!duplicadorFrequenciaPagamento || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].fre_pag_frequencia__frequencia_de_pagamento = retornoFrequenciaPagamento[0]
-                                ? retornoFrequenciaPagamento[0].UrlJsonContext.frequencia
-                                : '';
+                            arrayPost[y].fre_pag_frequencia__frequencia_de_pagamento = retornoFrequenciaPagamento[0] ? retornoFrequenciaPagamento[0].UrlJsonContext.frequencia : '';
                             arrayPost[y].fre_pag_frequencia_id = retornoFrequenciaPagamento[0] ? retornoFrequenciaPagamento[0].ID : '';
                         }
 
@@ -810,22 +798,16 @@ function gerarFiltro(fielNameP, valueP) {
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorFormaPagamento = gridDestino.filter(
-                            (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == arrayPost[y].forma_pago
-                        );
+                        let duplicadorFormaPagamento = gridDestino.filter((j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == arrayPost[y].forma_pago);
                         if (!duplicadorFormaPagamento || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].for_pag_formas_de_pagamentos__forma_de_pagamento = retornoFormaPagamento[0]
-                                ? retornoFormaPagamento[0].UrlJsonContext.formas_de_pagamentos
-                                : '';
+                            arrayPost[y].for_pag_formas_de_pagamentos__forma_de_pagamento = retornoFormaPagamento[0] ? retornoFormaPagamento[0].UrlJsonContext.formas_de_pagamentos : '';
                             arrayPost[y].for_pag_formas_de_pagamentos_id = retornoFormaPagamento[0] ? retornoFormaPagamento[0].ID : '';
                         }
 
                         //*pesq.ref:clasificacion_passthru
                         let classificacaoPassthruGrid = 'ad62c737-2abc-4c71-a572-e11933114ed8';
                         let registroClassificacaoPassthru = /*await*/ getOnergyItem(classificacaoPassthruGrid, data.assid, data.usrid, null);
-                        let retornoClassificacaoPassthru = registroClassificacaoPassthru.filter(
-                            (j) => j.UrlJsonContext.classificacao_passthru == arrayPost[y].clasificacion_passthru
-                        );
+                        let retornoClassificacaoPassthru = registroClassificacaoPassthru.filter((j) => j.UrlJsonContext.classificacao_passthru == arrayPost[y].clasificacion_passthru);
                         if (!retornoClassificacaoPassthru) {
                             status_desc = `ERROR: no hay "${arrayPost[y].clasificacion_passthru}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
                             statusPost.push(`${time}, ${status_desc}\n`);
@@ -920,9 +902,7 @@ function gerarFiltro(fielNameP, valueP) {
                         if (!duplicadorEstrato || data.em_caso_de_duplicidade == '1') {
                             arrayPost[y].LSTLST_estrato__ITDS_estrato = arrayPost[y].estrato;
                         }
-                        let duplicadorNivelTensao = gridDestino.filter(
-                            (j) => j.UrlJsonContext.NVTNVT_nivel__ITDS_nivel_de_tensao == arrayPost[y].nivel_tension
-                        );
+                        let duplicadorNivelTensao = gridDestino.filter((j) => j.UrlJsonContext.NVTNVT_nivel__ITDS_nivel_de_tensao == arrayPost[y].nivel_tension);
                         if (!duplicadorNivelTensao || data.em_caso_de_duplicidade == '1') {
                             arrayPost[y].NVTNVT_nivel__ITDS_nivel_de_tensao = arrayPost[y].nivel_tension;
                         }
@@ -967,9 +947,7 @@ function gerarFiltro(fielNameP, valueP) {
                             arrayPost[y].provisorio = arr03;
                         }
 
-                        let duplicadorQuantidadeProvisoria = gridDestino.filter(
-                            (j) => j.UrlJsonContext.quantidade_provisoria == arrayPost[y].cantidad_provisionales
-                        );
+                        let duplicadorQuantidadeProvisoria = gridDestino.filter((j) => j.UrlJsonContext.quantidade_provisoria == arrayPost[y].cantidad_provisionales);
                         if (!duplicadorQuantidadeProvisoria || data.em_caso_de_duplicidade == '1') {
                             arrayPost[y].quantidade_provisoria = arrayPost[y].cantidad_provisionales;
                         }
@@ -999,21 +977,15 @@ function gerarFiltro(fielNameP, valueP) {
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorNomeCliente = gridDestino.filter(
-                            (j) => j.UrlJsonContext.COLCCOLC_nome_cliente__clsit__nit_cliente == arrayPost[y].nombre_cliente
-                        );
+                        let duplicadorNomeCliente = gridDestino.filter((j) => j.UrlJsonContext.COLCCOLC_nome_cliente__clsit__nit_cliente == arrayPost[y].nombre_cliente);
                         if (!duplicadorNomeCliente || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].COLCCOLC_nome_cliente__clsit__nit_cliente = retornoClientes[0]
-                                ? retornoClientes[0].UrlJsonContext.COLC_nome_cliente
-                                : '';
+                            arrayPost[y].COLCCOLC_nome_cliente__clsit__nit_cliente = retornoClientes[0] ? retornoClientes[0].UrlJsonContext.COLC_nome_cliente : '';
                             arrayPost[y].COLCclsit__nit_cliente_id = retornoClientes[0] ? retornoClientes[0].ID : '';
                             arrayPost[y].COLCCOLC_codigo_cliente = retornoClientes[0] ? retornoClientes[0].UrlJsonContext.COLC_codigo_cliente : '';
                             arrayPost[y].COLCCOLC_nit_cliente = retornoClientes[0] ? retornoClientes[0].UrlJsonContext.COLC_nit_cliente : '';
                         }
 
-                        let duplicadorCodigoSitioCliente = gridDestino.filter(
-                            (j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == arrayPost[y].codigo_sitio_cliente
-                        );
+                        let duplicadorCodigoSitioCliente = gridDestino.filter((j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == arrayPost[y].codigo_sitio_cliente);
                         if (!duplicadorCodigoSitioCliente || data.em_caso_de_duplicidade == '1') {
                             arrayPost[y].clsit__codigo_do_sitio_do_cliente = arrayPost[y].codigo_sitio_cliente;
                         }
@@ -1028,35 +1000,25 @@ function gerarFiltro(fielNameP, valueP) {
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorNomeRegional = gridDestino.filter(
-                            (j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == arrayPost[y].nombre_regional
-                        );
+                        let duplicadorNomeRegional = gridDestino.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == arrayPost[y].nombre_regional);
                         if (!duplicadorNomeRegional || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].RCSRCS_nome_regional__clsit__regional_do_cliente = retornoRegional[0]
-                                ? retornoRegional[0].UrlJsonContext.RCS_nome_regional
-                                : '';
+                            arrayPost[y].RCSRCS_nome_regional__clsit__regional_do_cliente = retornoRegional[0] ? retornoRegional[0].UrlJsonContext.RCS_nome_regional : '';
                             arrayPost[y].RCSclsit__regional_do_cliente_id = retornoRegional[0] ? retornoRegional[0].ID : '';
                         }
 
                         //*pesq.ref:portafolio_cliente
                         let portfolioClienteGrid = 'b36cf260-c691-4d36-9339-137041e6fb63';
                         let registroPortfolioCliente = /*await*/ getOnergyItem(portfolioClienteGrid, data.assid, data.usrid, null);
-                        let retornoPortfolioCliente = registroPortfolioCliente.filter(
-                            (j) => j.UrlJsonContext.PCS_portafolio_cliente == arrayPost[y].portafolio_cliente
-                        );
+                        let retornoPortfolioCliente = registroPortfolioCliente.filter((j) => j.UrlJsonContext.PCS_portafolio_cliente == arrayPost[y].portafolio_cliente);
                         if (!retornoPortfolioCliente) {
                             status_desc = `ERROR: no hay "${arrayPost[y].portafolio_cliente}" registrado para ${tabExcel} de "${arrayPost[y].nit_cliente}"`;
                             statusPost.push(`${time}, ${status_desc}\n`);
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorPortfolioCliente = gridDestino.filter(
-                            (j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == arrayPost[y].portafolio_cliente
-                        );
+                        let duplicadorPortfolioCliente = gridDestino.filter((j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == arrayPost[y].portafolio_cliente);
                         if (!duplicadorPortfolioCliente || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].PCSPCS_portafolio_cliente__clsit__portifolio_cliente = retornoRegional[0]
-                                ? retornoRegional[0].UrlJsonContext.PCS_portafolio_cliente
-                                : '';
+                            arrayPost[y].PCSPCS_portafolio_cliente__clsit__portifolio_cliente = retornoRegional[0] ? retornoRegional[0].UrlJsonContext.PCS_portafolio_cliente : '';
                             arrayPost[y].PCSclsit__portifolio_cliente_id = retornoRegional[0] ? retornoRegional[0].ID : '';
                         }
 
@@ -1171,22 +1133,16 @@ function gerarFiltro(fielNameP, valueP) {
                         //*pesq.ref:regional_clientes
                         let RegionalClientesGrid = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
                         let registroRegionalClientes = /*await*/ getOnergyItem(RegionalClientesGrid, data.assid, data.usrid, null);
-                        let retornoRegionalClientes = registroRegionalClientes.filter(
-                            (j) => j.UrlJsonContext.RCS_nome_regional == arrayPost[y].nombre_regional
-                        );
+                        let retornoRegionalClientes = registroRegionalClientes.filter((j) => j.UrlJsonContext.RCS_nome_regional == arrayPost[y].nombre_regional);
                         if (!retornoRegionalClientes) {
                             status_desc = `ERROR: no hay "${arrayPost[y].nombre_regional}" registrado para ${tabExcel} de "${arrayPost[y].nit_cliente}"`;
                             statusPost.push(`${time}, ${status_desc}\n`);
                             /*await*/ postStatus(status_desc, statusPost, data);
                             return false;
                         }
-                        let duplicadorRegionalClientes = gridDestino.filter(
-                            (j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == arrayPost[y].nombre_regional
-                        );
+                        let duplicadorRegionalClientes = gridDestino.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == arrayPost[y].nombre_regional);
                         if (!duplicadorRegionalClientes || data.em_caso_de_duplicidade == '1') {
-                            arrayPost[y].RCSRCS_nome_regional__CCS_nombre_regional = retornoRegionalClientes[0]
-                                ? retornoRegionalClientes[0].UrlJsonContext.RCS_nome_regional
-                                : '';
+                            arrayPost[y].RCSRCS_nome_regional__CCS_nombre_regional = retornoRegionalClientes[0] ? retornoRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                             arrayPost[y].RCSCCS_nombre_regional_id = retornoRegionalClientes[0] ? retornoRegionalClientes[0].ID : '';
                         }
 
@@ -1214,9 +1170,7 @@ function gerarFiltro(fielNameP, valueP) {
 
                     //*aba:clasificacion_passthru
                     if (tabExcel == 'clasificacion_passthru') {
-                        let duplicadorClassificacaoPassthru = gridDestino.filter(
-                            (j) => j.UrlJsonContext.classificacao_passthru == arrayPost[y].clasificacion_passthru
-                        );
+                        let duplicadorClassificacaoPassthru = gridDestino.filter((j) => j.UrlJsonContext.classificacao_passthru == arrayPost[y].clasificacion_passthru);
                         if (!duplicadorClassificacaoPassthru || data.em_caso_de_duplicidade == '1') {
                             arrayPost[y].classificacao_passthru = arrayPost[y].clasificacion_passthru;
                         }
