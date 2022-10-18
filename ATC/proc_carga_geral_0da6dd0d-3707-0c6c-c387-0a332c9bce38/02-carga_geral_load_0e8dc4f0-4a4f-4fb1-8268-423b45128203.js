@@ -805,429 +805,439 @@ async function init(json) {
                         }
 
                         //*aba:sitios
-                        //TODO revisar jsons
                         if (tabExcel == 'sitios') {
-                            let duplicadorAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number == arrayPost[y].asset_number);
-                            if (!duplicadorAssetNumber || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].asset_number = arrayPost[y].asset_number;
+                            let isAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number == objPost.asset_number);
+                            if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
+                                objPost.asset_number = objPost.asset_number;
                             }
-                            let duplicadorProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == arrayPost[y].profit_cost_center);
-                            if (!duplicadorProfitCostCenter || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].profit_cost_center = arrayPost[y].profit_cost_center;
+
+                            let isProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == objPost.profit_cost_center);
+                            if (!isProfitCostCenter || data.em_caso_de_duplicidade == '1') {
+                                objPost.profit_cost_center = objPost.profit_cost_center;
                             }
-                            let duplicadorNomeSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == arrayPost[y].nombre_sitio);
-                            if (!duplicadorNomeSitio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].site_name = arrayPost[y].nombre_sitio;
+
+                            let isNombreSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == objPost.nombre_sitio);
+                            if (!isNombreSitio || data.em_caso_de_duplicidade == '1') {
+                                objPost.site_name = objPost.nombre_sitio;
+                                delete objPost.nombre_sitio;
                             }
 
                             //*pesq.ref:compania_atc
-                            let empresaATCGrid = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
-                            let registroEmpresaATC = await getOnergyItem(empresaATCGrid, data.assid, data.usrid, null);
-                            let retornoEmpresaATC = registroEmpresaATC.filter((j) => j.UrlJsonContext.site == arrayPost[y].compania_atc);
-                            if (!retornoEmpresaATC) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].compania_atc}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idCompaniaATC = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
+                            let getCompaniaATC = await getOnergyItem(idCompaniaATC, data.assid, data.usrid, null);
+                            let isCompaniaATC = getCompaniaATC.filter((j) => j.UrlJsonContext.site == objPost.compania_atc);
+                            if (!isCompaniaATC) {
+                                status_desc = `ERROR: no hay "${objPost.compania_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorEmpresaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site__empresa_atc == arrayPost[y].compania_atc);
-                            if (!duplicadorEmpresaATC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].emp_atc_site__empresa_atc = retornoEmpresaATC[0] ? retornoEmpresaATC[0].UrlJsonContext.site : '';
-                                arrayPost[y].emp_atc_empresa_atc_id = retornoEmpresaATC[0] ? retornoEmpresaATC[0].ID : '';
+
+                            let isSitCompaniaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site__empresa_atc == objPost.compania_atc);
+                            if (!isSitCompaniaATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.emp_atc_site__empresa_atc = isCompaniaATC.length > 0 ? isCompaniaATC[0].UrlJsonContext.site : '';
+                                objPost.emp_atc_empresa_atc_id = isCompaniaATC.length > 0 ? isCompaniaATC[0].ID : '';
+                                objPost.emp_atc_site = isCompaniaATC.length > 0 ? isCompaniaATC[0].UrlJsonContext.site : '';
+                                delete objPost.compania_atc;
                             }
 
                             //*pesq.ref:municipio
-                            let MunicipioGrid = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
-                            let registroMunicipio = await getOnergyItem(MunicipioGrid, data.assid, data.usrid, null);
-                            let retornoMunicipio = registroMunicipio.filter((j) => j.UrlJsonContext.municipio == arrayPost[y].municipio);
-                            if (!retornoMunicipio) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].municipio}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
+                            let getMunicipio = await getOnergyItem(idMunicipio, data.assid, data.usrid, null);
+                            let isMunicipio = getMunicipio.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
+                            if (!isMunicipio) {
+                                status_desc = `ERROR: no hay "${objPost.municipio}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio == arrayPost[y].municipio);
-                            if (!duplicadorMunicipio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].loca_cida_municipio = retornoMunicipio[0] ? retornoMunicipio[0].UrlJsonContext.municipio : '';
-                                arrayPost[y].loca_cida_id = retornoMunicipio[0] ? retornoMunicipio[0].ID : '';
-                                arrayPost[y].loca_uf_uf = retornoMunicipio[0] ? retornoMunicipio[0].UrlJsonContext.uf : '';
-                                arrayPost[y].loca_uf_id = retornoMunicipio[0] ? retornoMunicipio[0].UrlJsonContext.uf_id : '';
+
+                            let isSitMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio == objPost.municipio);
+                            if (!isSitMunicipio || data.em_caso_de_duplicidade == '1') {
+                                objPost.loca_cida_municipio = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.municipio : '';
+                                objPost.loca_cida_id = isMunicipio.length > 0 ? isMunicipio[0].ID : '';
+                                objPost.loca_uf_uf = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.uf : '';
+                                objPost.loca_uf_id = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.uf_id : '';
+                                delete objPost.municipio;
+                                delete objPost.departamento;
                             }
 
-                            let duplicadorCodigoAncora = gridDestino.filter((j) => j.UrlJsonContext.codigo_ancora == arrayPost[y].codigo_anchor);
-                            if (!duplicadorCodigoAncora || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].codigo_ancora = arrayPost[y].codigo_anchor;
+                            let isCodigoAnchor = gridDestino.filter((j) => j.UrlJsonContext.codigo_ancora == objPost.codigo_anchor);
+                            if (!isCodigoAnchor || data.em_caso_de_duplicidade == '1') {
+                                objPost.codigo_ancora = objPost.codigo_anchor;
+                                delete objPost.codigo_anchor;
                             }
-                            let duplicadorLogradouro = gridDestino.filter((j) => j.UrlJsonContext.logradouro == arrayPost[y].direccion);
-                            if (!duplicadorLogradouro || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].logradouro = arrayPost[y].direccion;
+
+                            let isDireccion = gridDestino.filter((j) => j.UrlJsonContext.logradouro == objPost.direccion);
+                            if (!isDireccion || data.em_caso_de_duplicidade == '1') {
+                                objPost.logradouro = objPost.direccion;
+                                delete objPost.direccion;
                             }
 
                             //*pesq.ref:estado_sitio
-                            let StatusSiteGrid = 'f0ee1dd9-bb48-4aef-9f77-43e357870a31';
-                            let registroStatusSite = await getOnergyItem(StatusSiteGrid, data.assid, data.usrid, null);
-                            let retornoStatusSite = registroStatusSite.filter((j) => j.UrlJsonContext.status == arrayPost[y].estado_sitio);
-                            if (!retornoStatusSite) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].municipio}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idEstadoSitio = 'f0ee1dd9-bb48-4aef-9f77-43e357870a31';
+                            let getEstadoSitio = await getOnergyItem(idEstadoSitio, data.assid, data.usrid, null);
+                            let isEstadoSitio = getEstadoSitio.filter((j) => j.UrlJsonContext.status == objPost.estado_sitio);
+                            if (!isEstadoSitio) {
+                                status_desc = `ERROR: no hay "${objPost.municipio}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorStatusSite = gridDestino.filter((j) => j.UrlJsonContext.STAstatus__status_do_site == arrayPost[y].estado_sitio);
-                            if (!duplicadorStatusSite || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].sta_site_status__status_do_site = retornoStatusSite[0] ? retornoStatusSite[0].UrlJsonContext.status : '';
-                                arrayPost[y].sta_site_status_do_site_id = retornoStatusSite[0] ? retornoStatusSite[0].ID : '';
+
+                            let isSitEstadoSitio = gridDestino.filter((j) => j.UrlJsonContext.STAstatus__status_do_site == objPost.estado_sitio);
+                            if (!isSitEstadoSitio || data.em_caso_de_duplicidade == '1') {
+                                objPost.sta_site_status__status_do_site = isEstadoSitio.length > 0 ? isEstadoSitio[0].UrlJsonContext.status : '';
+                                objPost.sta_site_status_do_site_id = isEstadoSitio.length > 0 ? isEstadoSitio[0].ID : '';
+                                objPost.sta_site_status = isEstadoSitio.length > 0 ? isEstadoSitio[0].UrlJsonContext.status : '';
+                                delete objPost.estado_sitio;
                             }
 
                             //*pesq.ref:portafolio_atc
-                            let portfolioGrid = '18615527-c678-4f1c-87e0-d7a9735d0c6e';
-                            let registroPortfolio = await getOnergyItem(portfolioGrid, data.assid, data.usrid, null);
-                            let retornoPortfolio = registroPortfolio.filter((j) => j.UrlJsonContext.tipo_portifolio == arrayPost[y].portafolio_atc);
-                            if (!retornoPortfolio) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].portafolio_atc}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idPortafolioATC = '18615527-c678-4f1c-87e0-d7a9735d0c6e';
+                            let getPortafolioATC = await getOnergyItem(idPortafolioATC, data.assid, data.usrid, null);
+                            let isPortafolioATC = getPortafolioATC.filter((j) => j.UrlJsonContext.tipo_portifolio == objPost.portafolio_atc);
+                            if (!isPortafolioATC) {
+                                status_desc = `ERROR: no hay "${objPost.portafolio_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorPortfolio = gridDestino.filter(
-                                (j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == arrayPost[y].portafolio_atc
-                            );
-                            if (!duplicadorPortfolio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tppf_tipo_portifolio__portfolio = retornoPortfolio[0] ? retornoPortfolio[0].UrlJsonContext.tipo_portifolio : '';
-                                arrayPost[y].tppf_portfolio_id = retornoPortfolio[0] ? retornoPortfolio[0].ID : '';
+
+                            let isSitPortafolioATC = gridDestino.filter((j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == objPost.portafolio_atc);
+                            if (!isSitPortafolioATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.tppf_tipo_portifolio__portfolio = isPortafolioATC.length > 0 ? isPortafolioATC[0].UrlJsonContext.tipo_portifolio : '';
+                                objPost.tppf_tipo_portifolio_portfolio_id = isPortafolioATC.length > 0 ? isPortafolioATC[0].ID : '';
+                                objPost.tppf_portfolio_id = isPortafolioATC.length > 0 ? isPortafolioATC[0].ID : '';
+                                delete objPost.portafolio_atc;
                             }
 
                             //*pesq.ref:regional_atc
-                            let regiaoATCGrid = '74d8a818-46a7-4d56-8a18-2369bdd00589';
-                            let registroRegiaoATC = await getOnergyItem(regiaoATCGrid, data.assid, data.usrid, null);
-                            let retornoRegiaoATC = registroRegiaoATC.filter((j) => j.UrlJsonContext.regional == arrayPost[y].regional_atc);
-                            if (!retornoRegiaoATC) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].regional_atc}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idRegionalATC = '74d8a818-46a7-4d56-8a18-2369bdd00589';
+                            let getRegionalATC = await getOnergyItem(idRegionalATC, data.assid, data.usrid, null);
+                            let isRegionalATC = getRegionalATC.filter((j) => j.UrlJsonContext.regional == objPost.regional_atc);
+                            if (!isRegionalATC) {
+                                status_desc = `ERROR: no hay "${objPost.regional_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorRegiaoATC = gridDestino.filter((j) => j.UrlJsonContext.regio_regional__regiao_atc == arrayPost[y].regional_atc);
-                            if (!duplicadorRegiaoATC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].regio_regional__regiao_atc = retornoRegiaoATC[0] ? retornoRegiaoATC[0].UrlJsonContext.regional : '';
-                                arrayPost[y].regio_regiao_atc_id = retornoRegiaoATC[0] ? retornoRegiaoATC[0].ID : '';
+
+                            let isSitRegionalATC = gridDestino.filter((j) => j.UrlJsonContext.regio_regional__regiao_atc == objPost.regional_atc);
+                            if (!isSitRegionalATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.regio_regional__regiao_atc = isRegionalATC.length > 0 ? isRegionalATC[0].UrlJsonContext.regional : '';
+                                objPost.regio_regional_regiao_atc_id = isRegionalATC.length > 0 ? isRegionalATC[0].ID : '';
+                                objPost.regio_regiao_atc_id = isRegionalATC.length > 0 ? isRegionalATC[0].ID : '';
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:sitios sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'asset_number', true, false, false);
+                            // onergy.log(`JFS: aba:sitios sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
                         }
 
                         //*aba:informacion_cuenta
                         if (tabExcel == 'informacion_cuenta') {
-                            let duplicadorProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == arrayPost[y].profit_cost_center);
-                            if (!duplicadorProfitCostCenter || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].profit_cost_center = arrayPost[y].profit_cost_center;
+                            //*id_one_ref:sitios
+                            let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
+                            let paiFiltro = gerarFiltro('asset_number', objPost.asset_number);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, paiFiltro);
+
+                            let isProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == objPost.profit_cost_center);
+                            if (!isProfitCostCenter || data.em_caso_de_duplicidade == '1') {
+                                objPost.profit_cost_center = objPost.profit_cost_center;
                             }
 
-                            let duplicadorPortfolioATC = gridDestino.filter(
-                                (j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == arrayPost[y].portfolio_atc
-                            );
-                            if (!duplicadorPortfolioATC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tppf_tipo_portifolio__portfolio = arrayPost[y].portfolio_atc;
-                                delete arrayPost[y].portfolio_atc;
+                            let isPortafolioATC = gridDestino.filter((j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == objPost.portafolio_atc);
+                            if (!isPortafolioATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.tppf_tipo_portifolio__portfolio = objPost.portafolio_atc;
+                                delete objPost.portfolio_atc;
                             }
 
-                            let duplicadorAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number_IDC == arrayPost[y].asset_number);
-                            if (!duplicadorAssetNumber || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].asset_number_IDC = arrayPost[y].asset_number;
-                                arrayPost[y].asset_number = arrayPost[y].asset_number;
+                            let isAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number_IDC == objPost.asset_number);
+                            if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
+                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
+                                objPost.asset_number_IDC = objPost.asset_number;
+                                objPost.asset_number = objPost.asset_number;
                             }
 
-                            let duplicadorNomeSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == arrayPost[y].nombre_sitio);
-                            if (!duplicadorNomeSitio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].site_name = arrayPost[y].nombre_sitio;
-                                delete arrayPost[y].nombre_sitio;
+                            let isNombreSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == objPost.nombre_sitio);
+                            if (!isNombreSitio || data.em_caso_de_duplicidade == '1') {
+                                objPost.site_name = objPost.nombre_sitio;
+                                delete objPost.nombre_sitio;
                             }
 
-                            let duplicadorEmpresaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site == arrayPost[y].compania_atc);
-                            if (!duplicadorEmpresaATC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].emp_atc_site = arrayPost[y].compania_atc;
-                                delete arrayPost[y].compania_atc;
+                            let isCompaniaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site == objPost.compania_atc);
+                            if (!isCompaniaATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.emp_atc_site = objPost.compania_atc;
+                                delete objPost.compania_atc;
                             }
 
-                            let duplicadorContaInternaNIC = gridDestino.filter((j) => j.UrlJsonContext.conta_interna_nic == arrayPost[y].cuenta_interna_nic);
-                            if (!duplicadorContaInternaNIC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].conta_interna_nic = arrayPost[y].cuenta_interna_nic;
-                                delete arrayPost[y].cuenta_interna_nic;
+                            let isCuentaInternaNIC = gridDestino.filter((j) => j.UrlJsonContext.conta_interna_nic == objPost.cuenta_interna_nic);
+                            if (!isCuentaInternaNIC || data.em_caso_de_duplicidade == '1') {
+                                objPost.conta_interna_nic = objPost.cuenta_interna_nic;
+                                delete objPost.cuenta_interna_nic;
                             }
 
-                            let duplicadorContaPai = gridDestino.filter((j) => j.UrlJsonContext.prcs__conta_pai == arrayPost[y].cuenta_padre);
-                            if (!duplicadorContaPai || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].prcs__conta_pai = arrayPost[y].cuenta_padre;
-                                delete arrayPost[y].cuenta_padre;
+                            let isCuentaPadre = gridDestino.filter((j) => j.UrlJsonContext.prcs__conta_pai == objPost.cuenta_padre);
+                            if (!isCuentaPadre || data.em_caso_de_duplicidade == '1') {
+                                objPost.prcs__conta_pai = objPost.cuenta_padre;
+                                delete objPost.cuenta_padre;
                             }
 
                             //*pesq.ref:tipo_cuenta
-                            let tipoContaGrid = '84ca5970-7a49-4192-a2c8-030031503a1a';
-                            let registroTipoConta = await getOnergyItem(tipoContaGrid, data.assid, data.usrid, null);
-                            let retornoTipoConta = registroTipoConta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == arrayPost[y].tipo_cuenta);
-                            if (!retornoTipoConta) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].tipo_cuenta}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
+                            let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
+                            let isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.tipo_cuenta);
+                            if (!isTipoCuenta) {
+                                status_desc = `ERROR: no hay "${objPost.tipo_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorTipoConta = gridDestino.filter(
-                                (j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == arrayPost[y].tipo_cuenta
-                            );
-                            if (!duplicadorTipoConta || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].TCTC_tipo_de_conta__prcs__tipo_de_conta = retornoTipoConta[0]
-                                    ? retornoTipoConta[0].UrlJsonContext.TC_tipo_de_conta
-                                    : '';
-                                arrayPost[y].TCprcs__tipo_de_conta_id = retornoTipoConta[0] ? retornoTipoConta[0].ID : '';
-                                arrayPost[y].TCTC_tipo_de_conta__TC_tipo_de_conta_valor = retornoTipoConta[0]
-                                    ? retornoTipoConta[0].UrlJsonContext.TC_tipo_de_conta
-                                    : '';
-                                arrayPost[y].prcs__tipo_de_conta_cache = retornoTipoConta[0] ? retornoTipoConta[0].ID : '';
-                                delete arrayPost[y].tipo_cuenta;
+                            let isIdlcTipoCuenta = gridDestino.filter((j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == objPost.tipo_cuenta);
+                            if (!isIdlcTipoCuenta || data.em_caso_de_duplicidade == '1') {
+                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCprcs__tipo_de_conta_id = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
+                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.prcs__tipo_de_conta_cache = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
+                                delete objPost.tipo_cuenta;
                             }
 
-                            let duplicadorNumeroMedidor = gridDestino.filter((j) => j.UrlJsonContext.numero_do_medidor == arrayPost[y].numero_medidor);
-                            if (!duplicadorNumeroMedidor || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].numero_do_medidor = arrayPost[y].numero_medidor;
-                                delete arrayPost[y].numero_medidor;
+                            let isNumeroMedidor = gridDestino.filter((j) => j.UrlJsonContext.numero_do_medidor == objPost.numero_medidor);
+                            if (!isNumeroMedidor || data.em_caso_de_duplicidade == '1') {
+                                objPost.numero_do_medidor = objPost.numero_medidor;
+                                delete objPost.numero_medidor;
                             }
 
                             //*pesq.ref:suscriptor
-                            let empresaATCGrid = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
-                            let registroEmpresaATC = await getOnergyItem(empresaATCGrid, data.assid, data.usrid, null);
-                            let retornoEmpresaATC = registroEmpresaATC.filter((j) => j.UrlJsonContext.site == arrayPost[y].suscriptor);
-                            if (!retornoEmpresaATC) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].suscriptor}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idCompaniaATC = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
+                            let getCompaniaATC = await getOnergyItem(idCompaniaATC, data.assid, data.usrid, null);
+                            let isSuscriptor = getCompaniaATC.filter((j) => j.UrlJsonContext.site == objPost.suscriptor);
+                            if (!isSuscriptor) {
+                                status_desc = `ERROR: no hay "${objPost.suscriptor}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorSuscriptor = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site__prcs__assinante_atc == arrayPost[y].suscriptor);
-                            if (!duplicadorSuscriptor || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].emp_atc_site__prcs__assinante_atc = retornoEmpresaATC[0] ? retornoEmpresaATC[0].UrlJsonContext.site : '';
-                                arrayPost[y].emp_atc_prcs__assinante_atc_id = retornoEmpresaATC[0] ? retornoEmpresaATC[0].ID : '';
-                                delete arrayPost[y].suscriptor;
+                            let isIdlcSuscriptor = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site__prcs__assinante_atc == objPost.suscriptor);
+                            if (!isIdlcSuscriptor || data.em_caso_de_duplicidade == '1') {
+                                objPost.emp_atc_site__prcs__assinante_atc = isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.site : '';
+                                objPost.emp_atc_prcs__assinante_atc_id = isSuscriptor.length > 0 ? isSuscriptor[0].ID : '';
+                                delete objPost.suscriptor;
                             }
 
                             //*pesq.ref:estado_cuenta
-                            let statusContaGrid = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
-                            let registroStatusConta = await getOnergyItem(statusContaGrid, data.assid, data.usrid, null);
-                            let retornoStatusConta = registroStatusConta.filter((j) => j.UrlJsonContext.status_conta == arrayPost[y].estado_cuenta);
-                            if (!retornoStatusConta) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].estado_cuenta}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
+                            let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
+                            let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == objPost.estado_cuenta);
+                            if (!isEstadoCuenta) {
+                                status_desc = `ERROR: no hay "${objPost.estado_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorStatusConta = gridDestino.filter((j) => j.UrlJsonContext.sta_cont_status_conta == arrayPost[y].estado_cuenta);
-                            if (!duplicadorStatusConta || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].sta_cont_status_conta = retornoStatusConta[0] ? retornoStatusConta[0].UrlJsonContext.status_conta : '';
-                                arrayPost[y].sta_cont_id = retornoStatusConta[0] ? retornoStatusConta[0].ID : '';
+                            let isIdlcEstadoCuenta = gridDestino.filter((j) => j.UrlJsonContext.sta_cont_status_conta == objPost.estado_cuenta);
+                            if (!isIdlcEstadoCuenta || data.em_caso_de_duplicidade == '1') {
+                                objPost.sta_cont_status_conta = idEstadoCuenta[0] ? idEstadoCuenta[0].UrlJsonContext.status_conta : '';
+                                objPost.sta_cont_id = idEstadoCuenta[0] ? idEstadoCuenta[0].ID : '';
+                                delete objPost.estado_cuenta;
                             }
 
                             //*pesq.ref:nombre_proveedor
-                            let provedoresGrid = '4783ca0b-357d-42ab-a5c8-3328ee315f86';
-                            let registroProvedores = await getOnergyItem(provedoresGrid, data.assid, data.usrid, null);
-                            let retornoProvedores = registroProvedores.filter((j) => j.UrlJsonContext.nome_provedor == arrayPost[y].nombre_proveedor);
-                            if (!retornoProvedores) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].nombre_proveedor}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idProveedores = '4783ca0b-357d-42ab-a5c8-3328ee315f86';
+                            let getProveedores = await getOnergyItem(idProveedores, data.assid, data.usrid, null);
+                            let isProveedores = getProveedores.filter((j) => j.UrlJsonContext.nome_provedor == objPost.nombre_proveedor);
+                            if (!isProveedores) {
+                                status_desc = `ERROR: no hay "${objPost.nombre_proveedor}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorProvedores = gridDestino.filter((j) => j.UrlJsonContext.prvd_nome_provedor == arrayPost[y].nombre_proveedor);
-                            if (!duplicadorProvedores || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].prvd_nome_provedor = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.nome_provedor : '';
-                                arrayPost[y].prvd_id = retornoProvedores[0] ? retornoProvedores[0].ID : '';
-                                arrayPost[y].nome_provedor_id_cache = retornoProvedores[0] ? retornoProvedores[0].ID : '';
-                                arrayPost[y].prvd_nome_comercial = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.nome_comercial : '';
-                                arrayPost[y].prvd_nit_provedor = retornoProvedores[0] ? retornoProvedores[0].nit_provedor : '';
-                                arrayPost[y].prvd_nit_beneficiario = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.nit_beneficiario : '';
-                                arrayPost[y].prvd_beneficiario = retornoProvedores[0] ? retornoProvedores[0].beneficiario : '';
-                                arrayPost[y].prvd_apelido_provedor = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.apelido_provedor : '';
-                                arrayPost[y].prvd_link_web = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.link_web : '';
-                                arrayPost[y].prvd_usuario = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.usuario : '';
-                                arrayPost[y].prvd_senha = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.senha : '';
-                                delete arrayPost[y].nombre_proveedor;
+                            let isIdlcProveedores = gridDestino.filter((j) => j.UrlJsonContext.prvd_nome_provedor == objPost.nombre_proveedor);
+                            if (!isIdlcProveedores || data.em_caso_de_duplicidade == '1') {
+                                objPost.prvd_nome_provedor = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.nome_provedor : '';
+                                objPost.prvd_id = isProveedores.length > 0 ? isProveedores[0].ID : '';
+                                objPost.nome_provedor_id_cache = isProveedores.length > 0 ? isProveedores[0].ID : '';
+                                objPost.prvd_nome_comercial = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.nome_comercial : '';
+                                objPost.prvd_nit_provedor = isProveedores.length > 0 ? isProveedores[0].nit_provedor : '';
+                                objPost.prvd_nit_beneficiario = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.nit_beneficiario : '';
+                                objPost.prvd_beneficiario = isProveedores.length > 0 ? isProveedores[0].beneficiario : '';
+                                objPost.prvd_apelido_provedor = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.apelido_provedor : '';
+                                objPost.prvd_link_web = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.link_web : '';
+                                objPost.prvd_usuario = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.usuario : '';
+                                objPost.prvd_senha = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.senha : '';
+                                delete objPost.nombre_proveedor;
+                                delete objPost.nit_proveedor;
+                                delete objPost.nit_beneficiario;
+                                delete objPost.beneficiario;
+                                delete objPost.apodo_proveedor;
+                                delete objPost.link_web;
+                                delete objPost.usuario;
+                                delete objPost.contrasena;
                             }
 
                             //*pesq.ref:servicios
-                            let servicosGrid = '8e284e84-b8f9-45c1-abe2-991555441ea2';
-                            let registroServicos = await getOnergyItem(servicosGrid, data.assid, data.usrid, null);
-                            let retornoServicos = registroServicos.filter((j) => j.UrlJsonContext.servicos == arrayPost[y].servicios);
-                            if (!retornoServicos) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].servicios}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idServicios = '8e284e84-b8f9-45c1-abe2-991555441ea2';
+                            let getServicios = await getOnergyItem(idServicios, data.assid, data.usrid, null);
+                            let isServicios = getServicios.filter((j) => j.UrlJsonContext.servicos == objPost.servicios);
+                            if (!isServicios) {
+                                status_desc = `ERROR: no hay "${objPost.servicios}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorServicos = gridDestino.filter((j) => j.UrlJsonContext.SERVservicos__servico == arrayPost[y].servicios);
-                            if (!duplicadorServicos || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].SERVservicos__servico = retornoServicos[0] ? retornoServicos[0].UrlJsonContext.servicos : '';
-                                arrayPost[y].SERVservico_id = retornoServicos[0] ? retornoServicos[0].ID : '';
-                                delete arrayPost[y].servicios;
+                            let isIdlcServicios = gridDestino.filter((j) => j.UrlJsonContext.SERVservicos__servico == objPost.servicios);
+                            if (!isIdlcServicios || data.em_caso_de_duplicidade == '1') {
+                                objPost.SERVservicos__servico = isServicios.length > 0 ? isServicios[0].UrlJsonContext.servicos : '';
+                                objPost.SERVservico_id = isServicios.length > 0 ? isServicios[0].ID : '';
+                                delete objPost.servicios;
                             }
 
                             //*pesq.ref:sujeto_pasivo
-                            let sujeitoPassivoGrid = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
-                            let registroSujeitoPassivo = await getOnergyItem(sujeitoPassivoGrid, data.assid, data.usrid, null);
-                            let retornoSujeitoPassivo = registroSujeitoPassivo.filter((j) => j.UrlJsonContext.sujeito == arrayPost[y].sujeto_pasivo);
-                            if (!retornoSujeitoPassivo) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].sujeto_pasivo}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idSujetoPasivo = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
+                            let getSujetoPasivo = await getOnergyItem(idSujetoPasivo, data.assid, data.usrid, null);
+                            let isSujetoPasivo = getSujetoPasivo.filter((j) => j.UrlJsonContext.sujeito == objPost.sujeto_pasivo);
+                            if (!isSujetoPasivo) {
+                                status_desc = `ERROR: no hay "${objPost.sujeto_pasivo}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorSujeitoPassivo = gridDestino.filter(
-                                (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == arrayPost[y].sujeto_pasivo
+                            let isIdlcSujetoPasivo = gridDestino.filter(
+                                (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo
                             );
 
-                            if (!duplicadorSujeitoPassivo || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = retornoSujeitoPassivo[0]
-                                    ? retornoSujeitoPassivo[0].UrlJsonContext.sujeito
-                                    : '';
-                                arrayPost[y].suj_pa_prcs__sujeito_passivo_alumbrado_publico_id = retornoSujeitoPassivo[0] ? retornoSujeitoPassivo[0].ID : '';
-                                delete arrayPost[y].sujeto_pasivo;
+                            if (!isIdlcSujetoPasivo || data.em_caso_de_duplicidade == '1') {
+                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico =
+                                    isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
+                                objPost.suj_pa_prcs__sujeito_passivo_alumbrado_publico_id = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].ID : '';
+                                delete objPost.sujeto_pasivo;
                             }
 
-                            let duplicadorAcordoResolucao = gridDestino.filter(
-                                (j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == arrayPost[y].acuerdo_resolucion
+                            let isAcuerdoResolucion = gridDestino.filter(
+                                (j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion
                             );
-                            if (!duplicadorAcordoResolucao || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].prcs__acuerdo_resolucion_alumbrado_publico = arrayPost[y].acuerdo_resolucion;
-                                delete arrayPost[y].acuerdo_resolucion;
+                            if (!isAcuerdoResolucion || data.em_caso_de_duplicidade == '1') {
+                                objPost.prcs__acuerdo_resolucion_alumbrado_publico = objPost.acuerdo_resolucion;
+                                delete objPost.acuerdo_resolucion;
                             }
 
                             //*pesq.ref:tipo_cobro
-                            let tipoCobrancaGrid = '22538843-147f-4d41-9534-20a6d674f4b6';
-                            let registroTipoCobranca = await getOnergyItem(tipoCobrancaGrid, data.assid, data.usrid, null);
-                            let retornoTipoCobranca = registroTipoCobranca.filter((j) => j.UrlJsonContext.tipos_cobrancas == arrayPost[y].tipo_cobro);
-                            if (!retornoTipoCobranca) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].tipo_cobro}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idTipoCobro = '22538843-147f-4d41-9534-20a6d674f4b6';
+                            let getTipoCobro = await getOnergyItem(idTipoCobro, data.assid, data.usrid, null);
+                            let isTipoCobro = getTipoCobro.filter((j) => j.UrlJsonContext.tipos_cobrancas == objPost.tipo_cobro);
+                            if (!isTipoCobro) {
+                                status_desc = `ERROR: no hay "${objPost.tipo_cobro}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorTipoCobranca = gridDestino.filter(
-                                (j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca == arrayPost[y].tipo_cobro
-                            );
-                            if (!duplicadorTipoCobranca || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tipo_cobr_tipos_cobrancas__tipo_de_cobranca = retornoTipoCobranca[0]
-                                    ? retornoTipoCobranca[0].UrlJsonContext.tipos_cobrancas
-                                    : '';
-                                arrayPost[y].tipo_cobr_tipo_de_cobranca_id = retornoTipoCobranca[0] ? retornoTipoCobranca[0].ID : '';
-                                delete arrayPost[y].tipo_cobro;
+                            let isIdlcTipoCobro = gridDestino.filter((j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca == objPost.tipo_cobro);
+                            if (!isIdlcTipoCobro || data.em_caso_de_duplicidade == '1') {
+                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca = isTipoCobro[0] ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
+                                objPost.tipo_cobr_tipo_de_cobranca_id = isTipoCobro[0] ? isTipoCobro[0].ID : '';
+                                delete objPost.tipo_cobro;
                             }
 
-                            let duplicadorDiaPagamento = gridDestino.filter((j) => j.UrlJsonContext.prcs__dia_de_pagamento == arrayPost[y].dia_de_pago);
-                            if (!duplicadorDiaPagamento || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].prcs__dia_de_pagamento = arrayPost[y].dia_de_pago;
-                                delete arrayPost[y].dia_de_pago;
+                            let isDiaDePago = gridDestino.filter((j) => j.UrlJsonContext.prcs__dia_de_pagamento == objPost.dia_de_pago);
+                            if (!isDiaDePago || data.em_caso_de_duplicidade == '1') {
+                                objPost.prcs__dia_de_pagamento = objPost.dia_de_pago;
+                                delete objPost.dia_de_pago;
                             }
 
                             //*pesq.ref:frecuencia_pago
-                            let frequenciaPagamentoGrid = '2d4edce3-7131-413a-98e5-35d328daef7f';
-                            let registroFrequenciaPagamento = await getOnergyItem(frequenciaPagamentoGrid, data.assid, data.usrid, null);
-                            let retornoFrequenciaPagamento = registroFrequenciaPagamento.filter(
-                                (j) => j.UrlJsonContext.frequencia == arrayPost[y].frecuencia_pago
-                            );
-                            if (!retornoFrequenciaPagamento) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].frecuencia_pago}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
+                            let getFrecuenciaPago = await getOnergyItem(idFrecuenciaPago, data.assid, data.usrid, null);
+                            let isFrecuenciaPago = getFrecuenciaPago.filter((j) => j.UrlJsonContext.frequencia == objPost.frecuencia_pago);
+                            if (!isFrecuenciaPago) {
+                                status_desc = `ERROR: no hay "${objPost.frecuencia_pago}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorFrequenciaPagamento = gridDestino.filter(
-                                (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == arrayPost[y].frecuencia_pago
+                            let isIdlcFrecuenciaPago = gridDestino.filter(
+                                (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago
                             );
-                            if (!duplicadorFrequenciaPagamento || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].fre_pag_frequencia__frequencia_de_pagamento = retornoFrequenciaPagamento[0]
-                                    ? retornoFrequenciaPagamento[0].UrlJsonContext.frequencia
-                                    : '';
-                                arrayPost[y].fre_pag_frequencia_de_pagamento_id = retornoFrequenciaPagamento[0] ? retornoFrequenciaPagamento[0].ID : '';
-                                delete arrayPost[y].frecuencia_pago;
+                            if (!isIdlcFrecuenciaPago || data.em_caso_de_duplicidade == '1') {
+                                objPost.fre_pag_frequencia__frequencia_de_pagamento = isFrecuenciaPago[0] ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
+                                objPost.fre_pag_frequencia_de_pagamento_id = isFrecuenciaPago[0] ? isFrecuenciaPago[0].ID : '';
+                                delete objPost.frecuencia_pago;
                             }
 
                             //*pesq.ref:forma_pago
-                            let formaPagamentoGrid = '0e8a4463-28db-474f-926b-39fa1bd0c9bc';
-                            let registroFormaPagamento = await getOnergyItem(formaPagamentoGrid, data.assid, data.usrid, null);
-                            let retornoFormaPagamento = registroFormaPagamento.filter((j) => j.UrlJsonContext.formas_de_pagamentos == arrayPost[y].forma_pago);
-                            if (!retornoFormaPagamento) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].forma_pago}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idFormaPago = '0e8a4463-28db-474f-926b-39fa1bd0c9bc';
+                            let getFormaPago = await getOnergyItem(idFormaPago, data.assid, data.usrid, null);
+                            let isFormaPago = getFormaPago.filter((j) => j.UrlJsonContext.formas_de_pagamentos == objPost.forma_pago);
+                            if (!isFormaPago) {
+                                status_desc = `ERROR: no hay "${objPost.forma_pago}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorFormaPagamento = gridDestino.filter(
-                                (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == arrayPost[y].forma_pago
+                            let isIdlcFormaPago = gridDestino.filter(
+                                (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago
                             );
-                            if (!duplicadorFormaPagamento || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].for_pag_formas_de_pagamentos__forma_de_pagamento = retornoFormaPagamento[0]
-                                    ? retornoFormaPagamento[0].UrlJsonContext.formas_de_pagamentos
+                            if (!isIdlcFormaPago || data.em_caso_de_duplicidade == '1') {
+                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento = isFormaPago[0]
+                                    ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos
                                     : '';
-                                arrayPost[y].for_pag_forma_de_pagamento_id = retornoFormaPagamento[0] ? retornoFormaPagamento[0].ID : '';
-                                delete arrayPost[y].forma_pago;
+                                objPost.for_pag_forma_de_pagamento_id = isFormaPago[0] ? isFormaPago[0].ID : '';
+                                delete objPost.forma_pago;
                             }
 
                             //*pesq.ref:clasificacion_passthru
-                            let classificacaoPassthruGrid = 'ad62c737-2abc-4c71-a572-e11933114ed8';
-                            let registroClassificacaoPassthru = await getOnergyItem(classificacaoPassthruGrid, data.assid, data.usrid, null);
-                            let retornoClassificacaoPassthru = registroClassificacaoPassthru.filter(
-                                (j) => j.UrlJsonContext.classificacao_passthru == arrayPost[y].clasificacion_passthru
+                            let idClasificacionPassthru = 'ad62c737-2abc-4c71-a572-e11933114ed8';
+                            let getClasificacionPassthru = await getOnergyItem(idClasificacionPassthru, data.assid, data.usrid, null);
+                            let isClasificacionPassthru = getClasificacionPassthru.filter(
+                                (j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru
                             );
-                            if (!retornoClassificacaoPassthru) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].clasificacion_passthru}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            if (!isClasificacionPassthru) {
+                                status_desc = `ERROR: no hay "${objPost.clasificacion_passthru}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorClassificacaoPassthru = gridDestino.filter(
-                                (j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == arrayPost[y].clasificacion_passthru
+                            let isIdlcClasificacionPassthru = gridDestino.filter(
+                                (j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru
                             );
-                            if (!duplicadorClassificacaoPassthru || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].CPTclassificacao_passthru__prcs__clasificacion_passthru = retornoClassificacaoPassthru[0]
-                                    ? retornoClassificacaoPassthru[0].UrlJsonContext.classificacao_passthru
+                            if (!isIdlcClasificacionPassthru || data.em_caso_de_duplicidade == '1') {
+                                objPost.CPTclassificacao_passthru__prcs__clasificacion_passthru = isClasificacionPassthru[0]
+                                    ? isClasificacionPassthru[0].UrlJsonContext.classificacao_passthru
                                     : '';
-                                arrayPost[y].CPTprcs__clasificacion_passthru_id = retornoClassificacaoPassthru[0] ? retornoClassificacaoPassthru[0].ID : '';
-                                delete arrayPost[y].clasificacion_passthru;
+                                objPost.CPTprcs__clasificacion_passthru_id = isClasificacionPassthru[0] ? isClasificacionPassthru[0].ID : '';
+                                delete objPost.clasificacion_passthru;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:informacion_cuenta sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'asset_number', true, false, false);
-
-                            //TODO to fazendo a carga de um grid filho
-                            //TODO minha carga nao sabe o ID_ONE_REF do grid pai
-                            //TODO como referenciar o grid filho ao grid pai?
+                            // onergy.log(`JFS: aba:informacion_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
                         }
 
                         //*aba:informacion_tecnica
