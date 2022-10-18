@@ -64,7 +64,6 @@ function replaceAll(content, needle, replacement) {
 function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
-
 /**CLI_SCRIPT**
  * Executar automático quando em processo: Não
  * Atividade de longa duração: Não
@@ -254,553 +253,555 @@ async function init(json) {
 
                     //*para cada linha do array de post, verifica se existe registro no grid destino
                     for (let y in arrayPost) {
-                        arrayPost[y].onergyteam_equipe = arrayPost[y].equipe;
-                        arrayPost[y].onergyteam_id = arrayPost[y].id_equipe_txt;
-                        delete arrayPost[y].id_equipe_txt;
+                        let objPost = arrayPost[y];
+                        objPost.onergyteam_equipe = objPost.equipe;
+                        objPost.onergyteam_id = objPost.id_equipe_txt;
+                        delete objPost.id_equipe_txt;
 
                         //*aba:categorias
                         if (tabExcel == 'categorias') {
-                            let duplicadorCategorias = gridDestino.filter((j) => j.UrlJsonContext.categorias == arrayPost[y].categorias);
-                            if (!duplicadorCategorias || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].categorias = arrayPost[y].categorias;
+                            let isCategorias = gridDestino.filter((j) => j.UrlJsonContext.categorias == objPost.categorias);
+                            if (!isCategorias || data.em_caso_de_duplicidade == '1') {
+                                objPost.categorias = objPost.categorias;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:categorias sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'categorias', true, false, false);
+                            // onergy.log(`JFS: aba:categorias sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'categorias', true, false, false);
                         }
 
                         //*aba:departamento
                         if (tabExcel == 'departamento') {
-                            let duplicadorUf = gridDestino.filter((j) => j.UrlJsonContext.uf == arrayPost[y].departamento_sigla);
-                            if (!duplicadorUf || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].uf = arrayPost[y].departamento_sigla;
-                                arrayPost[y].estado = arrayPost[y].departamento;
-                                delete arrayPost[y].departamento_sigla;
-                                delete arrayPost[y].departamento;
+                            let isDepartamento = gridDestino.filter((j) => j.UrlJsonContext.uf == objPost.departamento_sigla);
+                            if (!isDepartamento || data.em_caso_de_duplicidade == '1') {
+                                objPost.uf = objPost.departamento_sigla;
+                                objPost.estado = objPost.departamento;
+                                delete objPost.departamento_sigla;
+                                delete objPost.departamento;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:departamento sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'uf', true, false, false);
+                            // onergy.log(`JFS: aba:departamento sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'uf', true, false, false);
                         }
 
                         //*aba:municipio
                         if (tabExcel == 'municipio') {
                             //*pesq.ref:departamento
-                            let ufGrid = '132b8394-2193-4d83-a399-08f4cde70873';
-                            let registroUf = await getOnergyItem(ufGrid, data.assid, data.usrid, null);
-                            let retornoUf = registroUf.filter((j) => j.UrlJsonContext.uf == arrayPost[y].departamento);
-                            if (!retornoUf) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].departamento}" registrado para ${tabExcel} de "${arrayPost[y].municipio}"`;
+                            let idDepartamento = '132b8394-2193-4d83-a399-08f4cde70873';
+                            let getDepartamento = await getOnergyItem(idDepartamento, data.assid, data.usrid, null);
+                            let isDepartamento = getDepartamento.filter((j) => j.UrlJsonContext.uf == objPost.departamento);
+                            if (!isDepartamento) {
+                                status_desc = `ERROR: no hay "${objPost.departamento}" registrado para ${tabExcel} de "${objPost.municipio}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorCidade = gridDestino.filter((j) => j.UrlJsonContext.municipio == arrayPost[y].municipio);
-                            if (!duplicadorCidade || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].loca_uf_uf = retornoUf[0] ? retornoUf[0].UrlJsonContext.uf : '';
-                                arrayPost[y].loca_uf_id = retornoUf[0] ? retornoUf[0].ID : '';
-                                arrayPost[y].municipio = arrayPost[y].municipio;
+
+                            let isMunicipio = gridDestino.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
+                            if (!isMunicipio || data.em_caso_de_duplicidade == '1') {
+                                objPost.loca_uf_uf = isDepartamento.length > 0 ? isDepartamento[0].UrlJsonContext.uf : '';
+                                objPost.loca_uf_id = isDepartamento.length > 0 ? isDepartamento[0].ID : '';
+                                objPost.municipio = objPost.municipio;
+                                delete objPost.departamento;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:municipio sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'municipio', true, false, false);
+                            // onergy.log(`JFS: aba:municipio sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'municipio', true, false, false);
                         }
 
                         //*aba:compania_atc
                         if (tabExcel == 'compania_atc') {
-                            let duplicadorEmpresa = gridDestino.filter((j) => j.UrlJsonContext.site == arrayPost[y].compania_atc);
-                            if (!duplicadorEmpresa || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].site = arrayPost[y].compania_atc;
-                                delete arrayPost[y].compania_atc;
+                            let isCompaniaATC = gridDestino.filter((j) => j.UrlJsonContext.site == objPost.compania_atc);
+                            if (!isCompaniaATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.site = objPost.compania_atc;
+                                delete objPost.compania_atc;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:compania_atc sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'site', true, false, false);
+                            // onergy.log(`JFS: aba:compania_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'site', true, false, false);
                         }
 
                         //*aba:forma_pago
                         if (tabExcel == 'forma_pago') {
-                            let duplicadorFormaPagamento = gridDestino.filter((j) => j.UrlJsonContext.formas_de_pagamentos == arrayPost[y].forma_pago);
-                            if (!duplicadorFormaPagamento || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].formas_de_pagamentos = arrayPost[y].forma_pago;
-                                delete arrayPost[y].forma_pago;
+                            let isFormaPago = gridDestino.filter((j) => j.UrlJsonContext.formas_de_pagamentos == objPost.forma_pago);
+                            if (!isFormaPago || data.em_caso_de_duplicidade == '1') {
+                                objPost.formas_de_pagamentos = objPost.forma_pago;
+                                delete objPost.forma_pago;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:forma_pago sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'formas_de_pagamentos', true, false, false);
+                            // onergy.log(`JFS: aba:forma_pago sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'formas_de_pagamentos', true, false, false);
                         }
 
                         //*aba:frecuencia_pago
                         if (tabExcel == 'frecuencia_pago') {
-                            let duplicadorFrequencia = gridDestino.filter((j) => j.UrlJsonContext.frequencia == arrayPost[y].frecuencia_pago);
-                            if (!duplicadorFrequencia || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].frequencia = arrayPost[y].frecuencia_pago;
-                                delete arrayPost[y].frecuencia_pago;
+                            let isFrequencia = gridDestino.filter((j) => j.UrlJsonContext.frequencia == objPost.frecuencia_pago);
+                            if (!isFrequencia || data.em_caso_de_duplicidade == '1') {
+                                objPost.frequencia = objPost.frecuencia_pago;
+                                delete objPost.frecuencia_pago;
                             }
 
-                            let duplicadorFrequenciaMeses = gridDestino.filter((j) => j.UrlJsonContext.frequencia_em_meses == arrayPost[y].frecuencia_meses);
-                            if (!duplicadorFrequenciaMeses || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].frequencia_em_meses = arrayPost[y].frecuencia_meses;
-                                delete arrayPost[y].frecuencia_meses;
+                            let isFrequenciaMeses = gridDestino.filter((j) => j.UrlJsonContext.frequencia_em_meses == objPost.frecuencia_meses);
+                            if (!isFrequenciaMeses || data.em_caso_de_duplicidade == '1') {
+                                objPost.frequencia_em_meses = objPost.frecuencia_meses;
+                                delete objPost.frecuencia_meses;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:frecuencia_pago sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'frequencia', true, false, false);
+                            // onergy.log(`JFS: aba:frecuencia_pago sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'frequencia', true, false, false);
                         }
 
                         //*aba:lecturas
                         if (tabExcel == 'lecturas') {
-                            let duplicadorLectura = gridDestino.filter((j) => j.UrlJsonContext.LCT_ferramentas == arrayPost[y].herramientas);
-                            if (!duplicadorLectura || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].LCT_ferramentas = arrayPost[y].herramientas;
-                                delete arrayPost[y].herramientas;
+                            let isLecturas = gridDestino.filter((j) => j.UrlJsonContext.LCT_ferramentas == objPost.herramientas);
+                            if (!isLecturas || data.em_caso_de_duplicidade == '1') {
+                                objPost.LCT_ferramentas = objPost.herramientas;
+                                delete objPost.herramientas;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:lecturas sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'LCT_ferramentas', true, false, false);
+                            // onergy.log(`JFS: aba:lecturas sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'LCT_ferramentas', true, false, false);
                         }
 
                         //*aba:portafolio_atc
                         if (tabExcel == 'portafolio_atc') {
-                            let duplicadorPortifolio = gridDestino.filter((j) => j.UrlJsonContext.tipo_portifolio == arrayPost[y].portafolio_atc);
-                            if (!duplicadorPortifolio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tipo_portifolio = arrayPost[y].portafolio_atc;
-                                delete arrayPost[y].portafolio_atc;
+                            let isPortafolioATC = gridDestino.filter((j) => j.UrlJsonContext.tipo_portifolio == objPost.portafolio_atc);
+                            if (!isPortafolioATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.tipo_portifolio = objPost.portafolio_atc;
+                                delete objPost.portafolio_atc;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:portafolio_atc sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'tipo_portifolio', true, false, false);
+                            // onergy.log(`JFS: aba:portafolio_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'tipo_portifolio', true, false, false);
                         }
 
                         //*aba:regional_atc
                         if (tabExcel == 'regional_atc') {
-                            let duplicadorRegional = gridDestino.filter((j) => j.UrlJsonContext.regional == arrayPost[y].regional_atc);
-                            if (!duplicadorRegional || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].regional = arrayPost[y].regional_atc;
-                                delete arrayPost[y].regional_atc;
+                            let isRegionalATC = gridDestino.filter((j) => j.UrlJsonContext.regional == objPost.regional_atc);
+                            if (!isRegionalATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.regional = objPost.regional_atc;
+                                delete objPost.regional_atc;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:regional_atc sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'regional', true, false, false);
+                            // onergy.log(`JFS: aba:regional_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'regional', true, false, false);
                         }
 
                         //*aba:servicios
                         if (tabExcel == 'servicios') {
-                            let duplicadorServico = gridDestino.filter((j) => j.UrlJsonContext.servicos == arrayPost[y].servicios);
-                            if (!duplicadorServico || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].servicos = arrayPost[y].servicios;
-                                delete arrayPost[y].servicios;
+                            let isServicios = gridDestino.filter((j) => j.UrlJsonContext.servicos == objPost.servicios);
+                            if (!isServicios || data.em_caso_de_duplicidade == '1') {
+                                objPost.servicos = objPost.servicios;
+                                delete objPost.servicios;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:servicios sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'servicos', true, false, false);
+                            // onergy.log(`JFS: aba:servicios sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'servicos', true, false, false);
                         }
 
                         //*aba:estado_cuenta
                         if (tabExcel == 'estado_cuenta') {
-                            let duplicadorEstadoCuenta = gridDestino.filter((j) => j.UrlJsonContext.status_conta == arrayPost[y].estado_cuenta);
-                            if (!duplicadorEstadoCuenta || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].status_conta = arrayPost[y].estado_cuenta;
-                                delete arrayPost[y].estado_cuenta;
+                            let isEstadoCuenta = gridDestino.filter((j) => j.UrlJsonContext.status_conta == objPost.estado_cuenta);
+                            if (!isEstadoCuenta || data.em_caso_de_duplicidade == '1') {
+                                objPost.status_conta = objPost.estado_cuenta;
+                                delete objPost.estado_cuenta;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:estado_cuenta sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'status_conta', true, false, false);
+                            // onergy.log(`JFS: aba:estado_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'status_conta', true, false, false);
                         }
 
                         //*aba:estado_sitio
                         if (tabExcel == 'estado_sitio') {
-                            let duplicadorEstadoSitio = gridDestino.filter((j) => j.UrlJsonContext.status == arrayPost[y].estado_sitio);
-                            if (!duplicadorEstadoSitio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].status = arrayPost[y].estado_sitio;
-                                delete arrayPost[y].estado_sitio;
+                            let isEstadoSitio = gridDestino.filter((j) => j.UrlJsonContext.status == objPost.estado_sitio);
+                            if (!isEstadoSitio || data.em_caso_de_duplicidade == '1') {
+                                objPost.status = objPost.estado_sitio;
+                                delete objPost.estado_sitio;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:estado_sitio sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'status', true, false, false);
+                            // onergy.log(`JFS: aba:estado_sitio sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'status', true, false, false);
                         }
 
                         //*aba:sujeto_pasivo
                         if (tabExcel == 'sujeto_pasivo') {
-                            let duplicadorSujetoPasivo = gridDestino.filter((j) => j.UrlJsonContext.sujeito == arrayPost[y].sujeto_pasivo);
-                            if (!duplicadorSujetoPasivo || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].sujeito = arrayPost[y].sujeto_pasivo;
-                                delete arrayPost[y].sujeto_pasivo;
+                            let isSujetoPasivo = gridDestino.filter((j) => j.UrlJsonContext.sujeito == objPost.sujeto_pasivo);
+                            if (!isSujetoPasivo || data.em_caso_de_duplicidade == '1') {
+                                objPost.sujeito = objPost.sujeto_pasivo;
+                                delete objPost.sujeto_pasivo;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:sujeto_pasivo sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'sujeito', true, false, false);
+                            // onergy.log(`JFS: aba:sujeto_pasivo sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'sujeito', true, false, false);
                         }
 
                         //*aba:tipo_cobro
                         if (tabExcel == 'tipo_cobro') {
-                            let duplicadorTipoCobro = gridDestino.filter((j) => j.UrlJsonContext.tipos_cobrancas == arrayPost[y].tipo_cobro);
-                            if (!duplicadorTipoCobro || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tipos_cobrancas = arrayPost[y].tipo_cobro;
-                                delete arrayPost[y].tipo_cobro;
+                            let isTipoCobro = gridDestino.filter((j) => j.UrlJsonContext.tipos_cobrancas == objPost.tipo_cobro);
+                            if (!isTipoCobro || data.em_caso_de_duplicidade == '1') {
+                                objPost.tipos_cobrancas = objPost.tipo_cobro;
+                                delete objPost.tipo_cobro;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:tipo_cobro sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'tipos_cobrancas', true, false, false);
+                            // onergy.log(`JFS: aba:tipo_cobro sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'tipos_cobrancas', true, false, false);
                         }
 
                         //*aba:tipo_tercero
                         if (tabExcel == 'tipo_tercero') {
-                            let duplicadorTipoTercero = gridDestino.filter((j) => j.UrlJsonContext.tipo_de_terceiro == arrayPost[y].tipo_tercero);
-                            if (!duplicadorTipoTercero || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tipo_de_terceiro = arrayPost[y].tipo_tercero;
-                                delete arrayPost[y].tipo_tercero;
+                            let isTipoTercero = gridDestino.filter((j) => j.UrlJsonContext.tipo_de_terceiro == objPost.tipo_tercero);
+                            if (!isTipoTercero || data.em_caso_de_duplicidade == '1') {
+                                objPost.tipo_de_terceiro = objPost.tipo_tercero;
+                                delete objPost.tipo_tercero;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:tipo_tercero sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'tipo_de_terceiro', true, false, false);
+                            // onergy.log(`JFS: aba:tipo_tercero sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'tipo_de_terceiro', true, false, false);
                         }
 
                         //*aba:tipo_acceso
                         if (tabExcel == 'tipo_acceso') {
-                            let duplicadorTipoAcesso = gridDestino.filter((j) => j.UrlJsonContext.tipo_de_acesso == arrayPost[y].tipo_acceso);
-                            if (!duplicadorTipoAcesso || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tipo_de_acesso = arrayPost[y].tipo_acceso;
-                                delete arrayPost[y].tipo_acceso;
+                            let isTipoAcesso = gridDestino.filter((j) => j.UrlJsonContext.tipo_de_acesso == objPost.tipo_acceso);
+                            if (!isTipoAcesso || data.em_caso_de_duplicidade == '1') {
+                                objPost.tipo_de_acesso = objPost.tipo_acceso;
+                                delete objPost.tipo_acceso;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:tipo_acceso sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'tipo_de_acesso', true, false, false);
+                            // onergy.log(`JFS: aba:tipo_acceso sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'tipo_de_acesso', true, false, false);
                         }
 
                         //*aba:tipo_cuenta
                         if (tabExcel == 'tipo_cuenta') {
-                            let duplicadorTipoCuenta = gridDestino.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == arrayPost[y].tipo_cuenta);
-                            if (!duplicadorTipoCuenta || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].TC_tipo_de_conta = arrayPost[y].tipo_cuenta;
-                                delete arrayPost[y].tipo_cuenta;
+                            let isTipoCuenta = gridDestino.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.tipo_cuenta);
+                            if (!isTipoCuenta || data.em_caso_de_duplicidade == '1') {
+                                objPost.TC_tipo_de_conta = objPost.tipo_cuenta;
+                                delete objPost.tipo_cuenta;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:tipo_cuenta sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'TC_tipo_de_conta', true, false, false);
+                            // onergy.log(`JFS: aba:tipo_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'TC_tipo_de_conta', true, false, false);
                         }
 
                         //*aba:proveedores
-                        //TODO revisar jsons
                         if (tabExcel == 'proveedores') {
-                            let duplicadorNITProvedor = gridDestino.filter((j) => j.UrlJsonContext.nit_provedor == arrayPost[y].nit_proveedor);
-                            if (!duplicadorNITProvedor || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].nit_provedor = arrayPost[y].nit_proveedor;
+                            let isNITProveedor = gridDestino.filter((j) => j.UrlJsonContext.nit_provedor == objPost.nit_proveedor);
+                            if (!isNITProveedor || data.em_caso_de_duplicidade == '1') {
+                                objPost.nit_provedor = objPost.nit_proveedor;
+                                delete objPost.nit_proveedor;
                             }
-                            let duplicadorNomeProvedor = gridDestino.filter((j) => j.UrlJsonContext.nome_provedor == arrayPost[y].nombre_proveedor);
-                            if (!duplicadorNomeProvedor || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].nome_provedor = arrayPost[y].nombre_proveedor;
+
+                            let isNombreProveedor = gridDestino.filter((j) => j.UrlJsonContext.nome_provedor == objPost.nombre_proveedor);
+                            if (!isNombreProveedor || data.em_caso_de_duplicidade == '1') {
+                                objPost.nome_provedor = objPost.nombre_proveedor;
+                                delete objPost.nombre_proveedor;
                             }
-                            let duplicadorNITBeneficiario = gridDestino.filter((j) => j.UrlJsonContext.nit_beneficiario == arrayPost[y].nit_beneficiario);
-                            if (!duplicadorNITBeneficiario || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].nit_beneficiario = arrayPost[y].nit_beneficiario;
+
+                            let isNITBeneficiario = gridDestino.filter((j) => j.UrlJsonContext.nit_beneficiario == objPost.nit_beneficiario);
+                            if (!isNITBeneficiario || data.em_caso_de_duplicidade == '1') {
+                                objPost.nit_beneficiario = objPost.nit_beneficiario;
                             }
-                            let duplicadorNomeBeneficiario = gridDestino.filter((j) => j.UrlJsonContext.beneficiario == arrayPost[y].nombre_beneficiario);
-                            if (!duplicadorNomeBeneficiario || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].beneficiario = arrayPost[y].nombre_beneficiario;
+
+                            let isNombreBeneficiario = gridDestino.filter((j) => j.UrlJsonContext.beneficiario == objPost.nombre_beneficiario);
+                            if (!isNombreBeneficiario || data.em_caso_de_duplicidade == '1') {
+                                objPost.beneficiario = objPost.nombre_beneficiario;
+                                delete objPost.nombre_beneficiario;
                             }
 
                             //*pesq.ref:tipo_tercero
-                            let tipoTerceiroGrid = '70110b99-aa96-4e25-b1b2-177484668700';
-                            let registroTipoTerceiro = await getOnergyItem(tipoTerceiroGrid, data.assid, data.usrid, null);
-                            let retornoTipoTerceiro = registroTipoTerceiro.filter((j) => j.UrlJsonContext.tipo_de_terceiro == arrayPost[y].tipo_tercero);
-                            if (!retornoTipoTerceiro) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].tipo_tercero}" registrado para ${tabExcel} de "${arrayPost[y].nit_proveedor}"`;
+                            let idTipoTercero = '70110b99-aa96-4e25-b1b2-177484668700';
+                            let getTipoTercero = await getOnergyItem(idTipoTercero, data.assid, data.usrid, null);
+                            let isTipoTercero = getTipoTercero.filter((j) => j.UrlJsonContext.tipo_de_terceiro == objPost.tipo_tercero);
+                            if (!isTipoTercero) {
+                                status_desc = `ERROR: no hay "${objPost.tipo_tercero}" registrado para ${tabExcel} de "${objPost.nit_proveedor}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorTipoTerceiro = gridDestino.filter((j) => j.UrlJsonContext.tp3o_tipo_de_terceiro == arrayPost[y].tipo_tercero);
-                            if (!duplicadorTipoTerceiro || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tp3o_tipo_de_terceiro = retornoTipoTerceiro[0] ? retornoTipoTerceiro[0].UrlJsonContext.tipo_de_terceiro : '';
-                                arrayPost[y].tp3o_id = retornoTipoTerceiro[0] ? retornoTipoTerceiro[0].ID : '';
+
+                            let isPrvdTipoTercero = gridDestino.filter((j) => j.UrlJsonContext.tp3o_tipo_de_terceiro == objPost.tipo_tercero);
+                            if (!isPrvdTipoTercero || data.em_caso_de_duplicidade == '1') {
+                                objPost.tp3o_tipo_de_terceiro = isTipoTercero.length > 0 ? isTipoTercero[0].UrlJsonContext.tipo_de_terceiro : '';
+                                objPost.tp3o_id = isTipoTercero.length > 0 ? isTipoTercero[0].ID : '';
+                                delete objPost.tipo_tercero;
                             }
 
-                            let duplicadorNomeComercial = gridDestino.filter((j) => j.UrlJsonContext.nome_comercial == arrayPost[y].nombre_comercial);
-                            if (!duplicadorNomeComercial || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].nome_comercial = arrayPost[y].nombre_comercial;
+                            let isNombreComercial = gridDestino.filter((j) => j.UrlJsonContext.nome_comercial == objPost.nombre_comercial);
+                            if (!isNombreComercial || data.em_caso_de_duplicidade == '1') {
+                                objPost.nome_comercial = objPost.nombre_comercial;
+                                delete objPost.nombre_comercial;
                             }
 
                             //*lst.susp:tiene_cuenta_padre
-                            arrayPost[y].tiene_cuenta_padre = arrayPost[y].tiene_cuenta_padre == 'SI' ? 'sim' : 'nao';
-                            let duplicadorTemContaPai = gridDestino.filter((j) => j.UrlJsonContext.prvd__tem_conta_pai == arrayPost[y].tiene_cuenta_padre);
-                            if (!duplicadorTemContaPai || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].prvd__tem_conta_pai = arrayPost[y].tiene_cuenta_padre;
+                            objPost.tiene_cuenta_padre = objPost.tiene_cuenta_padre == 'SI' ? 'sim' : 'nao';
+                            let isTieneCuentaPadre = gridDestino.filter((j) => j.UrlJsonContext.prvd__tem_conta_pai == objPost.tiene_cuenta_padre);
+                            if (!isTieneCuentaPadre || data.em_caso_de_duplicidade == '1') {
+                                objPost.prvd__tem_conta_pai = objPost.tiene_cuenta_padre;
+                                objPost.prvd__tem_conta_pai_desc = objPost.tiene_cuenta_padre == 'sim' ? 'Sim' : 'Não';
+                                delete objPost.tiene_cuenta_padre;
                             }
 
                             //*pesq.ref:tipo_acceso
-                            let tipoAcessoGrid = '62e9a129-73b5-4819-9c16-f1d4bdababde';
-                            let registroTipoAcesso = await getOnergyItem(tipoAcessoGrid, data.assid, data.usrid, null);
-                            let retornoTipoAcesso = registroTipoAcesso.filter((j) => j.UrlJsonContext.tipo_de_acesso == arrayPost[y].tipo_acceso);
-                            if (!retornoTipoAcesso) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].tipo_acceso}" registrado para ${tabExcel} de "${arrayPost[y].nit_proveedor}"`;
+                            let idTipoAcceso = '62e9a129-73b5-4819-9c16-f1d4bdababde';
+                            let getTipoAcceso = await getOnergyItem(idTipoAcceso, data.assid, data.usrid, null);
+                            let isTipoAcceso = getTipoAcceso.filter((j) => j.UrlJsonContext.tipo_de_acesso == objPost.tipo_acceso);
+                            if (!isTipoAcceso) {
+                                status_desc = `ERROR: no hay "${objPost.tipo_acceso}" registrado para ${tabExcel} de "${objPost.nit_proveedor}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorTipoAcesso = gridDestino.filter((j) => j.UrlJsonContext.tp_acces_tipo_de_acesso == arrayPost[y].tipo_acceso);
-                            if (!duplicadorTipoAcesso || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tp_acces_tipo_de_acesso = retornoTipoAcesso[0] ? retornoTipoAcesso[0].UrlJsonContext.tipo_de_acesso : '';
-                                arrayPost[y].tp_acces_id = retornoTipoAcesso[0] ? retornoTipoAcesso[0].ID : '';
+
+                            let isPrvdTipoAcceso = gridDestino.filter((j) => j.UrlJsonContext.tp_acces_tipo_de_acesso == objPost.tipo_acceso);
+                            if (!isPrvdTipoAcceso || data.em_caso_de_duplicidade == '1') {
+                                objPost.tp_acces_tipo_de_acesso = isTipoAcceso.length > 0 ? isTipoAcceso[0].UrlJsonContext.tipo_de_acesso : '';
+                                objPost.tp_acces_id = isTipoAcceso.length > 0 ? isTipoAcceso[0].ID : '';
+                                delete objPost.tipo_acceso;
                             }
 
-                            let duplicadorApelidoProvedor = gridDestino.filter((j) => j.UrlJsonContext.apelido_provedor == arrayPost[y].apodo_proveedor);
-                            if (!duplicadorApelidoProvedor || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].apelido_provedor = arrayPost[y].apodo_proveedor;
-                            }
-                            let duplicadorLinkWeb = gridDestino.filter((j) => j.UrlJsonContext.link_web == arrayPost[y].link_web);
-                            if (!duplicadorLinkWeb || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].link_web = arrayPost[y].link_web;
-                            }
-                            let duplicadorUsuario = gridDestino.filter((j) => j.UrlJsonContext.usuario == arrayPost[y].usuario);
-                            if (!duplicadorUsuario || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].usuario = arrayPost[y].usuario;
-                            }
-                            let duplicadorSenha = gridDestino.filter((j) => j.UrlJsonContext.senha == arrayPost[y].contrasena);
-                            if (!duplicadorSenha || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].senha = arrayPost[y].contrasena;
+                            let isApodoProveedor = gridDestino.filter((j) => j.UrlJsonContext.apelido_provedor == objPost.apodo_proveedor);
+                            if (!isApodoProveedor || data.em_caso_de_duplicidade == '1') {
+                                objPost.apelido_provedor = objPost.apodo_proveedor;
+                                delete objPost.apodo_proveedor;
                             }
 
-                            let postArray = arrayPost[y];
+                            let isLinkWeb = gridDestino.filter((j) => j.UrlJsonContext.link_web == objPost.link_web);
+                            if (!isLinkWeb || data.em_caso_de_duplicidade == '1') {
+                                objPost.link_web = objPost.link_web;
+                            }
+
+                            let isUsuario = gridDestino.filter((j) => j.UrlJsonContext.usuario == objPost.usuario);
+                            if (!isUsuario || data.em_caso_de_duplicidade == '1') {
+                                objPost.usuario = objPost.usuario;
+                            }
+
+                            let isContrasena = gridDestino.filter((j) => j.UrlJsonContext.senha == objPost.contrasena);
+                            if (!isContrasena || data.em_caso_de_duplicidade == '1') {
+                                objPost.senha = objPost.contrasena;
+                                delete objPost.contrasena;
+                            }
+
                             //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: aba:proveedores sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'nit_provedor', true, false, false);
+                            // onergy.log(`JFS: aba:proveedores sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'nit_provedor', true, false, false);
                         }
 
                         //*aba:estrato
                         if (tabExcel == 'estrato') {
-                            let duplicadorEstrato = gridDestino.filter((j) => j.UrlJsonContext.LST_estrato == arrayPost[y].estrato);
-                            if (!duplicadorEstrato || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].LST_estrato = arrayPost[y].estrato;
-                                delete arrayPost[y].estrato;
+                            let isEstrato = gridDestino.filter((j) => j.UrlJsonContext.LST_estrato == objPost.estrato);
+                            if (!isEstrato || data.em_caso_de_duplicidade == '1') {
+                                objPost.LST_estrato = objPost.estrato;
+                                delete objPost.estrato;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:estrato sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'LST_estrato', true, false, false);
+                            // onergy.log(`JFS: aba:estrato sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'LST_estrato', true, false, false);
                         }
 
                         //*aba:nivel_tension
                         if (tabExcel == 'nivel_tension') {
-                            let duplicadorNivelTension = gridDestino.filter((j) => j.UrlJsonContext.NVT_nivel == arrayPost[y].nivel_tension);
-                            if (!duplicadorNivelTension || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].NVT_nivel = arrayPost[y].nivel_tension;
-                                delete arrayPost[y].nivel_tension;
+                            let isNivelTension = gridDestino.filter((j) => j.UrlJsonContext.NVT_nivel == objPost.nivel_tension);
+                            if (!isNivelTension || data.em_caso_de_duplicidade == '1') {
+                                objPost.NVT_nivel = objPost.nivel_tension;
+                                delete objPost.nivel_tension;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:nivel_tension sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'NVT_nivel', true, false, false);
+                            // onergy.log(`JFS: aba:nivel_tension sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'NVT_nivel', true, false, false);
                         }
 
                         //*aba:clientes
                         if (tabExcel == 'clientes') {
-                            let duplicadorNITCliente = gridDestino.filter((j) => j.UrlJsonContext.COLC_nit_cliente == arrayPost[y].nit_cliente);
-                            if (!duplicadorNITCliente || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].COLC_nit_cliente = arrayPost[y].nit_cliente;
-                                delete arrayPost[y].nit_cliente;
+                            let isNITCliente = gridDestino.filter((j) => j.UrlJsonContext.COLC_nit_cliente == objPost.nit_cliente);
+                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.COLC_nit_cliente = objPost.nit_cliente;
+                                delete objPost.nit_cliente;
                             }
 
-                            let duplicadorNomeCliente = gridDestino.filter((j) => j.UrlJsonContext.COLC_nome_cliente == arrayPost[y].nombre_cliente);
-                            if (!duplicadorNomeCliente || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].COLC_nome_cliente = arrayPost[y].nombre_cliente;
-                                delete arrayPost[y].nombre_cliente;
-
-                                //TODO qual devo usar?
-                                //TODO nome_fantasia
-                                //TODO COLC_nome_cliente
+                            let isNombreCliente = gridDestino.filter((j) => j.UrlJsonContext.COLC_nome_cliente == objPost.nombre_cliente);
+                            if (!isNombreCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.COLC_nome_cliente = objPost.nombre_cliente;
+                                delete objPost.nombre_cliente;
                             }
 
-                            let duplicadorNomeOficial = gridDestino.filter((j) => j.UrlJsonContext.COLC_nome_oficial == arrayPost[y].nombre_oficial);
-                            if (!duplicadorNomeOficial || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].COLC_nome_oficial = arrayPost[y].nombre_oficial;
-                                delete arrayPost[y].nombre_oficial;
-
-                                //TODO qual devo usar?
-                                //TODO razao_social
-                                //TODO COLC_nome_oficial
+                            let isNombreOficial = gridDestino.filter((j) => j.UrlJsonContext.COLC_nome_oficial == objPost.nombre_oficial);
+                            if (!isNombreOficial || data.em_caso_de_duplicidade == '1') {
+                                objPost.COLC_nome_oficial = objPost.nombre_oficial;
+                                delete objPost.nombre_oficial;
                             }
 
-                            let duplicadorCodigoCliente = gridDestino.filter((j) => j.UrlJsonContext.COLC_codigo_cliente == arrayPost[y].codigo_cliente);
-                            if (!duplicadorCodigoCliente || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].COLC_codigo_cliente = arrayPost[y].codigo_cliente;
-                                delete arrayPost[y].codigo_cliente;
-
-                                //TODO qual devo usar?
-                                //TODO codigo_cliente
-                                //TODO COLC_codigo_cliente
+                            let isCodigoCliente = gridDestino.filter((j) => j.UrlJsonContext.COLC_codigo_cliente == objPost.codigo_cliente);
+                            if (!isCodigoCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.COLC_codigo_cliente = objPost.codigo_cliente;
+                                delete objPost.codigo_cliente;
                             }
 
-                            let duplicadorLogradouro = gridDestino.filter((j) => j.UrlJsonContext.COLC_endereco == arrayPost[y].direccion);
-                            if (!duplicadorLogradouro || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].COLC_endereco = arrayPost[y].direccion;
-                                delete arrayPost[y].direccion;
+                            let isDireccion = gridDestino.filter((j) => j.UrlJsonContext.COLC_endereco == objPost.direccion);
+                            if (!isDireccion || data.em_caso_de_duplicidade == '1') {
+                                objPost.COLC_endereco = objPost.direccion;
+                                delete objPost.direccion;
                             }
 
                             //*pesq.ref:municipio
-                            let MunicipioGrid = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
-                            let registroMunicipio = await getOnergyItem(MunicipioGrid, data.assid, data.usrid, null);
-                            let retornoMunicipio = registroMunicipio.filter((j) => j.UrlJsonContext.municipio == arrayPost[y].municipio);
-                            if (!retornoMunicipio) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].municipio}" registrado para ${tabExcel} de "${arrayPost[y].nit_cliente}"`;
+                            let idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
+                            let getMunicipio = await getOnergyItem(idMunicipio, data.assid, data.usrid, null);
+                            let isMunicipio = getMunicipio.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
+                            if (!isMunicipio) {
+                                status_desc = `ERROR: no hay "${objPost.municipio}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio__COLC_cidade == arrayPost[y].municipio);
-                            if (!duplicadorMunicipio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].loca_cida_municipio__COLC_cidade = retornoMunicipio[0] ? retornoMunicipio[0].UrlJsonContext.municipio : '';
-                                arrayPost[y].loca_cida_COLC_cidade_id = retornoMunicipio[0] ? retornoMunicipio[0].ID : '';
-                                arrayPost[y].loca_cida_loca_uf_uf = retornoMunicipio[0] ? retornoMunicipio[0].UrlJsonContext.loca_uf_uf : '';
-                                delete arrayPost[y].municipio;
+                            let isColcMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio__COLC_cidade == objPost.municipio);
+                            if (!isColcMunicipio || data.em_caso_de_duplicidade == '1') {
+                                objPost.loca_cida_municipio__COLC_cidade = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.municipio : '';
+                                objPost.loca_cida_COLC_cidade_id = isMunicipio.length > 0 ? isMunicipio[0].ID : '';
+                                objPost.loca_cida_loca_uf_uf = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.loca_uf_uf : '';
+                                delete objPost.municipio;
+                                delete objPost.departamento;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:clientes sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'nit_cliente', true, false, false);
+                            // onergy.log(`JFS: aba:clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'COLC_nit_cliente', true, false, false);
                         }
 
                         //*aba:regional_clientes
                         if (tabExcel == 'regional_clientes') {
-                            let duplicadorNomeRegional = gridDestino.filter((j) => j.UrlJsonContext.RCS_nome_regional == arrayPost[y].nombre_regional);
-                            if (!duplicadorNomeRegional || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].RCS_nome_regional = arrayPost[y].nombre_regional;
-                                delete arrayPost[y].nombre_regional;
+                            //*id_one_ref:clientes
+                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
+                            let paiFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, paiFiltro);
+
+                            let isNITCliente = gridDestino.filter((j) => j.UrlJsonContext.RCS_nit_cliente == objPost.nit_cliente);
+                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
+                                objPost.RCS_nit_cliente = objPost.nit_cliente;
+                                delete objPost.nit_cliente;
                             }
 
-                            //TODO to fazendo a carga de um grid filho
-                            //TODO minha carga nao sabe o ID_ONE_REF do grid pai
-                            //TODO como referenciar o grid filho ao grid pai?
+                            let isNombreRegional = gridDestino.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
+                            if (!isNombreRegional || data.em_caso_de_duplicidade == '1') {
+                                objPost.RCS_nome_regional = objPost.nombre_regional;
+                                delete objPost.nombre_regional;
+                            }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:contactos_clientes sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'RCS_nome_regional', true, false, false);
+                            // onergy.log(`JFS: aba:contactos_clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'RCS_nit_cliente', true, false, false);
                         }
 
                         //*aba:contactos_clientes
                         if (tabExcel == 'contactos_clientes') {
+                            //*id_one_ref:clientes
+                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
+                            let paiFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, paiFiltro);
+
+                            let isNITCliente = gridDestino.filter((j) => j.UrlJsonContext.CCS_nit_cliente == objPost.nit_cliente);
+                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
+                                objPost.CCS_nit_cliente = objPost.nit_cliente;
+                                delete objPost.nit_cliente;
+                            }
+
                             //*pesq.ref:regional_clientes
-                            let RegionalClientesGrid = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
-                            let registroRegionalClientes = await getOnergyItem(RegionalClientesGrid, data.assid, data.usrid, null);
-                            let retornoRegionalClientes = registroRegionalClientes.filter(
-                                (j) => j.UrlJsonContext.RCS_nome_regional == arrayPost[y].nombre_regional
-                            );
-                            if (!retornoRegionalClientes) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].nombre_regional}" registrado para ${tabExcel} de "${arrayPost[y].nit_cliente}"`;
+                            let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
+                            let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.assid, data.usrid, null);
+                            let isRegionalClientes = getRegionalClientes.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
+                            if (!isRegionalClientes) {
+                                status_desc = `ERROR: no hay "${objPost.nombre_regional}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorRegionalClientes = gridDestino.filter(
-                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == arrayPost[y].nombre_regional
+                            let isRcsRegionalClientes = gridDestino.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional
                             );
-                            if (!duplicadorRegionalClientes || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].RCSRCS_nome_regional__CCS_nombre_regional = retornoRegionalClientes[0]
-                                    ? retornoRegionalClientes[0].UrlJsonContext.RCS_nome_regional
-                                    : '';
-                                arrayPost[y].RCSCCS_nombre_regional_id = retornoRegionalClientes[0] ? retornoRegionalClientes[0].ID : '';
-                                delete arrayPost[y].nombre_regional;
+                            if (!isRcsRegionalClientes || data.em_caso_de_duplicidade == '1') {
+                                objPost.RCSRCS_nome_regional__CCS_nombre_regional =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSCCS_nombre_regional_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
+                                delete objPost.nombre_regional;
                             }
 
-                            let duplicadorNomeContacto = gridDestino.filter((j) => j.UrlJsonContext.CCS_nombre_contacto == arrayPost[y].nombre_contacto);
-                            if (!duplicadorNomeContacto || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].CCS_nombre_contacto = arrayPost[y].nombre_contacto;
-                                delete arrayPost[y].nombre_contacto;
+                            let isNombreContacto = gridDestino.filter((j) => j.UrlJsonContext.CCS_nombre_contacto == objPost.nombre_contacto);
+                            if (!isNombreContacto || data.em_caso_de_duplicidade == '1') {
+                                objPost.CCS_nombre_contacto = objPost.nombre_contacto;
+                                delete objPost.nombre_contacto;
                             }
 
-                            let duplicadorTelefonoCelular = gridDestino.filter((j) => j.UrlJsonContext.CCS_telefono_celular == arrayPost[y].telefono_celular);
-                            if (!duplicadorTelefonoCelular || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].CCS_telefono_celular = arrayPost[y].telefono_celular;
-                                delete arrayPost[y].telefono_celular;
+                            let isTelefonoCelular = gridDestino.filter((j) => j.UrlJsonContext.CCS_telefono_celular == objPost.telefono_celular);
+                            if (!isTelefonoCelular || data.em_caso_de_duplicidade == '1') {
+                                objPost.CCS_telefono_celular = objPost.telefono_celular;
+                                delete objPost.telefono_celular;
                             }
 
-                            let duplicadorTelefonoFijo = gridDestino.filter((j) => j.UrlJsonContext.CCS_telefono_fijo == arrayPost[y].telefono_fijo);
-                            if (!duplicadorTelefonoFijo || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].CCS_telefono_fijo = arrayPost[y].telefono_fijo;
-                                delete arrayPost[y].telefono_fijo;
+                            let isTelefonoFijo = gridDestino.filter((j) => j.UrlJsonContext.CCS_telefono_fijo == objPost.telefono_fijo);
+                            if (!isTelefonoFijo || data.em_caso_de_duplicidade == '1') {
+                                objPost.CCS_telefono_fijo = objPost.telefono_fijo;
+                                delete objPost.telefono_fijo;
                             }
 
-                            let duplicadorCorreoEletronico = gridDestino.filter(
-                                (j) => j.UrlJsonContext.CCS_correo_electronico == arrayPost[y].correo_electronico
-                            );
-                            if (!duplicadorCorreoEletronico || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].CCS_correo_electronico = arrayPost[y].correo_electronico;
-                                delete arrayPost[y].correo_electronico;
+                            let isCorreoEletronico = gridDestino.filter((j) => j.UrlJsonContext.CCS_correo_electronico == objPost.correo_electronico);
+                            if (!isCorreoEletronico || data.em_caso_de_duplicidade == '1') {
+                                objPost.CCS_correo_electronico = objPost.correo_electronico;
+                                delete objPost.correo_electronico;
                             }
 
-                            //TODO to fazendo a carga de um grid filho
-                            //TODO minha carga nao sabe o ID_ONE_REF do grid pai
-                            //TODO como referenciar o grid filho ao grid pai?
-
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:contactos_clientes sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'nit_cliente', true, false, false);
+                            // onergy.log(`JFS: aba:contactos_clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'CCS_nit_cliente', true, false, false);
                         }
 
                         //*aba:portafolio_clientes
                         if (tabExcel == 'portafolio_clientes') {
-                            let duplicadorPortfolioCliente = gridDestino.filter(
-                                (j) => j.UrlJsonContext.PCS_portafolio_cliente == arrayPost[y].portafolio_cliente
-                            );
-                            if (!duplicadorPortfolioCliente || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].PCS_portafolio_cliente = arrayPost[y].portafolio_cliente;
-                                delete arrayPost[y].portafolio_cliente;
+                            //*id_one_ref:clientes
+                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
+                            let paiFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, paiFiltro);
+
+                            let isNITCliente = gridDestino.filter((j) => j.UrlJsonContext.PCS_nit_cliente == objPost.nit_cliente);
+                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
+                                objPost.PCS_nit_cliente = objPost.nit_cliente;
+                                delete objPost.nit_cliente;
                             }
 
-                            //TODO to fazendo a carga de um grid filho
-                            //TODO minha carga nao sabe o ID_ONE_REF do grid pai
-                            //TODO como referenciar o grid filho ao grid pai?
+                            let isPortafolioCliente = gridDestino.filter((j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente);
+                            if (!isPortafolioCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.PCS_portafolio_cliente = objPost.portafolio_cliente;
+                                delete objPost.portafolio_cliente;
+                            }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:portafolio_clientes sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'PCS_portafolio_cliente', true, false, false);
+                            // onergy.log(`JFS: aba:portafolio_clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'PCS_nit_cliente', true, false, false);
                         }
 
                         //*aba:sitios
@@ -924,7 +925,6 @@ async function init(json) {
                         }
 
                         //*aba:informacion_cuenta
-                        //TODO revisar jsons
                         if (tabExcel == 'informacion_cuenta') {
                             let duplicadorProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == arrayPost[y].profit_cost_center);
                             if (!duplicadorProfitCostCenter || data.em_caso_de_duplicidade == '1') {
@@ -1069,25 +1069,21 @@ async function init(json) {
 
                             //*pesq.ref:servicios
                             let servicosGrid = '8e284e84-b8f9-45c1-abe2-991555441ea2';
-                            let arr00 = arrayPost[y].servicios.split(',');
                             let registroServicos = await getOnergyItem(servicosGrid, data.assid, data.usrid, null);
-                            for (let s in arr00) {
-                                let retornoServicos = registroServicos.filter((j) => j.UrlJsonContext.servico == arr00[s]);
-                                if (!retornoServicos) {
-                                    status_desc = `ERROR: no hay "${arr00[s]}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
-                                    statusPost.push(`${time}, ${status_desc}`);
-                                    await postStatus(status_desc, statusPost, data);
-                                    statusPost = statusPost.concat('\n');
-                                    return false;
-                                }
+                            let retornoServicos = registroServicos.filter((j) => j.UrlJsonContext.servicos == arrayPost[y].servicios);
+                            if (!retornoServicos) {
+                                status_desc = `ERROR: no hay "${arrayPost[y].servicios}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                                statusPost.push(`${time}, ${status_desc}`);
+                                await postStatus(status_desc, statusPost, data);
+                                statusPost = statusPost.concat('\n');
+                                return false;
+                            }
 
-                                let duplicadorServicos = gridDestino.filter((j) => j.UrlJsonContext.SERVservicos__servico[0] == arr00[s]); //TODO precisa testar retorno de SERVservicos__servico
-                                if (!duplicadorServicos || data.em_caso_de_duplicidade == '1') {
-                                    arrayPost[y].SERVservicos__servico = retornoServicos[0] ? retornoServicos[0].UrlJsonContext.servico : '';
-                                    arrayPost[y].srvs_id = retornoServicos[0] ? retornoServicos[0].ID : '';
-                                    arrayPost[y].servicos_id_cache = retornoServicos[0] ? retornoServicos[0].ID : '';
-                                    delete arrayPost[y].servicios;
-                                }
+                            let duplicadorServicos = gridDestino.filter((j) => j.UrlJsonContext.SERVservicos__servico == arrayPost[y].servicios);
+                            if (!duplicadorServicos || data.em_caso_de_duplicidade == '1') {
+                                arrayPost[y].SERVservicos__servico = retornoServicos[0] ? retornoServicos[0].UrlJsonContext.servicos : '';
+                                arrayPost[y].SERVservico_id = retornoServicos[0] ? retornoServicos[0].ID : '';
+                                delete arrayPost[y].servicios;
                             }
 
                             //*pesq.ref:sujeto_pasivo
@@ -1236,352 +1232,337 @@ async function init(json) {
 
                         //*aba:informacion_tecnica
                         if (tabExcel == 'informacion_tecnica') {
+                            //*id_one_ref:sitios
+                            let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
+                            let paiFiltro = gerarFiltro('asset_number', objPost.asset_number);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, paiFiltro);
+
                             //*pesq.ref:categorias
-                            let categoriasGrid = '55ec978d-7dbe-4a6f-8cb4-536b53361d54';
-                            let registroCategorias = await getOnergyItem(categoriasGrid, data.assid, data.usrid, null);
-                            let retornoCategorias = registroCategorias.filter((j) => j.UrlJsonContext.categorias == arrayPost[y].categorias);
-                            if (!retornoCategorias) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].categorias}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idCategorias = '55ec978d-7dbe-4a6f-8cb4-536b53361d54';
+                            let getCategorias = await getOnergyItem(idCategorias, data.assid, data.usrid, null);
+                            let isCategorias = getCategorias.filter((j) => j.UrlJsonContext.categorias == objPost.categorias);
+                            if (!isCategorias) {
+                                status_desc = `ERROR: no hay "${objPost.categorias}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorCategorias = gridDestino.filter((j) => j.UrlJsonContext.ctgr_categorias__categoria == arrayPost[y].categorias);
-                            if (!duplicadorCategorias || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].ctgr_categorias__categoria = retornoCategorias[0] ? retornoCategorias[0].UrlJsonContext.categorias : '';
-                                arrayPost[y].ctgr_categoria_id = retornoCategorias[0] ? retornoCategorias[0].ID : '';
-                                delete arrayPost[y].categorias;
+                            let isItdsCategorias = gridDestino.filter((j) => j.UrlJsonContext.ctgr_categorias__categoria == objPost.categorias);
+                            if (!isItdsCategorias || data.em_caso_de_duplicidade == '1') {
+                                objPost.ctgr_categorias__categoria = isCategorias.length > 0 ? isCategorias[0].UrlJsonContext.categorias : '';
+                                objPost.ctgr_categoria_id = isCategorias.length > 0 ? isCategorias[0].ID : '';
+                                delete objPost.categorias;
                             }
 
                             //*pesq.ref:estrato
-                            let estratoGrid = '34f26407-6afe-41c8-8420-7dbcd4f1aed4';
-                            let registroEstrato = await getOnergyItem(estratoGrid, data.assid, data.usrid, null);
-                            let retornoEstrato = registroEstrato.filter((j) => j.UrlJsonContext.LST_estrato == arrayPost[y].estrato);
-                            if (!retornoEstrato) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].estrato}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idEstrato = '34f26407-6afe-41c8-8420-7dbcd4f1aed4';
+                            let getEstrato = await getOnergyItem(idEstrato, data.assid, data.usrid, null);
+                            let isEstrato = getEstrato.filter((j) => j.UrlJsonContext.LST_estrato == objPost.estrato);
+                            if (!isEstrato) {
+                                status_desc = `ERROR: no hay "${objPost.estrato}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorEstrato = gridDestino.filter((j) => j.UrlJsonContext.LSTLST_estrato__ITDS_estrato == arrayPost[y].estrato);
-                            if (!duplicadorEstrato || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].LSTLST_estrato__ITDS_estrato = retornoEstrato[0] ? retornoEstrato[0].UrlJsonContext.LST_estrato : '';
-                                arrayPost[y].LSTITDS_estrato_id = retornoEstrato[0] ? retornoEstrato[0].ID : '';
-                                delete arrayPost[y].estrato;
+                            let isItdsEstrato = gridDestino.filter((j) => j.UrlJsonContext.LSTLST_estrato__ITDS_estrato == objPost.estrato);
+                            if (!isItdsEstrato || data.em_caso_de_duplicidade == '1') {
+                                objPost.LSTLST_estrato__ITDS_estrato = isEstrato.length > 0 ? isEstrato[0].UrlJsonContext.LST_estrato : '';
+                                objPost.LSTITDS_estrato_id = isEstrato.length > 0 ? isEstrato[0].ID : '';
+                                delete objPost.estrato;
                             }
 
                             //*pesq.ref:nivel_tension
-                            let nivelTensionGrid = '4056b8c5-29c0-47ff-b5b1-cfc3c7f39018';
-                            let registroNivelTension = await getOnergyItem(nivelTensionGrid, data.assid, data.usrid, null);
-                            let retornoNivelTension = registroNivelTension.filter((j) => j.UrlJsonContext.NVT_nivel == arrayPost[y].nivel_tension);
-                            if (!retornoNivelTension) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].nivel_tension}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idNivelTension = '4056b8c5-29c0-47ff-b5b1-cfc3c7f39018';
+                            let getNivelTension = await getOnergyItem(idNivelTension, data.assid, data.usrid, null);
+                            let isNivelTension = getNivelTension.filter((j) => j.UrlJsonContext.NVT_nivel == objPost.nivel_tension);
+                            if (!isNivelTension) {
+                                status_desc = `ERROR: no hay "${objPost.nivel_tension}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorNivelTensao = gridDestino.filter(
-                                (j) => j.UrlJsonContext.NVTNVT_nivel__ITDS_nivel_de_tensao == arrayPost[y].nivel_tension
-                            );
-                            if (!duplicadorNivelTensao || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].NVTNVT_nivel__ITDS_nivel_de_tensao = retornoNivelTension[0] ? retornoNivelTension[0].UrlJsonContext.NVT_nivel : '';
-                                arrayPost[y].NVTITDS_nivel_de_tensao_id = retornoNivelTension[0] ? retornoNivelTension[0].ID : '';
-                                delete arrayPost[y].nivel_tension;
+                            let isItdsNivelTension = gridDestino.filter((j) => j.UrlJsonContext.NVTNVT_nivel__ITDS_nivel_de_tensao == objPost.nivel_tension);
+                            if (!isItdsNivelTension || data.em_caso_de_duplicidade == '1') {
+                                objPost.NVTNVT_nivel__ITDS_nivel_de_tensao = isNivelTension.length > 0 ? isNivelTension[0].UrlJsonContext.NVT_nivel : '';
+                                objPost.NVTITDS_nivel_de_tensao_id = isNivelTension.length > 0 ? isNivelTension[0].ID : '';
+                                delete objPost.nivel_tension;
                             }
 
                             //*pesq.ref:lecturas
-                            let lecturasGrid = '0d3b6287-8f3a-4ad7-acdd-e1c60426f73f';
-                            let registroLecturas = await getOnergyItem(lecturasGrid, data.assid, data.usrid, null);
-                            let retornoLecturas = registroLecturas.filter((j) => j.UrlJsonContext.LCT_ferramentas == arrayPost[y].lectura_atc);
-                            if (!retornoLecturas) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].lectura_atc}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                            let idLecturas = '0d3b6287-8f3a-4ad7-acdd-e1c60426f73f';
+                            let getLecturas = await getOnergyItem(idLecturas, data.assid, data.usrid, null);
+                            let isLecturas = getLecturas.filter((j) => j.UrlJsonContext.LCT_ferramentas == objPost.lectura_atc);
+                            if (!isLecturas) {
+                                status_desc = `ERROR: no hay "${objPost.lectura_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorLectura = gridDestino.filter((j) => j.UrlJsonContext.LCTLCT_ferramentas__ITDS_lecturas == arrayPost[y].lectura_atc);
-                            if (!duplicadorLectura || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].LCTLCT_ferramentas__ITDS_lecturas = retornoLecturas[0] ? retornoLecturas[0].UrlJsonContext.LCT_ferramentas : '';
-                                arrayPost[y].LCTITDS_lecturas_id = retornoLecturas[0] ? retornoLecturas[0].ID : '';
-                                delete arrayPost[y].lectura_atc;
+                            let isItdsLecturas = gridDestino.filter((j) => j.UrlJsonContext.LCTLCT_ferramentas__ITDS_lecturas == objPost.lectura_atc);
+                            if (!isItdsLecturas || data.em_caso_de_duplicidade == '1') {
+                                objPost.LCTLCT_ferramentas__ITDS_lecturas = isLecturas.length > 0 ? isLecturas[0].UrlJsonContext.LCT_ferramentas : '';
+                                objPost.LCTITDS_lecturas_id = isLecturas.length > 0 ? isLecturas[0].ID : '';
+                                delete objPost.lectura_atc;
                             }
 
-                            let duplicadorAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number == arrayPost[y].asset_number);
-                            if (!duplicadorAssetNumber || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].asset_number = arrayPost[y].asset_number;
+                            let isAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number == objPost.asset_number);
+                            if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
+                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
+                                objPost.asset_number = objPost.asset_number;
                             }
 
-                            let duplicadorNomeSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == arrayPost[y].nombre_sitio);
-                            if (!duplicadorNomeSitio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].site_name = arrayPost[y].nombre_sitio;
-                                delete arrayPost[y].nombre_sitio;
+                            let isNombreSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == objPost.nombre_sitio);
+                            if (!isNombreSitio || data.em_caso_de_duplicidade == '1') {
+                                objPost.site_name = objPost.nombre_sitio;
+                                delete objPost.nombre_sitio;
                             }
 
-                            let duplicadorLogradouro = gridDestino.filter((j) => j.UrlJsonContext.logradouro == arrayPost[y].direccion);
-                            if (!duplicadorLogradouro || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].logradouro = arrayPost[y].direccion;
-                                delete arrayPost[y].direccion;
+                            let isDireccion = gridDestino.filter((j) => j.UrlJsonContext.logradouro == objPost.direccion);
+                            if (!isDireccion || data.em_caso_de_duplicidade == '1') {
+                                objPost.logradouro = objPost.direccion;
+                                delete objPost.direccion;
                             }
 
-                            let duplicadorMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio == arrayPost[y].municipio);
-                            if (!duplicadorMunicipio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].loca_cida_municipio = arrayPost[y].municipio;
-                                arrayPost[y].loca_cida_loca_uf_uf = arrayPost[y].departamento;
-                                delete arrayPost[y].municipio;
-                                delete arrayPost[y].departamento;
+                            let isMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio == objPost.municipio);
+                            if (!isMunicipio || data.em_caso_de_duplicidade == '1') {
+                                objPost.loca_cida_municipio = objPost.municipio;
+                                objPost.loca_cida_loca_uf_uf = objPost.departamento;
+                                delete objPost.municipio;
+                                delete objPost.departamento;
                             }
 
-                            let duplicadorStatusSite = gridDestino.filter((j) => j.UrlJsonContext.sta_site_status == arrayPost[y].estado_sitio);
-                            if (!duplicadorStatusSite || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].sta_site_status = arrayPost[y].estado_sitio;
-                                delete arrayPost[y].estado_sitio;
+                            let isStatusSite = gridDestino.filter((j) => j.UrlJsonContext.sta_site_status == objPost.estado_sitio);
+                            if (!isStatusSite || data.em_caso_de_duplicidade == '1') {
+                                objPost.sta_site_status = objPost.estado_sitio;
+                                delete objPost.estado_sitio;
                             }
 
-                            let duplicadorEmpresaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site == arrayPost[y].compania_atc);
-                            if (!duplicadorEmpresaATC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].emp_atc_site = arrayPost[y].compania_atc;
-                                delete arrayPost[y].compania_atc;
+                            let isCompaniaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site == objPost.compania_atc);
+                            if (!isCompaniaATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.emp_atc_site = objPost.compania_atc;
+                                delete objPost.compania_atc;
                             }
 
                             //*btn.check:motogenerador
-                            arrayPost[y].motogenerador = arrayPost[y].motogenerador == 'SI' ? '1' : '';
+                            objPost.motogenerador = objPost.motogenerador == 'SI' ? '1' : '';
                             let arr00 = [];
-                            arr00.push(arrayPost[y].motogenerador);
-                            let duplicadorGerador = gridDestino.filter((j) => j.UrlJsonContext.gerador == arr00);
-                            if (!duplicadorGerador || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].gerador = arr00;
-                                arrayPost[y].gerador_desc = arrayPost[y].motogenerador == '1' ? 'Sim' : 'Não';
-                                delete arrayPost[y].motogenerador;
+                            arr00.push(objPost.motogenerador);
+                            let isMotogenerador = gridDestino.filter((j) => j.UrlJsonContext.gerador == arr00);
+                            if (!isMotogenerador || data.em_caso_de_duplicidade == '1') {
+                                objPost.gerador = arr00;
+                                objPost.gerador_desc = objPost.motogenerador == '1' ? 'Sim' : 'Não';
+                                delete objPost.motogenerador;
                             }
 
                             //*btn.check:tablero_independiente
-                            arrayPost[y].tablero_independiente = arrayPost[y].tablero_independiente == 'SI' ? '1' : '';
+                            objPost.tablero_independiente = objPost.tablero_independiente == 'SI' ? '1' : '';
                             let arr01 = [];
-                            arr01.push(arrayPost[y].tablero_independiente);
-                            let duplicadorTablero = gridDestino.filter((j) => j.UrlJsonContext.diretoria_independente == arr01);
-                            if (!duplicadorTablero || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].diretoria_independente = arr01;
-                                arrayPost[y].diretoria_independente_desc = arrayPost[y].tablero_independiente == '1' ? 'Sim' : 'Não';
-                                delete arrayPost[y].tablero_independiente;
+                            arr01.push(objPost.tablero_independiente);
+                            let isTableroIndependiente = gridDestino.filter((j) => j.UrlJsonContext.diretoria_independente == arr01);
+                            if (!isTableroIndependiente || data.em_caso_de_duplicidade == '1') {
+                                objPost.diretoria_independente = arr01;
+                                objPost.diretoria_independente_desc = objPost.tablero_independiente == '1' ? 'Sim' : 'Não';
+                                delete objPost.tablero_independiente;
                             }
 
                             //*btn.check:barter
-                            arrayPost[y].barter = arrayPost[y].barter == 'SI' ? '1' : '';
+                            objPost.barter = objPost.barter == 'SI' ? '1' : '';
                             let arr02 = [];
-                            arr02.push(arrayPost[y].barter);
-                            let duplicadorBarter = gridDestino.filter((j) => j.UrlJsonContext.escambo == arr02);
-                            if (!duplicadorBarter || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].escambo = arr02;
-                                arrayPost[y].escambo_desc = arrayPost[y].barter == '1' ? 'Sim' : 'Não';
-                                delete arrayPost[y].barter;
+                            arr02.push(objPost.barter);
+                            let isBarter = gridDestino.filter((j) => j.UrlJsonContext.escambo == arr02);
+                            if (!isBarter || data.em_caso_de_duplicidade == '1') {
+                                objPost.escambo = arr02;
+                                objPost.escambo_desc = objPost.barter == '1' ? 'Sim' : 'Não';
+                                delete objPost.barter;
                             }
 
                             //*btn.check:provisional
-                            arrayPost[y].provisional = arrayPost[y].provisional == 'SI' ? '1' : '';
+                            objPost.provisional = objPost.provisional == 'SI' ? '1' : '';
                             let arr03 = [];
-                            arr03.push(arrayPost[y].provisional);
-                            let duplicadorProvisional = gridDestino.filter((j) => j.UrlJsonContext.provisorio == arr03);
-                            if (!duplicadorProvisional || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].provisorio = arr03;
-                                arrayPost[y].provisorio_desc = arrayPost[y].provisional == '1' ? 'Sim' : 'Não';
-                                delete arrayPost[y].provisional;
+                            arr03.push(objPost.provisional);
+                            let isProvisional = gridDestino.filter((j) => j.UrlJsonContext.provisorio == arr03);
+                            if (!isProvisional || data.em_caso_de_duplicidade == '1') {
+                                objPost.provisorio = arr03;
+                                objPost.provisorio_desc = objPost.provisional == '1' ? 'Sim' : 'Não';
+                                delete objPost.provisional;
                             }
 
-                            let duplicadorQuantidadeProvisoria = gridDestino.filter(
-                                (j) => j.UrlJsonContext.quantidade_provisoria == arrayPost[y].cantidad_provisionales
-                            );
-                            if (!duplicadorQuantidadeProvisoria || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].quantidade_provisoria = arrayPost[y].cantidad_provisionales;
-                                delete arrayPost[y].cantidad_provisionales;
+                            let isCantidadProvisionales = gridDestino.filter((j) => j.UrlJsonContext.quantidade_provisoria == objPost.cantidad_provisionales);
+                            if (!isCantidadProvisionales || data.em_caso_de_duplicidade == '1') {
+                                objPost.quantidade_provisoria = objPost.cantidad_provisionales;
+                                delete objPost.cantidad_provisionales;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:informacion_tecnica sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'asset_number', true, false, false);
-
-                            //TODO to fazendo a carga de um grid filho
-                            //TODO minha carga nao sabe o ID_ONE_REF do grid pai
-                            //TODO como referenciar o grid filho ao grid pai?
+                            // onergy.log(`JFS: aba:informacion_tecnica sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
                         }
 
                         //*aba:clientes_sitio
                         if (tabExcel == 'clientes_sitio') {
+                            //*id_one_ref:clientes
+                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
+                            let paiFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, paiFiltro);
+
                             //*pesq.ref:nit_cliente
-                            let clientesGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
-                            let registroClientes = await getOnergyItem(clientesGrid, data.assid, data.usrid, null);
-                            let retornoClientes = registroClientes.filter((j) => j.UrlJsonContext.COLC_nit_cliente == arrayPost[y].nit_cliente);
-                            if (!retornoClientes) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].nit_cliente}" registrado para ${tabExcel} de "${arrayPost[y].nit_cliente}"`;
+                            let idClientes = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
+                            let getClientes = await getOnergyItem(idClientes, data.assid, data.usrid, null);
+                            let isClientes = getClientes.filter((j) => j.UrlJsonContext.COLC_nit_cliente == objPost.nit_cliente);
+                            if (!isClientes) {
+                                status_desc = `ERROR: no hay "${objPost.nit_cliente}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorNitCliente = gridDestino.filter((j) => j.UrlJsonContext.COLCCOLC_nit_cliente == arrayPost[y].nit_cliente);
-                            if (!duplicadorNitCliente || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].COLCCOLC_nit_cliente = retornoClientes[0] ? retornoClientes[0].UrlJsonContext.COLC_nit_cliente : '';
-                                arrayPost[y].COLCclsit__nit_cliente_id = retornoClientes[0] ? retornoClientes[0].ID : '';
-                                arrayPost[y].COLCCOLC_nome_cliente__clsit__nit_cliente = retornoClientes[0]
-                                    ? retornoClientes[0].UrlJsonContext.COLC_nome_cliente
-                                    : '';
-                                arrayPost[y].COLCCOLC_codigo_cliente = retornoClientes[0] ? retornoClientes[0].UrlJsonContext.COLC_codigo_cliente : '';
-                                delete arrayPost[y].nombre_cliente;
+                            let isNITCliente = gridDestino.filter((j) => j.UrlJsonContext.COLCCOLC_nit_cliente == objPost.nit_cliente);
+                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
+                                objPost.COLCCOLC_nit_cliente = isClientes.length > 0 ? isClientes[0].UrlJsonContext.COLC_nit_cliente : '';
+                                objPost.COLCclsit__nit_cliente_id = isClientes.length > 0 ? isClientes[0].ID : '';
+                                objPost.COLCCOLC_nome_cliente__clsit__nit_cliente = isClientes.length > 0 ? isClientes[0].UrlJsonContext.COLC_nome_cliente : '';
+                                objPost.COLCCOLC_codigo_cliente = isClientes.length > 0 ? isClientes[0].UrlJsonContext.COLC_codigo_cliente : '';
+                                delete objPost.nombre_cliente;
+                                delete objPost.nit_cliente;
+                                delete objPost.codigo_cliente;
                             }
 
-                            let duplicadorCodigoSitioCliente = gridDestino.filter(
-                                (j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == arrayPost[y].codigo_sitio_cliente
+                            let isCodigoSitioCliente = gridDestino.filter(
+                                (j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente
                             );
-                            if (!duplicadorCodigoSitioCliente || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].clsit__codigo_do_sitio_do_cliente = arrayPost[y].codigo_sitio_cliente;
-                                delete arrayPost[y].codigo_sitio_cliente;
+                            if (!isCodigoSitioCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.clsit__codigo_do_sitio_do_cliente = objPost.codigo_sitio_cliente;
+                                delete objPost.codigo_sitio_cliente;
                             }
 
                             //*pesq.ref:nombre_regional
-                            let regionalClientesGrid = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
-                            let registroRegional = await getOnergyItem(regionalClientesGrid, data.assid, data.usrid, null);
-                            let retornoRegional = registroRegional.filter((j) => j.UrlJsonContext.RCS_nome_regional == arrayPost[y].nombre_regional);
-                            if (!retornoRegional) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].nombre_regional}" registrado para ${tabExcel} de "${arrayPost[y].nit_cliente}"`;
+                            let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
+                            let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.assid, data.usrid, null);
+                            let isRegionalClientes = getRegionalClientes.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
+                            if (!isRegionalClientes) {
+                                status_desc = `ERROR: no hay "${objPost.nombre_regional}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorNomeRegional = gridDestino.filter(
-                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == arrayPost[y].nombre_regional
+                            let isNombreRegional = gridDestino.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional
                             );
-                            if (!duplicadorNomeRegional || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].RCSRCS_nome_regional__clsit__regional_do_cliente = retornoRegional[0]
-                                    ? retornoRegional[0].UrlJsonContext.RCS_nome_regional
-                                    : '';
-                                arrayPost[y].RCSclsit__regional_do_cliente_id = retornoRegional[0] ? retornoRegional[0].ID : '';
-                                delete arrayPost[y].nombre_regional;
+                            if (!isNombreRegional || data.em_caso_de_duplicidade == '1') {
+                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSclsit__regional_do_cliente_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
+                                delete objPost.nombre_regional;
                             }
 
                             //*pesq.ref:portafolio_cliente
-                            let portfolioClienteGrid = 'b36cf260-c691-4d36-9339-137041e6fb63';
-                            let registroPortfolioCliente = await getOnergyItem(portfolioClienteGrid, data.assid, data.usrid, null);
-                            let retornoPortfolioCliente = registroPortfolioCliente.filter(
-                                (j) => j.UrlJsonContext.PCS_portafolio_cliente == arrayPost[y].portafolio_cliente
-                            );
-                            if (!retornoPortfolioCliente) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].portafolio_cliente}" registrado para ${tabExcel} de "${arrayPost[y].nit_cliente}"`;
+                            let idPortafolioCliente = 'b36cf260-c691-4d36-9339-137041e6fb63';
+                            let getPortafolioCliente = await getOnergyItem(idPortafolioCliente, data.assid, data.usrid, null);
+                            let isPortafolioCliente = getPortafolioCliente.filter((j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente);
+                            if (!isPortafolioCliente) {
+                                status_desc = `ERROR: no hay "${objPost.portafolio_cliente}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
                                 await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
-                            let duplicadorPortfolioCliente = gridDestino.filter(
-                                (j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == arrayPost[y].portafolio_cliente
+                            let isPcsPortafolioCliente = gridDestino.filter(
+                                (j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente
                             );
-                            if (!duplicadorPortfolioCliente || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].PCSPCS_portafolio_cliente__clsit__portifolio_cliente = retornoRegional[0]
-                                    ? retornoRegional[0].UrlJsonContext.PCS_portafolio_cliente
+                            if (!isPcsPortafolioCliente || data.em_caso_de_duplicidade == '1') {
+                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente = isRegionalClientes[0]
+                                    ? isRegionalClientes[0].UrlJsonContext.PCS_portafolio_cliente
                                     : '';
-                                arrayPost[y].PCSclsit__portifolio_cliente_id = retornoRegional[0] ? retornoRegional[0].ID : '';
-                                delete arrayPost[y].portafolio_cliente;
+                                objPost.PCSclsit__portifolio_cliente_id = isRegionalClientes[0] ? isRegionalClientes[0].ID : '';
+                                delete objPost.portafolio_cliente;
                             }
 
-                            let duplicadorPortfolioATC = gridDestino.filter((j) => j.UrlJsonContext.tppf_tipo_portifolio == arrayPost[y].portafolio_atc);
-                            if (!duplicadorPortfolioATC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tppf_tipo_portifolio = arrayPost[y].portafolio_atc;
-                                delete arrayPost[y].portafolio_atc;
+                            let isPortafolioATC = gridDestino.filter((j) => j.UrlJsonContext.tppf_tipo_portifolio == objPost.portafolio_atc);
+                            if (!isPortafolioATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.tppf_tipo_portifolio = objPost.portafolio_atc;
+                                delete objPost.portafolio_atc;
                             }
 
-                            let duplicadorAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number == arrayPost[y].asset_number);
-                            if (!duplicadorAssetNumber || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].asset_number = arrayPost[y].asset_number;
+                            let isAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number == objPost.asset_number);
+                            if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
+                                objPost.asset_number = objPost.asset_number;
                             }
 
-                            let duplicadorProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == arrayPost[y].profit_cost_center);
-                            if (!duplicadorProfitCostCenter || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].profit_cost_center = arrayPost[y].profit_cost_center;
+                            let isProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == objPost.profit_cost_center);
+                            if (!isProfitCostCenter || data.em_caso_de_duplicidade == '1') {
+                                objPost.profit_cost_center = objPost.profit_cost_center;
                             }
 
-                            let duplicadorNomeSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == arrayPost[y].nombre_sitio);
-                            if (!duplicadorNomeSitio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].site_name = arrayPost[y].nombre_sitio;
-                                delete arrayPost[y].nombre_sitio;
+                            let isNombreSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == objPost.nombre_sitio);
+                            if (!isNombreSitio || data.em_caso_de_duplicidade == '1') {
+                                objPost.site_name = objPost.nombre_sitio;
+                                delete objPost.nombre_sitio;
                             }
 
-                            let duplicadorEmpresaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site == arrayPost[y].compania_atc);
-                            if (!duplicadorEmpresaATC || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].emp_atc_site = arrayPost[y].compania_atc;
-                                delete arrayPost[y].compania_atc;
+                            let isCompaniaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site == objPost.compania_atc);
+                            if (!isCompaniaATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.emp_atc_site = objPost.compania_atc;
+                                delete objPost.compania_atc;
                             }
 
-                            let duplicadorMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio == arrayPost[y].municipio);
-                            if (!duplicadorMunicipio || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].loca_cida_municipio = arrayPost[y].municipio;
-                                delete arrayPost[y].municipio;
+                            let isMunicipio = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_municipio == objPost.municipio);
+                            if (!isMunicipio || data.em_caso_de_duplicidade == '1') {
+                                objPost.loca_cida_municipio = objPost.municipio;
+                                delete objPost.municipio;
                             }
 
-                            let duplicadorDepartamento = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_loca_uf_uf == arrayPost[y].departamento);
-                            if (!duplicadorDepartamento || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].loca_cida_loca_uf_uf = arrayPost[y].departamento;
-                                delete arrayPost[y].departamento;
+                            let isDepartamento = gridDestino.filter((j) => j.UrlJsonContext.loca_cida_loca_uf_uf == objPost.departamento);
+                            if (!isDepartamento || data.em_caso_de_duplicidade == '1') {
+                                objPost.loca_cida_loca_uf_uf = objPost.departamento;
+                                delete objPost.departamento;
                             }
 
-                            let duplicadorRegional = gridDestino.filter((j) => j.UrlJsonContext.regio_regional == arrayPost[y].regional_atc);
-                            if (!duplicadorRegional || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].regio_regional = arrayPost[y].regional_atc;
-                                delete arrayPost[y].regional_atc;
+                            let isRegionalATC = gridDestino.filter((j) => j.UrlJsonContext.regio_regional == objPost.regional_atc);
+                            if (!isRegionalATC || data.em_caso_de_duplicidade == '1') {
+                                objPost.regio_regional = objPost.regional_atc;
+                                delete objPost.regional_atc;
                             }
 
-                            let postArray = arrayPost[y];
                             //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: aba:clientes_sitio sendItem=>postArray: ${JSON.stringify(postArray)}`);
-                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, postArray, '', 'nit_cliente', true, false, false);
-
-                            //TODO to fazendo a carga de um grid filho
-                            //TODO minha carga nao sabe o ID_ONE_REF do grid pai
-                            //TODO como referenciar o grid filho ao grid pai?
+                            // onergy.log(`JFS: aba:clientes_sitio sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'COLCCOLC_nit_cliente', true, false, false);
                         }
 
                         //*aba:clasificacion_passthru
                         if (tabExcel == 'clasificacion_passthru') {
-                            let duplicadorClassificacaoPassthru = gridDestino.filter(
-                                (j) => j.UrlJsonContext.classificacao_passthru == arrayPost[y].clasificacion_passthru
-                            );
-                            if (!duplicadorClassificacaoPassthru || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].classificacao_passthru = arrayPost[y].clasificacion_passthru;
-                                delete arrayPost[y].clasificacion_passthru;
+                            let isClasificacionPassthru = gridDestino.filter((j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru);
+                            if (!isClasificacionPassthru || data.em_caso_de_duplicidade == '1') {
+                                objPost.classificacao_passthru = objPost.clasificacion_passthru;
+                                delete objPost.clasificacion_passthru;
                             }
 
                             //*lst.susp:tiene_passthru
-                            arrayPost[y].tiene_passthru = arrayPost[y].tiene_passthru == 'SI' ? 'sim' : 'nao';
-                            let duplicadorTemPassthru = gridDestino.filter((j) => j.UrlJsonContext.CPT_tem_passthru == arrayPost[y].tiene_passthru);
-                            if (!duplicadorTemPassthru || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].CPT_tem_passthru = arrayPost[y].tiene_passthru;
-                                arrayPost[y].CPT_tem_passthru_desc = arrayPost[y].tiene_passthru == 'sim' ? 'Sim' : 'Não';
-                                delete arrayPost[y].tiene_passthru;
+                            objPost.tiene_passthru = objPost.tiene_passthru == 'SI' ? 'sim' : 'nao';
+                            let isTienePassthru = gridDestino.filter((j) => j.UrlJsonContext.CPT_tem_passthru == objPost.tiene_passthru);
+                            if (!isTienePassthru || data.em_caso_de_duplicidade == '1') {
+                                objPost.CPT_tem_passthru = objPost.tiene_passthru;
+                                objPost.CPT_tem_passthru_desc = objPost.tiene_passthru == 'sim' ? 'Sim' : 'Não';
+                                delete objPost.tiene_passthru;
                             }
+
+                            //!node:test (unhide log and hide sendItem)
+                            // onergy.log(`JFS: aba:clasificacion_passthru sendItem=>objPost: ${JSON.stringify(objPost)}`);
+                            await sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'classificacao_passthru', true, false, false);
                         }
                     }
-
-                    let postArray = arrayPost;
-                    //!node:test (unhide log and hide insertMany)
-                    // onergy.log(`JFS: for:arrayPost[y] insertMany=>postArray: ${JSON.stringify(postArray)}`);
-                    await onergy.InsertManyOnergy(postArray, tabExcelID, data.usrid, data.assid);
-
-                    //TODO antes de mandar coloca o registro no array do insert
-                    //TODO verifica se ele é atualizar ou criar
-                    //TODO se for atualizar cria um campo dentro dele pra saber q ele vai atualizar
-                    //TODO terminou, vai subir pra um grid auxiliar só pra guardar
-                    //TODO e dps vai vendo os que tem update e atualiza
-                    //TODO e o q for pra criar cria
                 } else {
                     status_desc = `ERROR: los datos de ${tabExcel} no fueron procesados`;
                     statusPost.push(`${time}, ${status_desc}`);
@@ -1636,42 +1617,43 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
     };
     return obj;
 }
-
 /**STD_METHODS**
  */
 let json = {
     processo: [
-        'Monday, October 17, 2022 5:29:27 PM, Cargando 49 registros de sitios\n',
-        'Monday, October 17, 2022 5:29:27 PM, Manejando 49 registros de sitios\n',
-        'Monday, October 17, 2022 5:29:27 PM, Inserindo 49 registros de sitios en Onergy\n',
-        'Monday, October 17, 2022 5:29:27 PM, Carga de sitios finalizada\n',
+        '18/10/2022 13:34:49, Cargando 49 registros de portafolio_clientes',
+        '\n',
+        '18/10/2022 13:34:49, Manejando 49 registros de portafolio_clientes',
+        '\n',
+        '18/10/2022 13:34:49, Carga de portafolio_clientes finalizada',
+        '\n',
     ],
-    horas: '14:29',
-    dataDate: '2022-10-17 17:29:27',
-    data: '2022-10-17 14:29:27',
+    horas: '15:34',
+    dataDate: '2022-10-18 18:34:48',
+    data: '2022-10-18 15:34:48',
     load_index_equipe: 'COL',
-    load_index_id_do_card: 'ad62c737-2abc-4c71-a572-e11933114ed8',
+    load_index_id_do_card: 'b36cf260-c691-4d36-9339-137041e6fb63',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx9d0a2256-d639-43ce-a47f-02fa4356b137.xlsx?sv=2018-03-28&sr=b&sig=DMvlueswc22e5DYpSbdniuMZR4ftTE7wQrNewbLNRCk%3D&se=2023-05-05T17%3A29%3A16Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxdb8b5885-d630-4bcf-b233-52e244585601.xlsx?sv=2018-03-28&sr=b&sig=8%2BieC9CliINgb8me%2Fj1uTTMfL8PAmCe0%2FQdKasgM2oY%3D&se=2023-05-06T18%3A34%3A34Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx9d0a2256-d639-43ce-a47f-02fa4356b137.xlsx?sv=2018-03-28&sr=b&sig=DMvlueswc22e5DYpSbdniuMZR4ftTE7wQrNewbLNRCk%3D&se=2023-05-05T17%3A29%3A16Z&sp=r',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxdb8b5885-d630-4bcf-b233-52e244585601.xlsx?sv=2018-03-28&sr=b&sig=8%2BieC9CliINgb8me%2Fj1uTTMfL8PAmCe0%2FQdKasgM2oY%3D&se=2023-05-06T18%3A34%3A34Z&sp=r',
             Name: 'tablas_maestras_v3.xlsx',
         },
     ],
-    load_index_tab_excel: 'clasificacion_passthru',
-    load_index_id: 'ea2c764b-d958-4905-af1e-669239bce62e',
+    load_index_tab_excel: 'portafolio_clientes',
+    load_index_id: 'b2fc48e3-c530-96b2-a64a-432f0a399dd8',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de sitios finalizada',
-    time: '14:29',
+    processamento: 'Carga de portafolio_clientes finalizada',
+    time: '15:34',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: 'Carga Geral',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     email: 'admin-colombia@atc.com.co',
     fdtid: '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f',
-    fedid: '6a500f2d-a951-f623-a091-a279a59c3842',
-    id_upload_planilha: '6a500f2d-a951-f623-a091-a279a59c3842',
+    fedid: 'cade2a10-4632-2cc7-1579-c2171455a8a8',
+    id_upload_planilha: 'cade2a10-4632-2cc7-1579-c2171455a8a8',
     onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
     timezone: null,
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
