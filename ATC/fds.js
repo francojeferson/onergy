@@ -75,6 +75,10 @@ function initBefore(json) {
 
 async function init(strData) {
     var data = JSON.parse(strData);
+
+    let date = new Date();
+    let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bogota' });
+
     let strPost = {
         nomePlanilhaCarga: 'tablas_maestras.xlsx',
         equipe: 'COL',
