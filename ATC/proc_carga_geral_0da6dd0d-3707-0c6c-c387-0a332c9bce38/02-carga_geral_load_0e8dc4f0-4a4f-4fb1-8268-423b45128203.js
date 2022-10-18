@@ -926,25 +926,47 @@ async function init(json) {
                         //*aba:informacion_cuenta
                         //TODO revisar jsons
                         if (tabExcel == 'informacion_cuenta') {
+                            let duplicadorProfitCostCenter = gridDestino.filter((j) => j.UrlJsonContext.profit_cost_center == arrayPost[y].profit_cost_center);
+                            if (!duplicadorProfitCostCenter || data.em_caso_de_duplicidade == '1') {
+                                arrayPost[y].profit_cost_center = arrayPost[y].profit_cost_center;
+                            }
+
+                            let duplicadorPortfolioATC = gridDestino.filter(
+                                (j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == arrayPost[y].portfolio_atc
+                            );
+                            if (!duplicadorPortfolioATC || data.em_caso_de_duplicidade == '1') {
+                                arrayPost[y].tppf_tipo_portifolio__portfolio = arrayPost[y].portfolio_atc;
+                                delete arrayPost[y].portfolio_atc;
+                            }
+
                             let duplicadorAssetNumber = gridDestino.filter((j) => j.UrlJsonContext.asset_number_IDC == arrayPost[y].asset_number);
                             if (!duplicadorAssetNumber || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].asset_number_IDC = arrayPost[y].asset_number;
+                                arrayPost[y].asset_number = arrayPost[y].asset_number;
                             }
+
                             let duplicadorNomeSitio = gridDestino.filter((j) => j.UrlJsonContext.site_name == arrayPost[y].nombre_sitio);
                             if (!duplicadorNomeSitio || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].site_name = arrayPost[y].nombre_sitio;
+                                delete arrayPost[y].nombre_sitio;
                             }
+
                             let duplicadorEmpresaATC = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site == arrayPost[y].compania_atc);
                             if (!duplicadorEmpresaATC || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].emp_atc_site = arrayPost[y].compania_atc;
+                                delete arrayPost[y].compania_atc;
                             }
+
                             let duplicadorContaInternaNIC = gridDestino.filter((j) => j.UrlJsonContext.conta_interna_nic == arrayPost[y].cuenta_interna_nic);
                             if (!duplicadorContaInternaNIC || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].conta_interna_nic = arrayPost[y].cuenta_interna_nic;
+                                delete arrayPost[y].cuenta_interna_nic;
                             }
+
                             let duplicadorContaPai = gridDestino.filter((j) => j.UrlJsonContext.prcs__conta_pai == arrayPost[y].cuenta_padre);
                             if (!duplicadorContaPai || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].prcs__conta_pai = arrayPost[y].cuenta_padre;
+                                delete arrayPost[y].cuenta_padre;
                             }
 
                             //*pesq.ref:tipo_cuenta
@@ -958,6 +980,7 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorTipoConta = gridDestino.filter(
                                 (j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == arrayPost[y].tipo_cuenta
                             );
@@ -965,12 +988,18 @@ async function init(json) {
                                 arrayPost[y].TCTC_tipo_de_conta__prcs__tipo_de_conta = retornoTipoConta[0]
                                     ? retornoTipoConta[0].UrlJsonContext.TC_tipo_de_conta
                                     : '';
-                                arrayPost[y].TC_tipo_de_conta_id = retornoTipoConta[0] ? retornoTipoConta[0].ID : '';
+                                arrayPost[y].TCprcs__tipo_de_conta_id = retornoTipoConta[0] ? retornoTipoConta[0].ID : '';
+                                arrayPost[y].TCTC_tipo_de_conta__TC_tipo_de_conta_valor = retornoTipoConta[0]
+                                    ? retornoTipoConta[0].UrlJsonContext.TC_tipo_de_conta
+                                    : '';
+                                arrayPost[y].prcs__tipo_de_conta_cache = retornoTipoConta[0] ? retornoTipoConta[0].ID : '';
+                                delete arrayPost[y].tipo_cuenta;
                             }
 
                             let duplicadorNumeroMedidor = gridDestino.filter((j) => j.UrlJsonContext.numero_do_medidor == arrayPost[y].numero_medidor);
                             if (!duplicadorNumeroMedidor || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].numero_do_medidor = arrayPost[y].numero_medidor;
+                                delete arrayPost[y].numero_medidor;
                             }
 
                             //*pesq.ref:suscriptor
@@ -984,12 +1013,12 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            let duplicadorAssinanteATC = gridDestino.filter(
-                                (j) => j.UrlJsonContext.emp_atc_site__prcs__assinante_atc == arrayPost[y].suscriptor
-                            );
-                            if (!duplicadorAssinanteATC || data.em_caso_de_duplicidade == '1') {
+
+                            let duplicadorSuscriptor = gridDestino.filter((j) => j.UrlJsonContext.emp_atc_site__prcs__assinante_atc == arrayPost[y].suscriptor);
+                            if (!duplicadorSuscriptor || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].emp_atc_site__prcs__assinante_atc = retornoEmpresaATC[0] ? retornoEmpresaATC[0].UrlJsonContext.site : '';
-                                arrayPost[y].emp_atc_assinante_atc_id = retornoEmpresaATC[0] ? retornoEmpresaATC[0].ID : '';
+                                arrayPost[y].emp_atc_prcs__assinante_atc_id = retornoEmpresaATC[0] ? retornoEmpresaATC[0].ID : '';
+                                delete arrayPost[y].suscriptor;
                             }
 
                             //*pesq.ref:estado_cuenta
@@ -1003,10 +1032,11 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorStatusConta = gridDestino.filter((j) => j.UrlJsonContext.sta_cont_status_conta == arrayPost[y].estado_cuenta);
                             if (!duplicadorStatusConta || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].sta_cont_status_conta = retornoStatusConta[0] ? retornoStatusConta[0].UrlJsonContext.status_conta : '';
-                                arrayPost[y].sta_cont_status_conta_id = retornoStatusConta[0] ? retornoStatusConta[0].ID : '';
+                                arrayPost[y].sta_cont_id = retornoStatusConta[0] ? retornoStatusConta[0].ID : '';
                             }
 
                             //*pesq.ref:nombre_proveedor
@@ -1020,10 +1050,12 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorProvedores = gridDestino.filter((j) => j.UrlJsonContext.prvd_nome_provedor == arrayPost[y].nombre_proveedor);
                             if (!duplicadorProvedores || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].prvd_nome_provedor = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.nome_provedor : '';
-                                arrayPost[y].prvd_nome_provedor_id = retornoProvedores[0] ? retornoProvedores[0].ID : '';
+                                arrayPost[y].prvd_id = retornoProvedores[0] ? retornoProvedores[0].ID : '';
+                                arrayPost[y].nome_provedor_id_cache = retornoProvedores[0] ? retornoProvedores[0].ID : '';
                                 arrayPost[y].prvd_nome_comercial = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.nome_comercial : '';
                                 arrayPost[y].prvd_nit_provedor = retornoProvedores[0] ? retornoProvedores[0].nit_provedor : '';
                                 arrayPost[y].prvd_nit_beneficiario = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.nit_beneficiario : '';
@@ -1032,23 +1064,30 @@ async function init(json) {
                                 arrayPost[y].prvd_link_web = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.link_web : '';
                                 arrayPost[y].prvd_usuario = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.usuario : '';
                                 arrayPost[y].prvd_senha = retornoProvedores[0] ? retornoProvedores[0].UrlJsonContext.senha : '';
+                                delete arrayPost[y].nombre_proveedor;
                             }
 
                             //*pesq.ref:servicios
                             let servicosGrid = '8e284e84-b8f9-45c1-abe2-991555441ea2';
+                            let arr00 = arrayPost[y].servicios.split(',');
                             let registroServicos = await getOnergyItem(servicosGrid, data.assid, data.usrid, null);
-                            let retornoServicos = registroServicos.filter((j) => j.UrlJsonContext.servicos == arrayPost[y].servicios);
-                            if (!retornoServicos) {
-                                status_desc = `ERROR: no hay "${arrayPost[y].servicios}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
-                                statusPost.push(`${time}, ${status_desc}`);
-                                await postStatus(status_desc, statusPost, data);
-                                statusPost = statusPost.concat('\n');
-                                return false;
-                            }
-                            let duplicadorServicos = gridDestino.filter((j) => j.UrlJsonContext.serv_servicos__servico == arrayPost[y].servicios);
-                            if (!duplicadorServicos || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].serv_servicos__servico = retornoServicos[0] ? retornoServicos[0].UrlJsonContext.servicos : '';
-                                arrayPost[y].serv_servicos_id = retornoServicos[0] ? retornoServicos[0].ID : '';
+                            for (let s in arr00) {
+                                let retornoServicos = registroServicos.filter((j) => j.UrlJsonContext.servico == arr00[s]);
+                                if (!retornoServicos) {
+                                    status_desc = `ERROR: no hay "${arr00[s]}" registrado para ${tabExcel} de "${arrayPost[y].asset_number}"`;
+                                    statusPost.push(`${time}, ${status_desc}`);
+                                    await postStatus(status_desc, statusPost, data);
+                                    statusPost = statusPost.concat('\n');
+                                    return false;
+                                }
+
+                                let duplicadorServicos = gridDestino.filter((j) => j.UrlJsonContext.SERVservicos__servico[0] == arr00[s]); //TODO precisa testar retorno de SERVservicos__servico
+                                if (!duplicadorServicos || data.em_caso_de_duplicidade == '1') {
+                                    arrayPost[y].SERVservicos__servico = retornoServicos[0] ? retornoServicos[0].UrlJsonContext.servico : '';
+                                    arrayPost[y].srvs_id = retornoServicos[0] ? retornoServicos[0].ID : '';
+                                    arrayPost[y].servicos_id_cache = retornoServicos[0] ? retornoServicos[0].ID : '';
+                                    delete arrayPost[y].servicios;
+                                }
                             }
 
                             //*pesq.ref:sujeto_pasivo
@@ -1062,14 +1101,17 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorSujeitoPassivo = gridDestino.filter(
                                 (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == arrayPost[y].sujeto_pasivo
                             );
+
                             if (!duplicadorSujeitoPassivo || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = retornoSujeitoPassivo[0]
                                     ? retornoSujeitoPassivo[0].UrlJsonContext.sujeito
                                     : '';
-                                arrayPost[y].suj_pa_sujeito_id = retornoSujeitoPassivo[0] ? retornoSujeitoPassivo[0].ID : '';
+                                arrayPost[y].suj_pa_prcs__sujeito_passivo_alumbrado_publico_id = retornoSujeitoPassivo[0] ? retornoSujeitoPassivo[0].ID : '';
+                                delete arrayPost[y].sujeto_pasivo;
                             }
 
                             let duplicadorAcordoResolucao = gridDestino.filter(
@@ -1077,6 +1119,7 @@ async function init(json) {
                             );
                             if (!duplicadorAcordoResolucao || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].prcs__acuerdo_resolucion_alumbrado_publico = arrayPost[y].acuerdo_resolucion;
+                                delete arrayPost[y].acuerdo_resolucion;
                             }
 
                             //*pesq.ref:tipo_cobro
@@ -1090,19 +1133,22 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorTipoCobranca = gridDestino.filter(
-                                (j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__prcs__tipo_cobro_alumbrado_publico == arrayPost[y].tipo_cobro
+                                (j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca == arrayPost[y].tipo_cobro
                             );
                             if (!duplicadorTipoCobranca || data.em_caso_de_duplicidade == '1') {
-                                arrayPost[y].tipo_cobr_tipos_cobrancas__prcs__tipo_cobro_alumbrado_publico = retornoTipoCobranca[0]
+                                arrayPost[y].tipo_cobr_tipos_cobrancas__tipo_de_cobranca = retornoTipoCobranca[0]
                                     ? retornoTipoCobranca[0].UrlJsonContext.tipos_cobrancas
                                     : '';
-                                arrayPost[y].tipo_cobr_tipos_cobrancas_id = retornoTipoCobranca[0] ? retornoTipoCobranca[0].ID : '';
+                                arrayPost[y].tipo_cobr_tipo_de_cobranca_id = retornoTipoCobranca[0] ? retornoTipoCobranca[0].ID : '';
+                                delete arrayPost[y].tipo_cobro;
                             }
 
                             let duplicadorDiaPagamento = gridDestino.filter((j) => j.UrlJsonContext.prcs__dia_de_pagamento == arrayPost[y].dia_de_pago);
                             if (!duplicadorDiaPagamento || data.em_caso_de_duplicidade == '1') {
                                 arrayPost[y].prcs__dia_de_pagamento = arrayPost[y].dia_de_pago;
+                                delete arrayPost[y].dia_de_pago;
                             }
 
                             //*pesq.ref:frecuencia_pago
@@ -1118,6 +1164,7 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorFrequenciaPagamento = gridDestino.filter(
                                 (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == arrayPost[y].frecuencia_pago
                             );
@@ -1125,7 +1172,8 @@ async function init(json) {
                                 arrayPost[y].fre_pag_frequencia__frequencia_de_pagamento = retornoFrequenciaPagamento[0]
                                     ? retornoFrequenciaPagamento[0].UrlJsonContext.frequencia
                                     : '';
-                                arrayPost[y].fre_pag_frequencia_id = retornoFrequenciaPagamento[0] ? retornoFrequenciaPagamento[0].ID : '';
+                                arrayPost[y].fre_pag_frequencia_de_pagamento_id = retornoFrequenciaPagamento[0] ? retornoFrequenciaPagamento[0].ID : '';
+                                delete arrayPost[y].frecuencia_pago;
                             }
 
                             //*pesq.ref:forma_pago
@@ -1139,6 +1187,7 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorFormaPagamento = gridDestino.filter(
                                 (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == arrayPost[y].forma_pago
                             );
@@ -1146,7 +1195,8 @@ async function init(json) {
                                 arrayPost[y].for_pag_formas_de_pagamentos__forma_de_pagamento = retornoFormaPagamento[0]
                                     ? retornoFormaPagamento[0].UrlJsonContext.formas_de_pagamentos
                                     : '';
-                                arrayPost[y].for_pag_formas_de_pagamentos_id = retornoFormaPagamento[0] ? retornoFormaPagamento[0].ID : '';
+                                arrayPost[y].for_pag_forma_de_pagamento_id = retornoFormaPagamento[0] ? retornoFormaPagamento[0].ID : '';
+                                delete arrayPost[y].forma_pago;
                             }
 
                             //*pesq.ref:clasificacion_passthru
@@ -1162,6 +1212,7 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
+
                             let duplicadorClassificacaoPassthru = gridDestino.filter(
                                 (j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == arrayPost[y].clasificacion_passthru
                             );
@@ -1169,7 +1220,8 @@ async function init(json) {
                                 arrayPost[y].CPTclassificacao_passthru__prcs__clasificacion_passthru = retornoClassificacaoPassthru[0]
                                     ? retornoClassificacaoPassthru[0].UrlJsonContext.classificacao_passthru
                                     : '';
-                                arrayPost[y].CPTclassificacao_passthru_id = retornoClassificacaoPassthru[0] ? retornoClassificacaoPassthru[0].ID : '';
+                                arrayPost[y].CPTprcs__clasificacion_passthru_id = retornoClassificacaoPassthru[0] ? retornoClassificacaoPassthru[0].ID : '';
+                                delete arrayPost[y].clasificacion_passthru;
                             }
 
                             let postArray = arrayPost[y];
@@ -1183,7 +1235,6 @@ async function init(json) {
                         }
 
                         //*aba:informacion_tecnica
-                        //TODO revisar jsons
                         if (tabExcel == 'informacion_tecnica') {
                             //*pesq.ref:categorias
                             let categoriasGrid = '55ec978d-7dbe-4a6f-8cb4-536b53361d54';
