@@ -1046,8 +1046,8 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isIdlcEstadoCuenta = gridDestino.filter((j) => j.UrlJsonContext.sta_cont_status_conta == objPost.estado_cuenta);
                             if (!isIdlcEstadoCuenta || data.em_caso_de_duplicidade == '1') {
-                                objPost.sta_cont_status_conta = idEstadoCuenta[0] ? idEstadoCuenta[0].UrlJsonContext.status_conta : '';
-                                objPost.sta_cont_id = idEstadoCuenta[0] ? idEstadoCuenta[0].ID : '';
+                                objPost.sta_cont_status_conta = isEstadoCuenta[0] ? isEstadoCuenta[0].UrlJsonContext.status_conta : '';
+                                objPost.sta_cont_id = isEstadoCuenta[0] ? isEstadoCuenta[0].ID : '';
                                 delete objPost.estado_cuenta;
                             }
 
@@ -1232,7 +1232,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: aba:informacion_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
+                            /*await*/ sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'asset_number_IDC', true, false, false);
                         }
 
                         //*aba:informacion_tecnica
@@ -1413,9 +1413,9 @@ function gerarDataHora(dataHoje, utc) {
 
                         //*aba:clientes_sitio
                         if (tabExcel == 'clientes_sitio') {
-                            //*id_one_ref:clientes
-                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
-                            let paiFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente);
+                            //*id_one_ref:sitios
+                            let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
+                            let paiFiltro = gerarFiltro('asset_number', objPost.asset_number);
                             let paiRegistro = /*await*/ getOnergyItem(paiGrid, data.assid, data.usrid, paiFiltro);
 
                             //*pesq.ref:nit_cliente
@@ -1543,7 +1543,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: aba:clientes_sitio sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'COLCCOLC_nit_cliente', true, false, false);
+                            /*await*/ sendItemToOnergy(tabExcelID, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
                         }
 
                         //*aba:clasificacion_passthru
