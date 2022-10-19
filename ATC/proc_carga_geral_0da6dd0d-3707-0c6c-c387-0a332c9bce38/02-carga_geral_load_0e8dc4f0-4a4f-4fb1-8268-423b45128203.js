@@ -212,30 +212,25 @@ function gerarDataHora(dataHoje, utc) {
                         let name = fielName[n];
                         let val = ctxExcel[x];
 
-                        //*se coluna contiver etiqueta, trata valor de acordo com tipo
-                        if (name.includes('{{int}}' || '{{INT}}')) {
-                            name = name.replace('{{int}}', '');
-                            name = name.replace('{{INT}}', '');
-                            val[name] = parseInt(val[name]);
-                        } else if (name.includes('{{float}}' || '{{FLOAT}}')) {
-                            name = name.replace('{{float}}', '');
-                            name = name.replace('{{FLOAT}}', '');
-                            val[name] = parseFloat(val[name]);
-                        } else if (name.includes('{{date}}' || '{{DATE}}')) {
-                            name = name.replace('{{date}}', '');
-                            name = name.replace('{{DATE}}', '');
-                            val[name] = new Date(val[name]);
-                        } else if (name.includes('{{bool}}' || '{{BOOL}}')) {
-                            name = name.replace('{{bool}}', '');
-                            name = name.replace('{{BOOL}}', '');
-                            val[name] = val[name] == 'true' ? true : false;
-                        }
+                        for (let y in val) {
+                            let prop = y;
+                            let value = val[y];
 
-                        //*se valor for string, remove espaços em branco
-                        if (typeof val[name] == 'string') {
-                            objLine[name] = val[name].trim();
-                        } else {
-                            objLine[name] = val[name];
+                            //*se prop possuir tag, remove tag e manipula value
+                            if (prop.includes('{{int}}' || '{{INT}}')) {
+                                value = parseInt(value);
+                                prop = prop.replace('{{int}}', '').replace('{{INT}}', '');
+                            } else if (prop.includes('{{float}}' || '{{FLOAT}}')) {
+                                value = parseFloat(value);
+                                prop = prop.replace('{{float}}', '').replace('{{FLOAT}}', '');
+                            } else {
+                            }
+
+                            //*se valor for string, remove espaços em branco
+                            if (typeof value == 'string') {
+                                value = value.trim();
+                            }
+                            objLine[prop] = value;
                         }
                     }
                     arrayPost.push(objLine);
@@ -1631,39 +1626,38 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
  */
 let json = {
     processo: [
-        '18/10/2022 13:34:49, Cargando 49 registros de portafolio_clientes',
+        '19/10/2022 -5:43, Cargando 4 registros de frecuencia_pago',
         '\n',
-        '18/10/2022 13:34:49, Manejando 49 registros de portafolio_clientes',
+        '19/10/2022 -5:43, Manejando 4 registros de frecuencia_pago',
         '\n',
-        '18/10/2022 13:34:49, Carga de portafolio_clientes finalizada',
-        '\n',
+        '19/10/2022 -5:43, Carga de frecuencia_pago finalizada',
     ],
-    horas: '15:34',
-    dataDate: '2022-10-18 18:34:48',
-    data: '2022-10-18 15:34:48',
+    horas: '21:42',
+    dataDate: '2022-10-19 00:43:02',
+    data: '2022-10-18 21:43:02',
     load_index_equipe: 'COL',
-    load_index_id_do_card: 'b36cf260-c691-4d36-9339-137041e6fb63',
+    load_index_id_do_card: '2d4edce3-7131-413a-98e5-35d328daef7f',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxdb8b5885-d630-4bcf-b233-52e244585601.xlsx?sv=2018-03-28&sr=b&sig=8%2BieC9CliINgb8me%2Fj1uTTMfL8PAmCe0%2FQdKasgM2oY%3D&se=2023-05-06T18%3A34%3A34Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxf243085c-0245-43e8-90d5-6a67d0184039.xlsx?sv=2018-03-28&sr=b&sig=6QiSruH9UbuQHUzxa0xDReabRiAgfP72kxalYIwW1DU%3D&se=2023-05-07T00%3A42%3A55Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxdb8b5885-d630-4bcf-b233-52e244585601.xlsx?sv=2018-03-28&sr=b&sig=8%2BieC9CliINgb8me%2Fj1uTTMfL8PAmCe0%2FQdKasgM2oY%3D&se=2023-05-06T18%3A34%3A34Z&sp=r',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxf243085c-0245-43e8-90d5-6a67d0184039.xlsx?sv=2018-03-28&sr=b&sig=6QiSruH9UbuQHUzxa0xDReabRiAgfP72kxalYIwW1DU%3D&se=2023-05-07T00%3A42%3A55Z&sp=r',
             Name: 'tablas_maestras_v3.xlsx',
         },
     ],
-    load_index_tab_excel: 'portafolio_clientes',
-    load_index_id: 'b2fc48e3-c530-96b2-a64a-432f0a399dd8',
+    load_index_tab_excel: 'frecuencia_pago',
+    load_index_id: '3b906cd4-b8a1-49c9-bff0-68832d21594c',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de portafolio_clientes finalizada',
-    time: '15:34',
+    processamento: 'Carga de frecuencia_pago finalizada',
+    time: '21:42',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: 'Carga Geral',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     email: 'admin-colombia@atc.com.co',
     fdtid: '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f',
-    fedid: 'cade2a10-4632-2cc7-1579-c2171455a8a8',
-    id_upload_planilha: 'cade2a10-4632-2cc7-1579-c2171455a8a8',
+    fedid: 'ea932508-7baf-2e41-fbfb-273db05cab59',
+    id_upload_planilha: 'ea932508-7baf-2e41-fbfb-273db05cab59',
     onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
     timezone: null,
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
