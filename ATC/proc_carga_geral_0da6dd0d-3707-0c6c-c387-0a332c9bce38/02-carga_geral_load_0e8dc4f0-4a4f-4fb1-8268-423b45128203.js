@@ -808,7 +808,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isAssetNumber = getTabExcel.filter((j) => j.UrlJsonContext.asset_number == objPost.asset_number);
                             if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
-                                objPost.asset_number = objPost.asset_number;
+                                objPost.asset_number = objPost.asset_number.toString();
                             }
 
                             let isProfitCostCenter = getTabExcel.filter((j) => j.UrlJsonContext.profit_cost_center == objPost.profit_cost_center);
@@ -966,8 +966,8 @@ function gerarDataHora(dataHoje, utc) {
                             let isAssetNumber = getTabExcel.filter((j) => j.UrlJsonContext.asset_number_IDC == objPost.asset_number);
                             if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
                                 objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
-                                objPost.asset_number_IDC = objPost.asset_number;
-                                objPost.asset_number = objPost.asset_number;
+                                objPost.asset_number_IDC = objPost.asset_number.toString();
+                                objPost.asset_number = objPost.asset_number.toString();
                             }
 
                             let isNombreSitio = getTabExcel.filter((j) => j.UrlJsonContext.site_name == objPost.nombre_sitio);
@@ -984,7 +984,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isCuentaInternaNIC = getTabExcel.filter((j) => j.UrlJsonContext.conta_interna_nic == objPost.cuenta_interna_nic);
                             if (!isCuentaInternaNIC || data.em_caso_de_duplicidade == '1') {
-                                objPost.conta_interna_nic = objPost.cuenta_interna_nic;
+                                objPost.conta_interna_nic = objPost.cuenta_interna_nic.toString();
                                 delete objPost.cuenta_interna_nic;
                             }
 
@@ -1330,7 +1330,7 @@ function gerarDataHora(dataHoje, utc) {
                             let isAssetNumber = getTabExcel.filter((j) => j.UrlJsonContext.asset_number == objPost.asset_number);
                             if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
                                 objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
-                                objPost.asset_number = objPost.asset_number;
+                                objPost.asset_number = objPost.asset_number.toString();
                             }
 
                             let isNombreSitio = getTabExcel.filter((j) => j.UrlJsonContext.site_name == objPost.nombre_sitio);
@@ -1511,7 +1511,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isAssetNumber = getTabExcel.filter((j) => j.UrlJsonContext.asset_number == objPost.asset_number);
                             if (!isAssetNumber || data.em_caso_de_duplicidade == '1') {
-                                objPost.asset_number = objPost.asset_number;
+                                objPost.asset_number = objPost.asset_number.toString();
                             }
 
                             let isProfitCostCenter = getTabExcel.filter((j) => j.UrlJsonContext.profit_cost_center == objPost.profit_cost_center);
@@ -1634,39 +1634,38 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
  */
 let json = {
     processo: [
-        '19/10/2022 13:00:49, Cargando 49 registros de informacion_cuenta',
+        '19/10/2022 10:56:21, Cargando 49 registros de sitios',
         '\n',
-        '19/10/2022 13:00:49, Manejando 49 registros de informacion_cuenta',
+        '19/10/2022 10:56:21, Manejando 49 registros de sitios',
         '\n',
-        '19/10/2022 13:00:49, Carga de informacion_cuenta finalizada',
+        '19/10/2022 10:56:21, Carga de sitios finalizada',
     ],
-    horas: '15:00',
-    dataDate: '2022-10-19 18:00:49',
-    data: '2022-10-19 15:00:49',
+    horas: '12:56',
+    dataDate: '2022-10-19 15:56:21',
+    data: '2022-10-19 12:56:21',
     load_index_equipe: 'COL',
-    load_index_id_equipe: '',
-    load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
+    load_index_id_do_card: 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx2a2d68fe-e6f3-4d65-bd6b-9bf40f8375eb.xlsx?sv=2018-03-28&sr=b&sig=j%2Be1nsTqo1gN1qkL6odjsJdjCNRNOJJP94RJTQdNx4U%3D&se=2023-05-07T18%3A00%3A38Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx7685f870-31c6-4863-924e-28fb5b3b3b90.xlsx?sv=2018-03-28&sr=b&sig=PWaVspM0upBGICSjtJALyv8af9tf8hTiop7x7g0VFlk%3D&se=2023-05-07T15%3A56%3A08Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx2a2d68fe-e6f3-4d65-bd6b-9bf40f8375eb.xlsx?sv=2018-03-28&sr=b&sig=j%2Be1nsTqo1gN1qkL6odjsJdjCNRNOJJP94RJTQdNx4U%3D&se=2023-05-07T18%3A00%3A38Z&sp=r',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx7685f870-31c6-4863-924e-28fb5b3b3b90.xlsx?sv=2018-03-28&sr=b&sig=PWaVspM0upBGICSjtJALyv8af9tf8hTiop7x7g0VFlk%3D&se=2023-05-07T15%3A56%3A08Z&sp=r',
             Name: 'tablas_maestras_v3.xlsx',
         },
     ],
-    load_index_tab_excel: 'informacion_cuenta',
-    load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
+    load_index_tab_excel: 'sitios',
+    load_index_id: 'ea2c764b-d958-4905-af1e-669239bce62e',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de informacion_cuenta finalizada',
-    time: '15:00',
+    processamento: 'Carga de sitios finalizada',
+    time: '12:56',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: 'Carga Geral',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     email: 'admin-colombia@atc.com.co',
     fdtid: '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f',
-    fedid: '802ee10f-af15-fd31-dcbe-6eabd99e14a3',
-    id_upload_planilha: '802ee10f-af15-fd31-dcbe-6eabd99e14a3',
+    fedid: 'feb6f327-04a1-6333-1968-ac1a8d417772',
+    id_upload_planilha: 'feb6f327-04a1-6333-1968-ac1a8d417772',
     onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
     timezone: null,
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
