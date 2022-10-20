@@ -151,32 +151,36 @@ async function init(json) {
     let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta);
     if (!isEstadoCuenta.length) {
         onergy.log(`JFS: Estado de cuenta no encontrado: ${data.sta_cont_status_conta}`);
-        return JSON.stringify({ status: 'error', message: 'Estado de cuenta no existe' });
+        return;
     } else if (isEstadoCuenta[0].UrlJsonContext.status_conta == 'INACTIVO') {
         onergy.log(`JFS: Estado de cuenta inactivo: ${data.sta_cont_status_conta}`);
-        return JSON.stringify({ status: 'error', message: 'Estado de cuenta inactivo' });
+        return;
     }
 
     //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '21672360-869c-4c29-8cf8-2bafa8530923';
     let strPesqRef = isEstadoCuenta[0].UrlJsonContext.status_conta;
-    let strFiltro = gerarFiltro('sta_cont_status_conta', strPesqRef);
-    let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, strFiltro);
+    let ftrPesqRef = gerarFiltro('sta_cont_status_conta', strPesqRef);
+    let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrPesqRef);
     if (!getInformacionCuenta.length) {
         onergy.log(`JFS: Informacion de cuenta no encontrada: ${strPesqRef}`);
-        return JSON.stringify({ status: 'error', message: 'Informacion de cuenta no existe' });
+        return;
     }
 
-    //*aba:facturas(pai:informacion_cuenta)
-    let idFacturas = 'de049824-99f5-4ab1-bf97-6c2c9640605f';
-    let getFacturas = await getOnergyItem(idFacturas, data.assid, data.usrid, null);
-    if (!getFacturas.length) {
-        onergy.log(`JFS: Facturas no encontradas`);
-        return JSON.stringify({ status: 'error', message: 'Facturas no encontradas' });
+    //*aba:factura(pai:informacion_cuenta)
+    let idFactura = 'de049824-99f5-4ab1-bf97-6c2c9640605f';
+    let strPai = getInformacionCuenta[0].UrlJsonContext.conta_interna_nic;
+    let ftrPai = gerarFiltro('conta_interna_nic', strPai);
+    let getFactura = await getOnergyItem(idFactura, data.assid, data.usrid, ftrPai);
+    if (!getFactura.length) {
+        onergy.log(`JFS: Factura no encontrada: ${strPai}`);
+        return;
     }
 
     //*para cada registro, verifica estado_cuenta e proximo_pago_oportuno comparado com hoje
     for (let i in getInformacionCuenta) {
+        let strAba = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
+        let strFiltro = gerarFiltro('prcs__proximo_pagamento', strAba);
     }
 
     debugger;
