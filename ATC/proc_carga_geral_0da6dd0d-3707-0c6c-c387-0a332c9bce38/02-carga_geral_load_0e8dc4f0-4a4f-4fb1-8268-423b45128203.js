@@ -1051,8 +1051,8 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isIdlcEstadoCuenta = getTabExcel.filter((j) => j.UrlJsonContext.sta_cont_status_conta == objPost.estado_cuenta);
                             if (!isIdlcEstadoCuenta || data.em_caso_de_duplicidade == '1') {
-                                objPost.sta_cont_status_conta = isEstadoCuenta[0] ? isEstadoCuenta[0].UrlJsonContext.status_conta : '';
-                                objPost.sta_cont_id = isEstadoCuenta[0] ? isEstadoCuenta[0].ID : '';
+                                objPost.sta_cont_status_conta = isEstadoCuenta.length > 0 ? isEstadoCuenta[0].UrlJsonContext.status_conta : '';
+                                objPost.sta_cont_id = isEstadoCuenta.length > 0 ? isEstadoCuenta[0].ID : '';
                                 delete objPost.estado_cuenta;
                             }
 
@@ -1149,8 +1149,8 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isIdlcTipoCobro = getTabExcel.filter((j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca == objPost.tipo_cobro);
                             if (!isIdlcTipoCobro || data.em_caso_de_duplicidade == '1') {
-                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca = isTipoCobro[0] ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
-                                objPost.tipo_cobr_tipo_de_cobranca_id = isTipoCobro[0] ? isTipoCobro[0].ID : '';
+                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca = isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
+                                objPost.tipo_cobr_tipo_de_cobranca_id = isTipoCobro.length > 0 ? isTipoCobro[0].ID : '';
                                 delete objPost.tipo_cobro;
                             }
 
@@ -1158,6 +1158,12 @@ function gerarDataHora(dataHoje, utc) {
                             if (!isDiaDePago || data.em_caso_de_duplicidade == '1') {
                                 objPost.prcs__dia_de_pagamento = objPost.dia_de_pago;
                                 delete objPost.dia_de_pago;
+                                delete objPost.fecha_pago_abril;
+                                delete objPost.fecha_pago_mayo;
+                                delete objPost.fecha_pago_junio;
+                                delete objPost.d1;
+                                delete objPost.d2;
+                                delete objPost.d3;
                             }
 
                             //*pesq.ref:frecuencia_pago
@@ -1174,8 +1180,8 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isIdlcFrecuenciaPago = getTabExcel.filter((j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago);
                             if (!isIdlcFrecuenciaPago || data.em_caso_de_duplicidade == '1') {
-                                objPost.fre_pag_frequencia__frequencia_de_pagamento = isFrecuenciaPago[0] ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
-                                objPost.fre_pag_frequencia_de_pagamento_id = isFrecuenciaPago[0] ? isFrecuenciaPago[0].ID : '';
+                                objPost.fre_pag_frequencia__frequencia_de_pagamento = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
+                                objPost.fre_pag_frequencia_de_pagamento_id = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].ID : '';
                                 delete objPost.frecuencia_pago;
                             }
 
@@ -1193,8 +1199,8 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isIdlcFormaPago = getTabExcel.filter((j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago);
                             if (!isIdlcFormaPago || data.em_caso_de_duplicidade == '1') {
-                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento = isFormaPago[0] ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
-                                objPost.for_pag_forma_de_pagamento_id = isFormaPago[0] ? isFormaPago[0].ID : '';
+                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento = isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
+                                objPost.for_pag_forma_de_pagamento_id = isFormaPago.length > 0 ? isFormaPago[0].ID : '';
                                 delete objPost.forma_pago;
                             }
 
@@ -1212,9 +1218,42 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isIdlcClasificacionPassthru = getTabExcel.filter((j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru);
                             if (!isIdlcClasificacionPassthru || data.em_caso_de_duplicidade == '1') {
-                                objPost.CPTclassificacao_passthru__prcs__clasificacion_passthru = isClasificacionPassthru[0] ? isClasificacionPassthru[0].UrlJsonContext.classificacao_passthru : '';
-                                objPost.CPTprcs__clasificacion_passthru_id = isClasificacionPassthru[0] ? isClasificacionPassthru[0].ID : '';
+                                objPost.CPTclassificacao_passthru__prcs__clasificacion_passthru =
+                                    isClasificacionPassthru.length > 0 ? isClasificacionPassthru[0].UrlJsonContext.classificacao_passthru : '';
+                                objPost.CPTprcs__clasificacion_passthru_id = isClasificacionPassthru.length > 0 ? isClasificacionPassthru[0].ID : '';
                                 delete objPost.clasificacion_passthru;
+                            }
+
+                            //*pesq.ref:estado_captura_cuenta
+                            let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
+                            let getEstadoCapturaCuenta = /*await*/ getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
+                            let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter((j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta);
+                            if (!isEstadoCapturaCuenta) {
+                                status_desc = `ERROR: no hay "${objPost.estado_captura_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
+                                statusPost.push(`${time}, ${status_desc}`);
+                                /*await*/ postStatus(status_desc, statusPost, data);
+                                statusPost = statusPost.concat('\n');
+                                return false;
+                            }
+
+                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter((j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta);
+                            if (!isIdlcEstadoCapturaCuenta || data.em_caso_de_duplicidade == '1') {
+                                objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
+                                    isEstadoCapturaCuenta.length > 0 ? isEstadoCapturaCuenta[0].UrlJsonContext.ECCU_estado_da_captura_da_conta : '';
+                                objPost.ECCUstatus_de_capturapago_id = isEstadoCapturaCuenta.length > 0 ? isEstadoCapturaCuenta[0].ID : '';
+                                delete objPost.estado_captura_cuenta;
+                            }
+
+                            let isProximaCaptura = getTabExcel.filter((j) => j.UrlJsonContext.prcs__proxima_captura == objPost.proxima_captura);
+                            if (!isProximaCaptura || data.em_caso_de_duplicidade == '1') {
+                                objPost.prcs__proxima_captura = objPost.proxima_captura;
+                                delete objPost.proxima_captura;
+                            }
+
+                            let isProximoPagoOportuno = getTabExcel.filter((j) => j.UrlJsonContext.prcs__proximo_pagamento == objPost.proximo_pago_oportuno);
+                            if (!isProximoPagoOportuno || data.em_caso_de_duplicidade == '1') {
+                                objPost.prcs__proximo_pagamento = objPost.proximo_pago_oportuno;
+                                delete objPost.proximo_pago_oportuno;
                             }
 
                             //!node:test (unhide log and hide sendItem)
