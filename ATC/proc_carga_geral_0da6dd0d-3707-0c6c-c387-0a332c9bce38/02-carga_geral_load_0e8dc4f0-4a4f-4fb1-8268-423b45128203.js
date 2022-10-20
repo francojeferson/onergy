@@ -312,7 +312,7 @@ function gerarDataHora(dataHoje, utc) {
                         if (tabExcel == 'compania_atc') {
                             let isCompaniaATC = getTabExcel.filter((j) => j.UrlJsonContext.site == objPost.compania_atc);
                             if (!isCompaniaATC || data.em_caso_de_duplicidade == '1') {
-                                //TODO carga não preenche item (ATC)
+                                //TODO: carga não preenche item (ATC)
                                 objPost.site = objPost.compania_atc;
                                 delete objPost.compania_atc;
                             }
@@ -853,7 +853,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isSitMunicipio = getTabExcel.filter((j) => j.UrlJsonContext.loca_cida_municipio == objPost.municipio);
                             if (!isSitMunicipio || data.em_caso_de_duplicidade == '1') {
-                                //TODO tabela-base divergente do campo inspecionado (uf)
+                                //TODO: tabela-base divergente do campo inspecionado (uf)
                                 objPost.loca_cida_municipio = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.municipio : '';
                                 objPost.loca_cida_id = isMunicipio.length > 0 ? isMunicipio[0].ID : '';
                                 objPost.loca_cida_loca_uf_uf = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.loca_uf_uf : '';
@@ -908,7 +908,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isSitPortafolioATC = getTabExcel.filter((j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == objPost.portafolio_atc);
                             if (!isSitPortafolioATC || data.em_caso_de_duplicidade == '1') {
-                                //TODO carga não preenche portafolio_atc
+                                //TODO: carga não preenche portafolio_atc
                                 objPost.tppf_tipo_portifolio__portfolio = isPortafolioATC.length > 0 ? isPortafolioATC[0].UrlJsonContext.tipo_portifolio : '';
                                 objPost.tppf_tipo_portifolio = isPortafolioATC.length > 0 ? isPortafolioATC[0].UrlJsonContext.tipo_portifolio : '';
                                 objPost.tppf_portfolio_id = isPortafolioATC.length > 0 ? isPortafolioATC[0].ID : '';
@@ -929,7 +929,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isSitRegionalATC = getTabExcel.filter((j) => j.UrlJsonContext.regio_regional__regiao_atc == objPost.regional_atc);
                             if (!isSitRegionalATC || data.em_caso_de_duplicidade == '1') {
-                                //TODO carga não preenche regional_atc
+                                //TODO: carga não preenche regional_atc
                                 objPost.regio_regional__regiao_atc = isRegionalATC.length > 0 ? isRegionalATC[0].UrlJsonContext.regional : '';
                                 objPost.regio_regional = isRegionalATC.length > 0 ? isRegionalATC[0].UrlJsonContext.regional : '';
                                 objPost.regio_regional_regiao_atc_id = isRegionalATC.length > 0 ? isRegionalATC[0].ID : '';
