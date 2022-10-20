@@ -172,18 +172,20 @@ async function init(json) {
     let strPai = getInformacionCuenta[0].UrlJsonContext.conta_interna_nic;
     let ftrPai = gerarFiltro('conta_interna_nic', strPai);
     let getFactura = await getOnergyItem(idFactura, data.assid, data.usrid, ftrPai);
-    if (getFactura.length > 0) {
-        //*para cada registro, verifica estado_cuenta e proximo_pago_oportuno comparado com hoje
+    if (getFactura /*.length > 0*/) {
+        //TODO: remover comentário acima assim que houver fatura para teste
+        //*pesq.ref:proximo_pago_oportuno
         for (let i in getInformacionCuenta) {
-            let strAba = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
-            let strFiltro = gerarFiltro('prcs__proximo_pagamento', strAba);
+            let strPai = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
+            let ftrPai = gerarFiltro('prcs__proximo_pagamento', strPai);
+            let getProximoPagamento = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrPai);
+            debugger;
         }
     } else {
         onergy.log(`JFS: Factura no encontrada para Cuenta Interna (NIC): ${strPai}`);
         return;
     }
 
-    debugger;
     //return true;
     return SetObjectResponse(true, data, true);
 }
