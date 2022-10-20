@@ -163,7 +163,7 @@ async function init(json) {
     let ftrPesqRef = gerarFiltro('sta_cont_status_conta', strPesqRef);
     let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrPesqRef);
     if (!getInformacionCuenta.length) {
-        onergy.log(`JFS: Informacion de cuenta no encontrada: ${strPesqRef}`);
+        onergy.log(`JFS: Información de Cuenta no encontrada para Estado de Cuenta: ${strPesqRef}`);
         return;
     }
 
@@ -172,15 +172,15 @@ async function init(json) {
     let strPai = getInformacionCuenta[0].UrlJsonContext.conta_interna_nic;
     let ftrPai = gerarFiltro('conta_interna_nic', strPai);
     let getFactura = await getOnergyItem(idFactura, data.assid, data.usrid, ftrPai);
-    if (!getFactura.length) {
-        onergy.log(`JFS: Factura no encontrada: ${strPai}`);
+    if (getFactura.length > 0) {
+        //*para cada registro, verifica estado_cuenta e proximo_pago_oportuno comparado com hoje
+        for (let i in getInformacionCuenta) {
+            let strAba = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
+            let strFiltro = gerarFiltro('prcs__proximo_pagamento', strAba);
+        }
+    } else {
+        onergy.log(`JFS: Factura no encontrada para Cuenta Interna (NIC): ${strPai}`);
         return;
-    }
-
-    //*para cada registro, verifica estado_cuenta e proximo_pago_oportuno comparado com hoje
-    for (let i in getInformacionCuenta) {
-        let strAba = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
-        let strFiltro = gerarFiltro('prcs__proximo_pagamento', strAba);
     }
 
     debugger;
