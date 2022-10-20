@@ -186,6 +186,12 @@ async function init(json) {
         return;
     }
 
+    //pra que serve
+    //tantos códigos
+    //se a vida
+    //não é programada
+    //e as melhores coisas
+    //não tem lógica
     //return true;
     return SetObjectResponse(true, data, true);
 }
