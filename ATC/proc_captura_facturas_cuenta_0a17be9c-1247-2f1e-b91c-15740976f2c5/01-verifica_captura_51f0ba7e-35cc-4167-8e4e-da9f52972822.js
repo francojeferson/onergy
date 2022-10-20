@@ -149,15 +149,37 @@ async function init(json) {
     let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
     let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
     let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta);
+    if (!isEstadoCuenta.length) {
+        onergy.log(`JFS: Estado de cuenta no encontrado: ${data.sta_cont_status_conta}`);
+        return JSON.stringify({ status: 'error', message: 'Estado de cuenta no existe' });
+    } else if (isEstadoCuenta[0].UrlJsonContext.status_conta == 'INACTIVO') {
+        onergy.log(`JFS: Estado de cuenta inactivo: ${data.sta_cont_status_conta}`);
+        return JSON.stringify({ status: 'error', message: 'Estado de cuenta inactivo' });
+    }
 
+    //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '21672360-869c-4c29-8cf8-2bafa8530923';
-    let strFiltro = gerarFiltro('ACTIVA', data.sta_cont_status_conta);
+    let strPesqRef = isEstadoCuenta[0].UrlJsonContext.status_conta;
+    let strFiltro = gerarFiltro('sta_cont_status_conta', strPesqRef);
     let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, strFiltro);
-    debugger;
+    if (!getInformacionCuenta.length) {
+        onergy.log(`JFS: Informacion de cuenta no encontrada: ${strPesqRef}`);
+        return JSON.stringify({ status: 'error', message: 'Informacion de cuenta no existe' });
+    }
 
+    //*aba:facturas(pai:informacion_cuenta)
+    let idFacturas = 'de049824-99f5-4ab1-bf97-6c2c9640605f';
+    let getFacturas = await getOnergyItem(idFacturas, data.assid, data.usrid, null);
+    if (!getFacturas.length) {
+        onergy.log(`JFS: Facturas no encontradas`);
+        return JSON.stringify({ status: 'error', message: 'Facturas no encontradas' });
+    }
+
+    //*para cada registro, verifica estado_cuenta e proximo_pago_oportuno comparado com hoje
     for (let i in getInformacionCuenta) {
     }
 
+    debugger;
     //return true;
     return SetObjectResponse(true, data, true);
 }
