@@ -176,14 +176,16 @@ async function init(json) {
     }
 
     for (let i in getInformacionCuenta) {
-        //selecionar somente TCTC_tipo_de_conta__prcs__tipo_de_conta == P, PH e I
-        let isTipoCuenta = getInformacionCuenta[i].UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta;
+        let objPost = getInformacionCuenta[i].UrlJsonContext;
+
+        //tipo_cuenta == P, PH e I
+        let isTipoCuenta = objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta;
         if (isTipoCuenta == 'P' || isTipoCuenta == 'PH' || isTipoCuenta == 'I') {
-            let isProximoPago = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
-            let isProximaCaptura = getInformacionCuenta[i].UrlJsonContext.prcs__proxima_captura;
-            let isDiaDePago = getInformacionCuenta[i].UrlJsonContext.prcs__dia_de_pagamento;
-            let isFrecuenciaPago = getInformacionCuenta[i].UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento;
-            let isEstadoCaptura = getInformacionCuenta[i].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+            let isProximoPago = objPost.prcs__proximo_pagamento;
+            let isProximaCaptura = objPost.prcs__proxima_captura;
+            let isDiaDePago = objPost.prcs__dia_de_pagamento;
+            let isFrecuenciaPago = objPost.fre_pag_frequencia__frequencia_de_pagamento;
+            let isEstadoCaptura = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
             debugger;
         }
     }
