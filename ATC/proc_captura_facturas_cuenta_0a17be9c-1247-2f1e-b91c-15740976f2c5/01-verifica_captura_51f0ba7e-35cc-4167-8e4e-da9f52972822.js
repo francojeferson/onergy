@@ -144,18 +144,26 @@ function gerarDataHora(dataHoje, utc) {
 }
 async function init(json) {
     var data = JSON.parse(json);
+    arrPost = [];
 
     //*pesq.ref:estado_cuenta
     let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
     let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
     let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta);
     if (!isEstadoCuenta.length) {
-        onergy.log(`JFS: Estado de cuenta no encontrado: ${data.sta_cont_status_conta}`);
+        onergy.log(`JFS: isEstadoCuenta: Estado de cuenta no encontrado: ${data.sta_cont_status_conta}`);
         return;
     } else if (isEstadoCuenta[0].UrlJsonContext.status_conta == 'INACTIVO') {
-        onergy.log(`JFS: Estado de cuenta inactivo: ${data.sta_cont_status_conta}`);
+        onergy.log(`JFS: isEstadoCuenta: Estado de cuenta inactivo: ${data.sta_cont_status_conta}`);
         return;
     }
+
+    //*pesq.ref:constantes
+    let idConstantes = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
+    let getConstantes = await getOnergyItem(idConstantes, data.assid, data.usrid, null);
+    let isAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura');
+    let isBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
+    let isLimiteAjustamiento = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'limite_ajuste');
 
     //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '21672360-869c-4c29-8cf8-2bafa8530923';
@@ -163,27 +171,21 @@ async function init(json) {
     let ftrPesqRef = gerarFiltro('sta_cont_status_conta', strPesqRef);
     let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrPesqRef);
     if (!getInformacionCuenta.length) {
-        onergy.log(`JFS: Información de Cuenta no encontrada para Estado de Cuenta: ${strPesqRef}`);
+        onergy.log(`JFS: getInformacionCuenta: Información de la Cuenta no encontrada para Estado de Cuenta: ${strPesqRef}`);
         return;
     }
 
-    //*aba:factura(pai:informacion_cuenta)
-    let idFactura = 'de049824-99f5-4ab1-bf97-6c2c9640605f';
-    let strPai = getInformacionCuenta[0].UrlJsonContext.conta_interna_nic;
-    let ftrPai = gerarFiltro('conta_interna_nic', strPai);
-    let getFactura = await getOnergyItem(idFactura, data.assid, data.usrid, ftrPai);
-    if (getFactura /*.length > 0*/) {
-        //TODO: remover comentário acima assim que houver fatura para teste
-        //*pesq.ref:proximo_pago_oportuno
-        for (let i in getInformacionCuenta) {
-            let strPai = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
-            let ftrPai = gerarFiltro('prcs__proximo_pagamento', strPai);
-            let getProximoPagamento = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrPai);
+    for (let i in getInformacionCuenta) {
+        //selecionar somente TCTC_tipo_de_conta__prcs__tipo_de_conta == P, PH e I
+        let isTipoCuenta = getInformacionCuenta[i].UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta;
+        if (isTipoCuenta == 'P' || isTipoCuenta == 'PH' || isTipoCuenta == 'I') {
+            let isProximoPago = getInformacionCuenta[i].UrlJsonContext.prcs__proximo_pagamento;
+            let isProximaCaptura = getInformacionCuenta[i].UrlJsonContext.prcs__proxima_captura;
+            let isDiaDePago = getInformacionCuenta[i].UrlJsonContext.prcs__dia_de_pagamento;
+            let isFrecuenciaPago = getInformacionCuenta[i].UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento;
+            let isEstadoCaptura = getInformacionCuenta[i].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
             debugger;
         }
-    } else {
-        onergy.log(`JFS: Factura no encontrada para Cuenta Interna (NIC): ${strPai}`);
-        return;
     }
 
     //pra que serve
@@ -214,58 +216,66 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
 /**STD_METHODS**
  */
 let json = {
-    nomePlanilhaCarga: 'tablas_maestras_v3.xlsx',
+    nomePlanilhaCarga: 'tablas_maestras_v4.xlsx',
     equipe: 'COL',
     tppf_tipo_portifolio__portfolio: 'TIGO VMLA COLLOS',
-    asset_number: '158515',
-    profit_cost_center: '158515-WT1',
+    asset_number: '196502',
+    profit_cost_center: '196502-WT1',
     portafolio_atc: 'TIGO VMLA COLLOS',
     emp_atc_site: 'ATC SITIOS DE COLOMBIA S.A.S',
-    conta_interna_nic: '43613933',
-    prcs__conta_pai: '3970717-4',
-    TCTC_tipo_de_conta__prcs__tipo_de_conta: 'H',
-    numero_do_medidor: 'jfs-numero-medidor-49',
+    conta_interna_nic: '1117502',
+    prcs__conta_pai: 'NO',
+    TCTC_tipo_de_conta__prcs__tipo_de_conta: 'I',
+    numero_do_medidor: 'jfs-numero-medidor-2042',
     emp_atc_site__prcs__assinante_atc: 'ATC SITIOS DE COLOMBIA S.A.S',
-    sta_cont_status_conta: 'ACTIVA', // estado_cuenta
-    prvd_nome_provedor: '',
-    nombre_comercial: '',
+    sta_cont_status_conta: 'ACTIVA',
+    prvd_nome_provedor: 'CARIBESOL DE LA COSTA SAS. ESP -  AIR-E',
+    nombre_comercial: 'AIR E SAS ESP',
+    nombre_beneficiario: 'AIR E SAS ESP',
+    suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico: 'ATC',
+    prcs__acuerdo_resolucion_alumbrado_publico: 'jfs-acuerdo-resolucion-2042',
+    tipo_cobr_tipos_cobrancas__tipo_de_cobranca: 'VARIABLE',
+    prcs__dia_de_pagamento: 16,
+    ECCUstatus_de_capturapago_id: '4e105a9a-86fe-8811-f04b-50da183cfa8f',
+    CPTprcs__clasificacion_passthru_id: '935a0db5-02b9-41f6-8c64-500152f912fd',
     for_pag_forma_de_pagamento_id: '89781b6e-d9d7-40bd-b88f-168b727e3e26',
     fre_pag_frequencia_de_pagamento_id: '519cec38-38b9-45db-b8a6-9f52259d93b4',
-    nombre_beneficiario: '',
-    suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico: 'ATC',
-    prcs__acuerdo_resolucion_alumbrado_publico: 'jfs-acuerdo-resolucion-49',
-    tipo_cobr_tipos_cobrancas__tipo_de_cobranca: 'VARIABLE',
-    prcs__dia_de_pagamento: 1,
     fre_pag_frequencia__frequencia_de_pagamento: 'MENSUAL',
     for_pag_formas_de_pagamentos__forma_de_pagamento: 'PSE',
     CPTclassificacao_passthru__prcs__clasificacion_passthru: 'VMLA',
+    ECCUECCU_estado_da_captura_da_conta__status_de_capturapago: 'EN ESPERA',
+    prcs__proxima_captura: '2022-10-21 00:00:00',
+    prcs__proximo_pagamento: '2022-10-21 00:00:00',
     tipo_cobr_tipo_de_cobranca_id: 'a10cbcaa-b0f2-4515-81b6-4ea900a11301',
     suj_pa_prcs__sujeito_passivo_alumbrado_publico_id: 'e801fa1d-4892-4a6a-8b67-73fa662a6395',
+    tipo_acceso: 'DIRECTO',
     SERVservico_id: 'dccfc5ec-05a4-4547-b026-aed00d8c2440',
     SERVservicos__servico: 'ENERGIA',
     onergyteam_equipe: 'COL',
     onergyteam_id: '084942ee-dd72-45f7-b044-6a47395bf6cc',
-    ID_ONE_REF: '2dd6ecf2-220d-4fa0-890a-a505b85218a4',
-    asset_number_IDC: '158515',
-    site_name: 'JUAN REY A',
-    TCprcs__tipo_de_conta_id: '3c495728-28fd-7d69-860c-dbe5ed3d7e4d',
-    TCTC_tipo_de_conta__TC_tipo_de_conta_valor: 'H',
-    prcs__tipo_de_conta_cache: '3c495728-28fd-7d69-860c-dbe5ed3d7e4d',
+    ID_ONE_REF: 'fe3f71c2-2e8a-4d8a-8384-0c854252084d',
+    asset_number_IDC: '196502',
+    site_name: 'Juan REY A 2013',
+    TCprcs__tipo_de_conta_id: '918ee6ff-a9ca-c76d-90a8-c0538d111d2b',
+    TCTC_tipo_de_conta__TC_tipo_de_conta_valor: 'I',
+    prcs__tipo_de_conta_cache: '918ee6ff-a9ca-c76d-90a8-c0538d111d2b',
     emp_atc_prcs__assinante_atc_id: '87b272d2-54c1-4c09-a6cf-187c51adcec9',
     sta_cont_id: '93a8ad28-42a9-44b2-9787-ba0df7650b0b',
-    prvd_id: '',
-    nome_provedor_id_cache: '',
-    prvd_nome_comercial: '',
-    prvd_nit_provedor: '',
-    prvd_nit_beneficiario: '',
-    prvd_beneficiario: '',
-    prvd_apelido_provedor: '',
-    prvd_link_web: '',
-    prvd_usuario: '',
-    prvd_senha: '',
-    CPTprcs__clasificacion_passthru_id: '935a0db5-02b9-41f6-8c64-500152f912fd',
+    prvd_id: '95611535-dfa3-4736-8f90-14713e51b7f8',
+    nome_provedor_id_cache: '95611535-dfa3-4736-8f90-14713e51b7f8',
+    prvd_nome_comercial: 'AIR E SAS ESP',
+    prvd_nit_provedor: 901380930,
+    prvd_nit_beneficiario: 901380930,
+    prvd_beneficiario: 'AIR E SAS ESP',
+    prvd_apelido_provedor: 'CARIBESOL',
+    prvd_link_web: 'https://caribesol.facture.co/Consulta#/List',
+    prvd_usuario: 'PIDE DOS VECES EL NÚMERO DE CUENTA',
+    prvd_senha: 'N/A',
     oneTemplateTitle: '',
+};
+let idATC = {
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
 };
+json = Object.assign(json, idATC);
 init(JSON.stringify(json));
