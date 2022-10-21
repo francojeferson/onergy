@@ -143,20 +143,8 @@ function gerarDataHora(dataHoje, utc) {
     return dataHojeFormatada + ' ' + horaTimezoneFormat;
 }
 async function init(json) {
-    var data = JSON.parse(json);
-    arrPost = [];
-
-    //*pesq.ref:estado_cuenta
-    let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
-    let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
-    let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta);
-    if (!isEstadoCuenta.length) {
-        onergy.log(`JFS: isEstadoCuenta: Estado de cuenta no encontrado: ${data.sta_cont_status_conta}`);
-        return;
-    } else if (isEstadoCuenta[0].UrlJsonContext.status_conta == 'INACTIVO') {
-        onergy.log(`JFS: isEstadoCuenta: Estado de cuenta inactivo: ${data.sta_cont_status_conta}`);
-        return;
-    }
+    let data = JSON.parse(json);
+    let arrPost = [];
 
     //*pesq.ref:constantes
     let idConstantes = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
@@ -165,29 +153,51 @@ async function init(json) {
     let isBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
     let isLimiteAjustamiento = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'limite_ajuste');
 
+    //*pesq.ref:estado_cuenta
+    let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
+    let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
+    let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta != 'INACTIVO');
+
     //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '21672360-869c-4c29-8cf8-2bafa8530923';
-    let strPesqRef = isEstadoCuenta[0].UrlJsonContext.status_conta;
-    let ftrPesqRef = gerarFiltro('sta_cont_status_conta', strPesqRef);
-    let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrPesqRef);
-    if (!getInformacionCuenta.length) {
-        onergy.log(`JFS: getInformacionCuenta: Información de la Cuenta no encontrada para Estado de Cuenta: ${strPesqRef}`);
-        return;
-    }
+    let strEstadoCuenta = isEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta)[0].UrlJsonContext.status_conta;
+    let ftrEstadoCuenta = gerarFiltro('sta_cont_status_conta', strEstadoCuenta);
+    let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrEstadoCuenta);
+    if (getInformacionCuenta.length > 0) {
+        for (let i in getInformacionCuenta) {
+            let objPost = getInformacionCuenta[i].UrlJsonContext;
 
-    for (let i in getInformacionCuenta) {
-        let objPost = getInformacionCuenta[i].UrlJsonContext;
+            //*pesq.ref:tipo_cuenta
+            let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
+            let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
+            let isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta);
 
-        //tipo_cuenta == P, PH e I
-        let isTipoCuenta = objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta;
-        if (isTipoCuenta == 'P' || isTipoCuenta == 'PH' || isTipoCuenta == 'I') {
-            let isProximoPago = objPost.prcs__proximo_pagamento;
-            let isProximaCaptura = objPost.prcs__proxima_captura;
-            let isDiaDePago = objPost.prcs__dia_de_pagamento;
-            let isFrecuenciaPago = objPost.fre_pag_frequencia__frequencia_de_pagamento;
-            let isEstadoCaptura = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
-            debugger;
+            //*tipo_cuenta == Padre, PadreHibrido, Individual
+            if (
+                isTipoCuenta.length > 0 &&
+                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' ||
+                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' ||
+                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
+            ) {
+                let isFrecuenciaPago = objPost.fre_pag_frequencia__frequencia_de_pagamento;
+
+                //*frecuencia_pago == MENSUAL
+                if (isFrecuenciaPago == 'MENSUAL') {
+                    //*pesq.ref:estado_captura_cuenta
+                    let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
+                    let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
+                    let isEstadoCaptura = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+
+                    let isProximoPago = objPost.prcs__proximo_pagamento;
+                    let isProximaCaptura = objPost.prcs__proxima_captura;
+                    let isDiaDePago = objPost.prcs__dia_de_pagamento;
+                    debugger;
+                }
+            }
         }
+    } else {
+        onergy.log(`JFS: getInformacionCuenta: Estado de Cuenta ${strEstadoCuenta} no encontrado para Información de la Cuenta ${data.asset_number}`);
+        return;
     }
 
     //pra que serve
@@ -208,7 +218,7 @@ function initDelete(json) {
 function SetObjectResponse(cond, json, WaitingWebHook) {
     if (WaitingWebHook === undefined) WaitingWebHook = false;
 
-    var obj = {
+    let obj = {
         cond: cond,
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
