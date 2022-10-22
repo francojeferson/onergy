@@ -186,12 +186,17 @@ async function init(json) {
                     //*pesq.ref:estado_captura_cuenta
                     let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
                     let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
-                    let isEstadoCaptura = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+                    let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter(
+                        (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago
+                    );
 
-                    let isProximoPago = objPost.prcs__proximo_pagamento;
-                    let isProximaCaptura = objPost.prcs__proxima_captura;
-                    let isDiaDePago = objPost.prcs__dia_de_pagamento;
-                    debugger;
+                    //*estado_captura_cuenta == EN ESPERA
+                    if (isEstadoCapturaCuenta == 'EN ESPERA') {
+                        let isProximoPago = objPost.prcs__proximo_pagamento;
+                        let isProximaCaptura = objPost.prcs__proxima_captura;
+                        let isDiaDePago = objPost.prcs__dia_de_pagamento;
+                        debugger;
+                    }
                 }
             }
         }
