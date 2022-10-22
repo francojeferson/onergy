@@ -156,7 +156,9 @@ function gerarDataHora(dataHoje, utc) {
     let horaFormat = dataHoje.getHours() + ':' + dataHoje.getMinutes() + ':' + dataHoje.getSeconds();
     let arrayHora = horaFormat.split(':');
     let horaTimezone = parseInt(arrayHora[0]) + utc;
-    let horaTimezoneFormat = JSON.stringify(horaTimezone).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
+    let horaTimezone24h = horaTimezone > 24 ? horaTimezone - 24 : horaTimezone;
+    horaTimezone24h = horaTimezone24h < 0 ? horaTimezone24h + 24 : horaTimezone24h;
+    let horaTimezoneFormat = JSON.stringify(horaTimezone24h).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
     return dataHojeFormatada + ' ' + horaTimezoneFormat;
 }
 /*async*/ function init(json) {
