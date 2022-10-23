@@ -149,9 +149,9 @@ async function init(json) {
     //*pesq.ref:constantes
     let idConstantes = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
     let getConstantes = await getOnergyItem(idConstantes, data.assid, data.usrid, null);
-    let isAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura');
-    let isBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
-    let isLimiteAjustamiento = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'limite_ajuste');
+    let isConstAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura');
+    let isConstBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
+    let isConstLimiteAjustamiento = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'limite_ajuste');
 
     //*pesq.ref:estado_cuenta
     let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
@@ -191,7 +191,7 @@ async function init(json) {
                     );
 
                     //*estado_captura_cuenta == EN ESPERA
-                    if (isEstadoCapturaCuenta == 'EN ESPERA') {
+                    if (isEstadoCapturaCuenta.length > 0 && objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == 'EN ESPERA') {
                         let isProximoPago = objPost.prcs__proximo_pagamento;
                         let isProximaCaptura = objPost.prcs__proxima_captura;
                         let isDiaDePago = objPost.prcs__dia_de_pagamento;
