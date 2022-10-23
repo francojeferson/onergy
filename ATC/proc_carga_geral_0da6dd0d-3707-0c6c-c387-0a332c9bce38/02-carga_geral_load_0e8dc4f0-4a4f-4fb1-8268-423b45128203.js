@@ -1136,8 +1136,14 @@ function gerarDataHora(dataHoje, utc) {
 
                             let isIdlcServicios = getTabExcel.filter((j) => j.UrlJsonContext.SERVservicos__servico == objPost.servicios);
                             if (!isIdlcServicios || data.em_caso_de_duplicidade == '1') {
+                                let arr00 = [];
                                 objPost.SERVservicos__servico = isServicios.length > 0 ? isServicios[0].UrlJsonContext.servicos : '';
+                                arr00.push(objPost.SERVservicos__servico);
+                                objPost.SERVservicos__servico = arr00;
+                                let arr01 = [];
                                 objPost.SERVservico_id = isServicios.length > 0 ? isServicios[0].ID : '';
+                                arr01.push(objPost.SERVservico_id);
+                                objPost.SERVservico_id = arr01;
                                 delete objPost.servicios;
                             }
 
@@ -1694,23 +1700,23 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
  */
 let json = {
     processo: [
-        '20/10/2022 05:59:37, Cargando 49 registros de informacion_cuenta',
+        '21/10/2022 18:07:16, Cargando 2042 registros de informacion_cuenta',
         '\n',
-        '20/10/2022 05:59:37, Manejando 49 registros de informacion_cuenta',
+        '21/10/2022 18:08:21, Manejando 2042 registros de informacion_cuenta',
         '\n',
-        '20/10/2022 05:59:37, Carga de informacion_cuenta finalizada',
+        '21/10/2022 18:48:00, Carga de informacion_cuenta finalizada',
     ],
-    horas: '7:59',
-    dataDate: '2022-10-20 10:59:38',
-    data: '2022-10-20 07:59:38',
+    horas: '20:06',
+    dataDate: '2022-10-21 23:06:59',
+    data: '2022-10-21 20:06:59',
     load_index_equipe: 'COL',
     load_index_id_equipe: '',
     load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxf9f1f9ae-607e-4399-a34c-551aeba6a41a.xlsx?sv=2018-03-28&sr=b&sig=hJCLKQ7s8Fn54%2FFXXgHj4u1EuTiSH6BSwHdAcRxpIUg%3D&se=2023-05-08T10%3A59%3A27Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxd96168f7-54dd-4c70-bbe4-394b34d47028.xlsx?sv=2018-03-28&sr=b&sig=4P1%2BikuCIw6qAc%2Ff%2Bvuw5bvVGUw8IF8gEjVtpCl2Las%3D&se=2023-05-09T23%3A06%3A51Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxf9f1f9ae-607e-4399-a34c-551aeba6a41a.xlsx?sv=2018-03-28&sr=b&sig=hJCLKQ7s8Fn54%2FFXXgHj4u1EuTiSH6BSwHdAcRxpIUg%3D&se=2023-05-08T10%3A59%3A27Z&sp=r',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsxd96168f7-54dd-4c70-bbe4-394b34d47028.xlsx?sv=2018-03-28&sr=b&sig=4P1%2BikuCIw6qAc%2Ff%2Bvuw5bvVGUw8IF8gEjVtpCl2Las%3D&se=2023-05-09T23%3A06%3A51Z&sp=r',
             Name: 'tablas_maestras_v3.xlsx',
         },
     ],
@@ -1718,15 +1724,15 @@ let json = {
     load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
     em_caso_de_duplicidade: '1',
     processamento: 'Carga de informacion_cuenta finalizada',
-    time: '7:59',
+    time: '20:06',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: 'Carga Geral',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     email: 'admin-colombia@atc.com.co',
     fdtid: '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f',
-    fedid: '17115d0f-214a-5ee6-a650-97ba1fe9036f',
-    id_upload_planilha: '17115d0f-214a-5ee6-a650-97ba1fe9036f',
+    fedid: '217bd39b-c208-9a7a-3a5f-b410a504c567',
+    id_upload_planilha: '217bd39b-c208-9a7a-3a5f-b410a504c567',
     onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
     timezone: null,
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
