@@ -1,111 +1,7 @@
-// 1. Objetivo del proceso:
-
-// Verificar que la/as Facturas de cada Cuenta correspondientes al período fueron capturadas por los diversos medios de obtención de Facturas (RPA, upload de PDF, Manual, Email - verificar)
-
-// 2. Breve Descripción:
-
-// El proceso será programado para ejecución diaria (horario a combinar) de forma automática. Este proceso no requiere intervención del usuario.
-
-// IMPORTANTE: Esta definición asume como premisa que durante el proceso de carga de una factura (cualquiera que sea el medio de carga) el Estado de Captura de la Cuenta se actualizará al valor "CAPTURADO" y se actualizará la fecha de Última Captura por este proceso de carga..
-
-// El proceso buscará todos los registros de Informaciones de la Cuenta y para cada uno de ellos se comprobará inicialmente el Estado de Captura de la Cuenta.
-
-// Dependiendo del Estado de la Cuenta, la fecha de ejecución del proceso (Hoy) y la fecha de Próximo Pago Oportuno (PPO) el sistema emitirá  información de  Atraso o Alerta si el valor del campo Estado de Captura no es "CAPTURADO" en las cercanías de la fecha de PPO.
-
-// El dia después del Pago Oportuno, el sistema recalcula los valores de los campos Próximo Pago Oportuno (PPO) y Próxima Captura (PC) considerando la Frecuencia de Pago de la Cuenta.
-
-// IMPORTANTE: El proceso se centra  únicamente en la captura de Facturas Cuenta. No comprueba el importe de las facturas, es decir, no comprueba si una factura corresponde al período exactamente posterior de la anterior o si tiene un intervalo de período entre las facturas.
-
-// 3. Diagrama del Proceso
-
-// ATC/proc_captura_facturas_cuenta_0a17be9c-1247-2f1e-b91c-15740976f2c5/c4848211-9ea7-47c5-8902-fe221e870e6a.png
-
-// 4. Componentes del Proceso:
-
-// 4.1 Schedule
-
-// El proceso se ejecuta una vez al día. Preferiblemente por la noche.
-
-// Barrerá todos los registros de Informaciones de la Cuenta. La Secuencia de Lectura será:
-
-// Cuentas Padre y Padres Híbridas
-
-// Cuentas Hijas e Hija Híbridas
-
-// Cuentas Individuales
-
-// 4.2. Consulta de Estado y Cambio de Campo Captura de la Cuenta
-
-// La consulta Captura de la Cuenta State se realiza para cada registro independientemente del Tipo de Cuenta
-
-// Los únicos valores posibles del campo Captura state de la Cuenta son:
-
-// EN ESPERA
-
-// ATRASADA
-
-// ALERTA
-
-// CAPTURADA
-
-// 4.3. Descripción del proceso
-
-// 4.3.1 Verifica Data de Próximo Pago Oportuno
-
-// Si Próximo Pago Oportuno + 1 = Hoy, entonces continua aqui si no salta para el próximo paso 4.3.2
-
-// A) Calcula  Proximo Pago Oportuno
-
-// Para Cuentas del Tipo: P, PH o I
-
-// Próximo Pago Oportuno = Próximo Pago Oportuno (actual) + Frecuencia
-
-// Para Cuentas de Tipo: H o HH
-
-// copiar PPO de su Padre
-
-// B ) Próxima Captura
-
-// Para Cuentas del Tipo: P, PH o I
-
-// Próxima Captura = Próximo Pago Oportuno - Atraso
-
-// Para Cuentas de Tipo: H o HH
-
-// copiar Próxima Captura de su Padre
-
-// C) Parámetros
-
-// Atraso = Constante del Sistema (tabla Constantes)
-
-// Alerta = Constante del Sistema (tabla Constantes)
-
-// 4.3.2 Viene del paso 4.3.1 en el caso que Próximo Pago Oportuno +1 <> Hoy
-
-// Si ABA IDC - Estado de Captura = CAPTURDA, próximo registro
-
-// Si no continua abajo
-
-// Si Hoy > Próximo Pago Oportuno - (Constante-Atraso) , entonces ABA IDC Estado de Captura = ATRASO
-
-// Si no, próximo registro
-
-// Si Hoy > Próximo Pago Oportuno - (Constante-Alerta) , entonces ABA IDC Estado de Captura = ALERTA
-
-// Si no, próximo registro
-
-// 4.4 Continua el proceso hasta el último registro de ABA Informaciones de la Cuenta
-
-// 5. Consideraciones para el proceso de carga masiva de Informaciones de la Cuenta
-
-// El valor predeterminado para el campo Estado de captura es igual a "EN ESPERA"
-
-// El valor predeterminado para el campo Próximo Pago Oportuno es igual a (Dia de Pagamento + Mes Actual del Sistema + Año Actual)
-
 /**ENV_NODE**
  * node:test (find and replace)
- * async /**
- * await /**
+ * /*async*/ /**
+ * /*await*/ /**
  */
 const { date } = require('assert-plus');
 const { formatDate } = require('tough-cookie');
@@ -118,42 +14,42 @@ const fs = require('fs');
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
 const utils = require('../../onergy/onergy-utils');
-async function ajax(args) {
-    return await onergy.ajax(args);
+/*async*/ function ajax(args) {
+    return /*await*/ onergy.ajax(args);
 }
-async function ajaxPost(args) {
-    return await onergy.ajaxPost(args);
+/*async*/ function ajaxPost(args) {
+    return /*await*/ onergy.ajaxPost(args);
 }
-async function hashMd5(args) {
-    return await onergy.hashMd5(args);
+/*async*/ function hashMd5(args) {
+    return /*await*/ onergy.hashMd5(args);
 }
-async function increment(args) {
-    return await onergy.increment(args);
+/*async*/ function increment(args) {
+    return /*await*/ onergy.increment(args);
 }
-async function onergy_countdocs(args) {
-    return await onergy.onergy_countdocs(args);
+/*async*/ function onergy_countdocs(args) {
+    return /*await*/ onergy.onergy_countdocs(args);
 }
-async function onergy_get(args) {
-    let r = await onergy.onergy_get(args);
+/*async*/ function onergy_get(args) {
+    let r = /*await*/ onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-async function onergy_save(args) {
-    return await onergy.onergy_save(args);
+/*async*/ function onergy_save(args) {
+    return /*await*/ onergy.onergy_save(args);
 }
-async function ReadExcelToJson(args) {
-    return await onergy.ReadExcelToJson(args);
+/*async*/ function ReadExcelToJson(args) {
+    return /*await*/ onergy.ReadExcelToJson(args);
 }
-async function ReadTextPdf(args) {
-    return await onergy.ReadTextPdf(args);
+/*async*/ function ReadTextPdf(args) {
+    return /*await*/ onergy.ReadTextPdf(args);
 }
-async function sendmail(args) {
-    return await onergy.sendmail(args);
+/*async*/ function sendmail(args) {
+    return /*await*/ onergy.sendmail(args);
 }
-async function onergy_sendto(args) {
-    let r = await onergy.onergy_sendto(args);
+/*async*/ function onergy_sendto(args) {
+    let r = /*await*/ onergy.onergy_sendto(args);
     return JSON.stringify(r);
 }
-async function onergy_updatemany(data) {
+/*async*/ function onergy_updatemany(data) {
     return data;
 }
 function failureCallback(error) {
@@ -175,13 +71,13 @@ function successCallback(result) {
  * Condicional: nenhum
  * Aprovação: nenhum
  */
-async function getOnergyItem(fdtid, assid, usrid, filtro) {
+/*async*/ function getOnergyItem(fdtid, assid, usrid, filtro) {
     let keepSearching = true;
     let skip = 0;
     let take = 500;
     let result = [];
     while (keepSearching) {
-        let strPageResp = await onergy_get({
+        let strPageResp = /*await*/ onergy_get({
             fdtid: fdtid,
             assid: assid,
             usrid: usrid,
@@ -200,7 +96,7 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
     }
     return result;
 }
-async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
+/*async*/ function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
     let onergySaveData = {
         fdtid: templateid,
         assid: assid,
@@ -224,7 +120,7 @@ async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, 
     if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
         onergySaveData.addCfgViewGroup = addCfgViewGroup;
     }
-    return await onergy_save(onergySaveData);
+    return /*await*/ onergy_save(onergySaveData);
 }
 function gerarFiltro(fielNameP, valueP) {
     return JSON.stringify([
@@ -236,44 +132,40 @@ function gerarFiltro(fielNameP, valueP) {
         },
     ]);
 }
-function gerarDataHora(dataHoje, utc) {
+function gerarData(dataHoje) {
     let dataHojeFormat = dataHoje.getFullYear() + '-' + (dataHoje.getMonth() + 1) + '-' + dataHoje.getDate();
     let arrayData = dataHojeFormat.split('-');
-    let dataHojeFormatada = arrayData[2].padStart(2, '0') + '/' + arrayData[1].padStart(2, '0') + '/' + arrayData[0];
-    let horaFormat = dataHoje.getHours() + ':' + dataHoje.getMinutes() + ':' + dataHoje.getSeconds();
-    let arrayHora = horaFormat.split(':');
-    let horaTimezone = parseInt(arrayHora[0]) + utc;
-    let horaTimezoneFormat = JSON.stringify(horaTimezone).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
-    return dataHojeFormatada + ' ' + horaTimezoneFormat;
+    let dataHojeFormatada = arrayData[0] + '-' + arrayData[1].padStart(2, '0') + '-' + arrayData[2].padStart(2, '0');
+    return dataHojeFormatada;
 }
-async function init(json) {
+/*async*/ function init(json) {
     let data = JSON.parse(json);
-    let arrPost = [];
+    let newPost = [];
 
     //*pesq.ref:constantes
     let idConstantes = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
-    let getConstantes = await getOnergyItem(idConstantes, data.assid, data.usrid, null);
+    let getConstantes = /*await*/ getOnergyItem(idConstantes, data.assid, data.usrid, null);
     let isConstAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura');
     let isConstBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
     let isConstLimiteAjustamiento = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'limite_ajuste');
 
     //*pesq.ref:estado_cuenta
     let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
-    let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
+    let getEstadoCuenta = /*await*/ getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
     let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta != 'INACTIVO');
 
     //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '21672360-869c-4c29-8cf8-2bafa8530923';
     let strEstadoCuenta = isEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta)[0].UrlJsonContext.status_conta;
     let ftrEstadoCuenta = gerarFiltro('sta_cont_status_conta', strEstadoCuenta);
-    let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrEstadoCuenta);
+    let getInformacionCuenta = /*await*/ getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrEstadoCuenta);
     if (getInformacionCuenta.length > 0) {
         for (let i in getInformacionCuenta) {
             let objPost = getInformacionCuenta[i].UrlJsonContext;
 
             //*pesq.ref:tipo_cuenta
             let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
-            let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
+            let getTipoCuenta = /*await*/ getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
             let isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta);
 
             //*tipo_cuenta == Padre, PadreHibrido, Individual
@@ -281,13 +173,16 @@ async function init(json) {
                 isTipoCuenta.length > 0 &&
                 (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
             ) {
-                let isFrecuenciaPago = objPost.fre_pag_frequencia__frequencia_de_pagamento;
+                //*pesq.ref:frecuencia_pago
+                let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
+                let getFrecuenciaPago = /*await*/ getOnergyItem(idFrecuenciaPago, data.assid, data.usrid, null);
+                let isFrecuenciaPago = getFrecuenciaPago.filter((j) => j.UrlJsonContext.frequencia == objPost.fre_pag_frequencia__frequencia_de_pagamento);
 
                 //*frecuencia_pago == MENSUAL
-                if (isFrecuenciaPago == 'MENSUAL') {
+                if (isFrecuenciaPago.length > 0 && objPost.fre_pag_frequencia__frequencia_de_pagamento == 'MENSUAL') {
                     //*pesq.ref:estado_captura_cuenta
                     let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
-                    let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
+                    let getEstadoCapturaCuenta = /*await*/ getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
                     let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter(
                         (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago
                     );
@@ -298,7 +193,35 @@ async function init(json) {
                         let isProximaCaptura = objPost.prcs__proxima_captura;
                         let isDiaDePago = objPost.prcs__dia_de_pagamento;
 
-                        debugger;
+                        let setProximoPago = new Date(isProximoPago + ' 00:00:00');
+                        let checkProximoPago = new Date(setProximoPago.setDate(setProximoPago.getDate() + 1));
+
+                        let hoje = new Date();
+                        //*hoje == ProximoPago + 1
+                        if (checkProximoPago.getDate() == hoje.getDate() && checkProximoPago.getMonth() == hoje.getMonth() && checkProximoPago.getFullYear() == hoje.getFullYear()) {
+                            //*calcula ProximoPago
+                            let newMonthProximoPago = isFrecuenciaPago[0].UrlJsonContext.frequencia_em_meses;
+                            let thisProximoPago = new Date(isProximoPago + ' 00:00:00');
+                            let newProximoPago = new Date(thisProximoPago.setMonth(thisProximoPago.getMonth() + newMonthProximoPago));
+
+                            //*calcula ProximaCaptura
+                            let newDayProximaCaptura = JSON.parse(isConstBuscaCaptura[0].UrlJsonContext.valor);
+                            let thisProximaCaptura = new Date(newProximoPago);
+                            let newProximaCaptura = new Date(thisProximaCaptura.setDate(thisProximaCaptura.getDate() - newDayProximaCaptura));
+
+                            //*altera estado_captura_cuenta
+                            let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+                            newEstadoCapturaCuenta = 'EN ESPERA';
+
+                            //*envia resultado
+                            objPost.prcs__proximo_pagamento = gerarData(newProximoPago);
+                            objPost.prcs__proxima_captura = gerarData(newProximaCaptura);
+                            objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
+
+                            idDestino = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
+                            let resultPost = /*await*/ sendItemToOnergy(idDestino, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
+                            debugger;
+                        }
                     }
                 }
             }
