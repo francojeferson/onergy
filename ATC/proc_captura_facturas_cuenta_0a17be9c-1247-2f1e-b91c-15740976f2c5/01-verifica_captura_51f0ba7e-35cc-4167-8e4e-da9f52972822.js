@@ -1,3 +1,107 @@
+// 1. Objetivo del proceso:
+
+// Verificar que la/as Facturas de cada Cuenta correspondientes al período fueron capturadas por los diversos medios de obtención de Facturas (RPA, upload de PDF, Manual, Email - verificar)
+
+// 2. Breve Descripción:
+
+// El proceso será programado para ejecución diaria (horario a combinar) de forma automática. Este proceso no requiere intervención del usuario.
+
+// IMPORTANTE: Esta definición asume como premisa que durante el proceso de carga de una factura (cualquiera que sea el medio de carga) el Estado de Captura de la Cuenta se actualizará al valor "CAPTURADO" y se actualizará la fecha de Última Captura por este proceso de carga..
+
+// El proceso buscará todos los registros de Informaciones de la Cuenta y para cada uno de ellos se comprobará inicialmente el Estado de Captura de la Cuenta.
+
+// Dependiendo del Estado de la Cuenta, la fecha de ejecución del proceso (Hoy) y la fecha de Próximo Pago Oportuno (PPO) el sistema emitirá  información de  Atraso o Alerta si el valor del campo Estado de Captura no es "CAPTURADO" en las cercanías de la fecha de PPO.
+
+// El dia después del Pago Oportuno, el sistema recalcula los valores de los campos Próximo Pago Oportuno (PPO) y Próxima Captura (PC) considerando la Frecuencia de Pago de la Cuenta.
+
+// IMPORTANTE: El proceso se centra  únicamente en la captura de Facturas Cuenta. No comprueba el importe de las facturas, es decir, no comprueba si una factura corresponde al período exactamente posterior de la anterior o si tiene un intervalo de período entre las facturas.
+
+// 3. Diagrama del Proceso
+
+// ATC/proc_captura_facturas_cuenta_0a17be9c-1247-2f1e-b91c-15740976f2c5/c4848211-9ea7-47c5-8902-fe221e870e6a.png
+
+// 4. Componentes del Proceso:
+
+// 4.1 Schedule
+
+// El proceso se ejecuta una vez al día. Preferiblemente por la noche.
+
+// Barrerá todos los registros de Informaciones de la Cuenta. La Secuencia de Lectura será:
+
+// Cuentas Padre y Padres Híbridas
+
+// Cuentas Hijas e Hija Híbridas
+
+// Cuentas Individuales
+
+// 4.2. Consulta de Estado y Cambio de Campo Captura de la Cuenta
+
+// La consulta Captura de la Cuenta State se realiza para cada registro independientemente del Tipo de Cuenta
+
+// Los únicos valores posibles del campo Captura state de la Cuenta son:
+
+// EN ESPERA
+
+// ATRASADA
+
+// ALERTA
+
+// CAPTURADA
+
+// 4.3. Descripción del proceso
+
+// 4.3.1 Verifica Data de Próximo Pago Oportuno
+
+// Si Próximo Pago Oportuno + 1 = Hoy, entonces continua aqui si no salta para el próximo paso 4.3.2
+
+// A) Calcula  Proximo Pago Oportuno
+
+// Para Cuentas del Tipo: P, PH o I
+
+// Próximo Pago Oportuno = Próximo Pago Oportuno (actual) + Frecuencia
+
+// Para Cuentas de Tipo: H o HH
+
+// copiar PPO de su Padre
+
+// B ) Próxima Captura
+
+// Para Cuentas del Tipo: P, PH o I
+
+// Próxima Captura = Próximo Pago Oportuno - Atraso
+
+// Para Cuentas de Tipo: H o HH
+
+// copiar Próxima Captura de su Padre
+
+// C) Parámetros
+
+// Atraso = Constante del Sistema (tabla Constantes)
+
+// Alerta = Constante del Sistema (tabla Constantes)
+
+// 4.3.2 Viene del paso 4.3.1 en el caso que Próximo Pago Oportuno +1 <> Hoy
+
+// Si ABA IDC - Estado de Captura = CAPTURDA, próximo registro
+
+// Si no continua abajo
+
+// Si Hoy > Próximo Pago Oportuno - (Constante-Atraso) , entonces ABA IDC Estado de Captura = ATRASO
+
+// Si no, próximo registro
+
+// Si Hoy > Próximo Pago Oportuno - (Constante-Alerta) , entonces ABA IDC Estado de Captura = ALERTA
+
+// Si no, próximo registro
+
+// 4.4 Continua el proceso hasta el último registro de ABA Informaciones de la Cuenta
+
+// 5. Consideraciones para el proceso de carga masiva de Informaciones de la Cuenta
+
+// El valor predeterminado para el campo Estado de captura es igual a "EN ESPERA"
+
+// El valor predeterminado para el campo Próximo Pago Oportuno es igual a (Dia de Pagamento + Mes Actual del Sistema + Año Actual)
+
 /**ENV_NODE**
  * node:test (find and replace)
  * async /**
@@ -175,9 +279,7 @@ async function init(json) {
             //*tipo_cuenta == Padre, PadreHibrido, Individual
             if (
                 isTipoCuenta.length > 0 &&
-                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' ||
-                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' ||
-                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
+                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
             ) {
                 let isFrecuenciaPago = objPost.fre_pag_frequencia__frequencia_de_pagamento;
 
@@ -195,6 +297,7 @@ async function init(json) {
                         let isProximoPago = objPost.prcs__proximo_pagamento;
                         let isProximaCaptura = objPost.prcs__proxima_captura;
                         let isDiaDePago = objPost.prcs__dia_de_pagamento;
+
                         debugger;
                     }
                 }
