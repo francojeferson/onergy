@@ -104,8 +104,8 @@
 
 /**ENV_NODE**
  * node:test (find and replace)
- * async /**
- * await /**
+ * /*async*/ /**
+ * /*await*/ /**
  */
 const { date } = require('assert-plus');
 const { formatDate } = require('tough-cookie');
@@ -118,42 +118,42 @@ const fs = require('fs');
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
 const utils = require('../../onergy/onergy-utils');
-async function ajax(args) {
-    return await onergy.ajax(args);
+/*async*/ function ajax(args) {
+    return /*await*/ onergy.ajax(args);
 }
-async function ajaxPost(args) {
-    return await onergy.ajaxPost(args);
+/*async*/ function ajaxPost(args) {
+    return /*await*/ onergy.ajaxPost(args);
 }
-async function hashMd5(args) {
-    return await onergy.hashMd5(args);
+/*async*/ function hashMd5(args) {
+    return /*await*/ onergy.hashMd5(args);
 }
-async function increment(args) {
-    return await onergy.increment(args);
+/*async*/ function increment(args) {
+    return /*await*/ onergy.increment(args);
 }
-async function onergy_countdocs(args) {
-    return await onergy.onergy_countdocs(args);
+/*async*/ function onergy_countdocs(args) {
+    return /*await*/ onergy.onergy_countdocs(args);
 }
-async function onergy_get(args) {
-    let r = await onergy.onergy_get(args);
+/*async*/ function onergy_get(args) {
+    let r = /*await*/ onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-async function onergy_save(args) {
-    return await onergy.onergy_save(args);
+/*async*/ function onergy_save(args) {
+    return /*await*/ onergy.onergy_save(args);
 }
-async function ReadExcelToJson(args) {
-    return await onergy.ReadExcelToJson(args);
+/*async*/ function ReadExcelToJson(args) {
+    return /*await*/ onergy.ReadExcelToJson(args);
 }
-async function ReadTextPdf(args) {
-    return await onergy.ReadTextPdf(args);
+/*async*/ function ReadTextPdf(args) {
+    return /*await*/ onergy.ReadTextPdf(args);
 }
-async function sendmail(args) {
-    return await onergy.sendmail(args);
+/*async*/ function sendmail(args) {
+    return /*await*/ onergy.sendmail(args);
 }
-async function onergy_sendto(args) {
-    let r = await onergy.onergy_sendto(args);
+/*async*/ function onergy_sendto(args) {
+    let r = /*await*/ onergy.onergy_sendto(args);
     return JSON.stringify(r);
 }
-async function onergy_updatemany(data) {
+/*async*/ function onergy_updatemany(data) {
     return data;
 }
 function failureCallback(error) {
@@ -175,13 +175,13 @@ function successCallback(result) {
  * Condicional: nenhum
  * Aprovação: nenhum
  */
-async function getOnergyItem(fdtid, assid, usrid, filtro) {
+/*async*/ function getOnergyItem(fdtid, assid, usrid, filtro) {
     let keepSearching = true;
     let skip = 0;
     let take = 500;
     let result = [];
     while (keepSearching) {
-        let strPageResp = await onergy_get({
+        let strPageResp = /*await*/ onergy_get({
             fdtid: fdtid,
             assid: assid,
             usrid: usrid,
@@ -200,7 +200,7 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
     }
     return result;
 }
-async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
+/*async*/ function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
     let onergySaveData = {
         fdtid: templateid,
         assid: assid,
@@ -224,7 +224,7 @@ async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, 
     if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
         onergySaveData.addCfgViewGroup = addCfgViewGroup;
     }
-    return await onergy_save(onergySaveData);
+    return /*await*/ onergy_save(onergySaveData);
 }
 function gerarFiltro(fielNameP, valueP) {
     return JSON.stringify([
@@ -242,50 +242,53 @@ function gerarData(dataHoje) {
     let dataHojeFormatada = arrayData[0] + '-' + arrayData[1].padStart(2, '0') + '-' + arrayData[2].padStart(2, '0');
     return dataHojeFormatada;
 }
-async function init(json) {
+/*async*/ function init(json) {
     let data = JSON.parse(json);
 
     //*pesq.ref:constantes
     let idConstantes = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
-    let getConstantes = await getOnergyItem(idConstantes, data.assid, data.usrid, null);
+    let getConstantes = /*await*/ getOnergyItem(idConstantes, data.assid, data.usrid, null);
     let isConstAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura');
     let isConstBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
-    let isConstLimiteAjustamiento = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'limite_ajuste');
+    let isConstDiaCorte = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dia_corte');
 
     //*pesq.ref:estado_cuenta
     let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
-    let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
+    let getEstadoCuenta = /*await*/ getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
     let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta != 'INACTIVO');
 
     //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
     let strEstadoCuenta = isEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta)[0].UrlJsonContext.status_conta;
     let ftrEstadoCuenta = gerarFiltro('sta_cont_status_conta', strEstadoCuenta);
-    let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrEstadoCuenta);
+    let getInformacionCuenta = /*await*/ getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrEstadoCuenta);
     if (getInformacionCuenta.length > 0) {
         for (let i in getInformacionCuenta) {
             let objPost = getInformacionCuenta[i].UrlJsonContext;
 
             //*pesq.ref:tipo_cuenta
             let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
-            let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
+            let getTipoCuenta = /*await*/ getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
             let isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta);
 
-            //*tipo_cuenta == Padre, PadreHibrido, Individual
+            //*tipo_cuenta == P || PH || I, calcula ProximoPago e ProximaCaptura
+            //*else, copia ProximoPago e ProximaCaptura de P para H || HH
             if (
                 isTipoCuenta.length > 0 &&
-                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
+                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' ||
+                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' ||
+                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
             ) {
                 //*pesq.ref:frecuencia_pago
                 let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
-                let getFrecuenciaPago = await getOnergyItem(idFrecuenciaPago, data.assid, data.usrid, null);
+                let getFrecuenciaPago = /*await*/ getOnergyItem(idFrecuenciaPago, data.assid, data.usrid, null);
                 let isFrecuenciaPago = getFrecuenciaPago.filter((j) => j.UrlJsonContext.frequencia == objPost.fre_pag_frequencia__frequencia_de_pagamento);
 
                 //*frecuencia_pago
                 if (isFrecuenciaPago.length > 0) {
                     //*pesq.ref:estado_captura_cuenta
                     let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
-                    let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
+                    let getEstadoCapturaCuenta = /*await*/ getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
                     let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter(
                         (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago
                     );
@@ -293,67 +296,161 @@ async function init(json) {
                     //*estado_captura_cuenta
                     if (isEstadoCapturaCuenta.length > 0) {
                         let hoje = new Date();
-                        let isProximoPago = objPost.prcs__proximo_pagamento;
-                        let setProximoPago = new Date(isProximoPago + ' 00:00:00');
-                        let checkProximoPago = new Date(setProximoPago.setDate(setProximoPago.getDate() + 1));
 
-                        //*hoje == ProximoPago + 1
-                        if (checkProximoPago.getDate() == hoje.getDate() && checkProximoPago.getMonth() == hoje.getMonth() && checkProximoPago.getFullYear() == hoje.getFullYear()) {
+                        //*DiaDePago
+                        let isDiaDePago = objPost.prcs__dia_de_pagamento;
+                        let strDiaDePago = JSON.stringify(isDiaDePago);
+                        let hojeDiaDePago = gerarData(hoje);
+                        let newDiaDePago = hojeDiaDePago.slice(0, -2) + strDiaDePago;
+                        let setDiaDePago = new Date(newDiaDePago + ' 00:00:00');
+
+                        //*ProximoPago
+                        let isProximoPago = objPost.prcs__proximo_pagamento;
+                        let validProximoPago = isProximoPago.includes(' 00:00:00') ? isProximoPago : isProximoPago + ' 00:00:00';
+                        let setProximoPago = new Date(validProximoPago);
+
+                        //*se ProximoPago <= ontem, calcula novo ProximoPago e ProximaCaptura
+                        let isHoje = new Date(hoje);
+                        let ontem = new Date(isHoje.setDate(isHoje.getDate() - 1));
+                        if (setProximoPago.getTime() <= ontem.getTime()) {
                             //*calcula ProximoPago
-                            let newMonthProximoPago = isFrecuenciaPago[0].UrlJsonContext.frequencia_em_meses;
-                            let thisProximoPago = new Date(isProximoPago + ' 00:00:00');
-                            let newProximoPago = new Date(thisProximoPago.setMonth(thisProximoPago.getMonth() + newMonthProximoPago));
+                            let valFrecuenciaPago = isFrecuenciaPago[0].UrlJsonContext.frequencia_em_meses;
+                            let thisProximoPago = setProximoPago;
+                            let newProximoPago = new Date(thisProximoPago.setMonth(thisProximoPago.getMonth() + valFrecuenciaPago));
+                            let ajustProximoPago = new Date(newProximoPago.setDate(setDiaDePago.getDate()));
 
                             //*calcula ProximaCaptura
-                            let newDayProximaCaptura = JSON.parse(isConstBuscaCaptura[0].UrlJsonContext.valor);
-                            let thisProximaCaptura = new Date(newProximoPago);
-                            let newProximaCaptura = new Date(thisProximaCaptura.setDate(thisProximaCaptura.getDate() - newDayProximaCaptura));
+                            let valConstBuscaCaptura = JSON.parse(isConstBuscaCaptura[0].UrlJsonContext.valor);
+                            let isProximaCaptura = new Date(ajustProximoPago);
+                            let newProximaCaptura = new Date(isProximaCaptura.setDate(isProximaCaptura.getDate() - valConstBuscaCaptura));
 
                             //*estado_captura_cuenta == EN ESPERA
                             let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
                             newEstadoCapturaCuenta = 'EN ESPERA';
 
                             //*envia resultado
-                            objPost.prcs__proximo_pagamento = gerarData(newProximoPago);
+                            objPost.prcs__proximo_pagamento = gerarData(ajustProximoPago);
                             objPost.prcs__proxima_captura = gerarData(newProximaCaptura);
                             objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
 
-                            //*else, estado_captura_cuenta == CAPTURADA
-                            onergy.log(`[INFO] - ${objPost.prcs__proximo_pagamento} - ${objPost.prcs__proxima_captura} - ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`);
-                            //FIXME: let resultPost = await sendItemToOnergy(idInformacionCuenta, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
-                        } else if (/*FIXME:objPost.*/ data.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == 'CAPTURADA') {
-                            onergy.log(`estado_captura_cuenta: ${data.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`);
-                            debugger;
+                            //!node:test(unhide log and hide resultPost)
+                            // onergy.log(
+                            //     `[JFS] asset_number: ${objPost.asset_number} - proximo_pago: ${objPost.prcs__proximo_pagamento} - proxima_captura: ${objPost.prcs__proxima_captura} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
+                            // );
+                            let resultPost = /*await*/ sendItemToOnergy(
+                                idInformacionCuenta,
+                                data.usrid,
+                                data.assid,
+                                objPost,
+                                '',
+                                'asset_number',
+                                true,
+                                false,
+                                false
+                            );
+                        } else if (objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == 'CAPTURADA') {
+                            //*else if, estado_captura_cuenta == CAPTURADA
+                            //!node:test(unhide log)
+                            // onergy.log(
+                            //     `[JFS] asset_number: ${objPost.asset_number} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
+                            // );
                             continue;
                         } else {
-                            //*else, check hoje > ProximoPago - atraso
-                            let hoje = new Date();
-                            let isProximoPago = objPost.prcs__proximo_pagamento;
-                            let isProximaCaptura = objPost.prcs__proxima_captura;
-                            let isDiaDePago = objPost.prcs__dia_de_pagamento;
+                            //*else, check hoje > (ProximoPago - constAtraso)
+                            let valConstDiaCorte = JSON.parse(isConstDiaCorte[0].UrlJsonContext.valor);
+                            let thisProximoPago = setProximoPago;
+                            let atrasoProximoPago = new Date(thisProximoPago.setDate(thisProximoPago.getDate() - valConstDiaCorte));
+                            //!node:test(unhide log)
+                            // onergy.log(`[JFS] asset_number: ${objPost.asset_number} - hoje: ${hoje} - atrasoProximoPago: ${atrasoProximoPago}`);
 
-                            let setProximoPago = new Date(isProximoPago + ' 00:00:00');
-                            let checkProximoPago = new Date(setProximoPago.setDate(setProximoPago.getDate() + 1));
+                            //*hoje > (ProximoPago - constAtraso)
+                            if (hoje.getTime() > atrasoProximoPago.getTime()) {
+                                //*estado_captura_cuenta == ATRASADA
+                                let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+                                newEstadoCapturaCuenta = 'ATRASADA';
 
-                            //*hoje > ProximoPago - atraso
-                            if (checkProximoPago.getDate() == hoje.getDate() && checkProximoPago.getMonth() == hoje.getMonth() && checkProximoPago.getFullYear() == hoje.getFullYear()) {
+                                //*envia resultado
+                                objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
+                                //!node:test(unhide log and hide resultPost)
+                                // onergy.log(
+                                //     `[JFS] asset_number: ${objPost.asset_number} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
+                                // );
+                                let resultPost = /*await*/ sendItemToOnergy(
+                                    idInformacionCuenta,
+                                    data.usrid,
+                                    data.assid,
+                                    objPost,
+                                    '',
+                                    'asset_number',
+                                    true,
+                                    false,
+                                    false
+                                );
+
+                                //*check hoje >= (ProximoPago - constAlerta)
+                                let valConstAlerta = JSON.parse(isConstAlertaCaptura[0].UrlJsonContext.valor);
+                                let thisProximoPago = setProximoPago;
+                                let alertaProximoPago = new Date(thisProximoPago.setDate(thisProximoPago.getDate() - valConstAlerta));
+                                //!node:test(unhide log)
+                                // onergy.log(`[JFS] asset_number: ${objPost.asset_number} - hoje: ${hoje} - alertaProximoPago: ${alertaProximoPago}`);
+
+                                //*hoje >= (ProximoPago - constAlerta)
+                                if (hoje.getTime() > alertaProximoPago.getTime()) {
+                                    //*estado_captura_cuenta == ALERTA
+                                    let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+                                    newEstadoCapturaCuenta = 'ALERTA';
+
+                                    //*envia resultado
+                                    objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
+                                    //!node:test(unhide log and hide resultPost)
+                                    // onergy.log(
+                                    //     `[JFS] asset_number: ${objPost.asset_number} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
+                                    // );
+                                    let resultPost = /*await*/ sendItemToOnergy(
+                                        idInformacionCuenta,
+                                        data.usrid,
+                                        data.assid,
+                                        objPost,
+                                        '',
+                                        'asset_number',
+                                        true,
+                                        false,
+                                        false
+                                    );
+                                }
                             }
-
-                            //*set estado_captura_cuenta == ATRASADA
-                            //TODO: codigo para atrasada
-                            //*if hoje >= ProximoPago - alerta
-                            //*set estado_captura_cuenta == ALERTA
-                            //TODO: codigo para alerta
                         }
                     }
                 }
-            } else if (isTipoCuenta.length > 0 && (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'H' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'HH')) {
-                //TODO: copiar ppo e pc de Cuenta Padre
+            } else if (
+                isTipoCuenta.length > 0 &&
+                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'H' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'HH')
+            ) {
+                //*else, copia ProximoPago e ProximaCaptura de P para H || HH
+                let isCuentaPadre = objPost.prcs__conta_pai;
+                let strInformacionCuenta = getInformacionCuenta.filter((j) => j.UrlJsonContext.conta_interna_nic == isCuentaPadre);
+
+                if (strInformacionCuenta.length > 0) {
+                    //*envia resultado
+                    objPost.prcs__proximo_pagamento = strInformacionCuenta[0].UrlJsonContext.prcs__proximo_pagamento;
+                    objPost.prcs__proxima_captura = strInformacionCuenta[0].UrlJsonContext.prcs__proxima_captura;
+                    objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
+                        strInformacionCuenta[0].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+
+                    //!node:test(unhide log and hide resultPost)
+                    // onergy.log(
+                    //     `[JFS] asset_number: ${objPost.asset_number} cuenta_padre: ${objPost.prcs__conta_pai} - proximo_pago: ${objPost.prcs__proximo_pagamento} - proxima_captura: ${objPost.prcs__proxima_captura} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
+                    // );
+                    let resultPost = /*await*/ sendItemToOnergy(idInformacionCuenta, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
+                } else {
+                    onergy.log(`[JFS] asset_number: ${objPost.asset_number} - Cuenta Padre no encontrada`);
+                }
+            } else {
+                onergy.log(`[JFS] asset_number: ${objPost.asset_number} - Tipo de Cuenta no encontrada`);
             }
         }
     } else {
-        onergy.log(`JFS: getInformacionCuenta: Estado de Cuenta ${strEstadoCuenta} no encontrado para Información de la Cuenta ${data.asset_number}`);
-        return;
+        onergy.log(`[JFS] getInformacionCuenta: Estado de Cuenta ${strEstadoCuenta} no encontrado para Información de la Cuenta ${data.asset_number}`);
     }
 
     //return true;
@@ -378,62 +475,65 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
 /**STD_METHODS**
  */
 let json = {
-    nomePlanilhaCarga: 'tablas_maestras_v4.xlsx',
-    equipe: 'COL',
-    tppf_tipo_portifolio__portfolio: 'TIGO VMLA COLLOS',
-    asset_number: '196502',
-    profit_cost_center: '196502-WT1',
-    portafolio_atc: 'TIGO VMLA COLLOS',
+    faturas: null,
+    prcs__ocultar_campo: 'sim',
+    profit_cost_center: '102030-WTI',
+    tppf_tipo_portifolio__portfolio: 'ATC',
+    idc_pode_apagar: 'sim',
+    registro_salvo_: 'sim',
+    equipe: '',
+    asset_number_IDC: '102030',
+    asset_number: '102030',
+    site_name: '[JFS]Nombre del Sitio: Teste',
     emp_atc_site: 'ATC SITIOS DE COLOMBIA S.A.S',
-    conta_interna_nic: '1117502',
-    prcs__conta_pai: 'NO',
-    TCTC_tipo_de_conta__prcs__tipo_de_conta: 'I',
-    numero_do_medidor: 'jfs-numero-medidor-2042',
+    conta_interna_nic: '122436',
+    prcs__conta_pai: '112233',
+    prcs__tipo_de_conta_cache: '3c495728-28fd-7d69-860c-dbe5ed3d7e4d',
+    TCTC_tipo_de_conta__prcs__tipo_de_conta: 'H',
+    TCprcs__tipo_de_conta_id: '3c495728-28fd-7d69-860c-dbe5ed3d7e4d',
+    TCTC_tipo_de_conta__TC_tipo_de_conta_valor: 'H',
+    numero_do_medidor: '',
     emp_atc_site__prcs__assinante_atc: 'ATC SITIOS DE COLOMBIA S.A.S',
-    sta_cont_status_conta: 'ACTIVA',
-    prvd_nome_provedor: 'CARIBESOL DE LA COSTA SAS. ESP -  AIR-E',
-    nombre_comercial: 'AIR E SAS ESP',
-    nombre_beneficiario: 'AIR E SAS ESP',
-    suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico: 'ATC',
-    prcs__acuerdo_resolucion_alumbrado_publico: 'jfs-acuerdo-resolucion-2042',
-    tipo_cobr_tipos_cobrancas__tipo_de_cobranca: 'VARIABLE',
-    prcs__dia_de_pagamento: 16,
-    ECCUstatus_de_capturapago_id: '4e105a9a-86fe-8811-f04b-50da183cfa8f',
-    CPTprcs__clasificacion_passthru_id: '935a0db5-02b9-41f6-8c64-500152f912fd',
-    for_pag_forma_de_pagamento_id: '89781b6e-d9d7-40bd-b88f-168b727e3e26',
-    fre_pag_frequencia_de_pagamento_id: '519cec38-38b9-45db-b8a6-9f52259d93b4',
-    fre_pag_frequencia__frequencia_de_pagamento: 'MENSUAL',
-    for_pag_formas_de_pagamentos__forma_de_pagamento: 'PSE',
-    CPTclassificacao_passthru__prcs__clasificacion_passthru: 'VMLA',
-    ECCUECCU_estado_da_captura_da_conta__status_de_capturapago: 'EN ESPERA',
-    prcs__proxima_captura: '2022-10-21 00:00:00',
-    prcs__proximo_pagamento: '2022-10-21 00:00:00',
-    tipo_cobr_tipo_de_cobranca_id: 'a10cbcaa-b0f2-4515-81b6-4ea900a11301',
-    suj_pa_prcs__sujeito_passivo_alumbrado_publico_id: 'e801fa1d-4892-4a6a-8b67-73fa662a6395',
-    tipo_acceso: 'DIRECTO',
-    SERVservico_id: 'dccfc5ec-05a4-4547-b026-aed00d8c2440',
-    SERVservicos__servico: 'ENERGIA',
-    onergyteam_equipe: 'COL',
-    onergyteam_id: '084942ee-dd72-45f7-b044-6a47395bf6cc',
-    ID_ONE_REF: 'fe3f71c2-2e8a-4d8a-8384-0c854252084d',
-    asset_number_IDC: '196502',
-    site_name: 'Juan REY A 2013',
-    TCprcs__tipo_de_conta_id: '918ee6ff-a9ca-c76d-90a8-c0538d111d2b',
-    TCTC_tipo_de_conta__TC_tipo_de_conta_valor: 'I',
-    prcs__tipo_de_conta_cache: '918ee6ff-a9ca-c76d-90a8-c0538d111d2b',
     emp_atc_prcs__assinante_atc_id: '87b272d2-54c1-4c09-a6cf-187c51adcec9',
+    sta_cont_status_conta: 'ACTIVA',
     sta_cont_id: '93a8ad28-42a9-44b2-9787-ba0df7650b0b',
-    prvd_id: '95611535-dfa3-4736-8f90-14713e51b7f8',
-    nome_provedor_id_cache: '95611535-dfa3-4736-8f90-14713e51b7f8',
-    prvd_nome_comercial: 'AIR E SAS ESP',
-    prvd_nit_provedor: 901380930,
-    prvd_nit_beneficiario: 901380930,
-    prvd_beneficiario: 'AIR E SAS ESP',
-    prvd_apelido_provedor: 'CARIBESOL',
-    prvd_link_web: 'https://caribesol.facture.co/Consulta#/List',
-    prvd_usuario: 'PIDE DOS VECES EL NÚMERO DE CUENTA',
-    prvd_senha: 'N/A',
-    oneTemplateTitle: '',
+    prvd_apelido_provedor: '',
+    ESPACO: ' ',
+    nome_provedor_id_cache: '6c591850-98ea-476a-828e-b855d420d9b9',
+    prvd_nome_provedor: 'CARIBEMAR DE LA COSTA SAS. ESP -AFINIA',
+    prvd_id: '6c591850-98ea-476a-828e-b855d420d9b9',
+    prvd_nome_comercial: 'CARIBEMAR DE LA COSTA SAS ESP',
+    prvd_nit_provedor: '901380949',
+    prvd_nit_beneficiario: '901380949',
+    prvd_beneficiario: 'CARIBEMAR DE LA COSTA SAS ESP',
+    SERVservicos__servico: '',
+    SERVservico_id: '',
+    suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico: '',
+    suj_pa_prcs__sujeito_passivo_alumbrado_publico_id: '',
+    prcs__acuerdo_resolucion_alumbrado_publico: '',
+    tipo_cobr_tipos_cobrancas__tipo_de_cobranca: '',
+    tipo_cobr_tipo_de_cobranca_id: '',
+    prcs__media_valor_total: 0,
+    prcs__media_valor_energia: 0,
+    prcs__media_valor_iluminacao: 0,
+    prcs__dia_de_pagamento: 16,
+    fre_pag_frequencia__frequencia_de_pagamento: 'MENSUAL',
+    fre_pag_frequencia_de_pagamento_id: '519cec38-38b9-45db-b8a6-9f52259d93b4',
+    for_pag_formas_de_pagamentos__forma_de_pagamento: '',
+    for_pag_forma_de_pagamento_id: '',
+    CPTclassificacao_passthru__prcs__clasificacion_passthru: '',
+    CPTprcs__clasificacion_passthru_id: '',
+    prcs__ultima_captura: null,
+    ECCUECCU_estado_da_captura_da_conta__status_de_capturapago: '',
+    ECCUstatus_de_capturapago_id: '',
+    prcs__proxima_captura: null,
+    prcs__proximo_pagamento: null,
+    prvd_usuario: '',
+    prvd_senha: '',
+    prvd_link_web: '',
+    pode_apagar: 'nao',
+    ID_ONE_REF: '7099f693-bf73-f767-ea7d-b2e19a4da873',
+    oneTemplateTitle: 'COL- Informaciones de la Cuenta',
 };
 let idATC = {
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
