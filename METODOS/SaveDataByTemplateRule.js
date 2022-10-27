@@ -1,44 +1,7 @@
-// let x = {
-//     jsondata: 'string',
-//     usrid: 'string',
-//     assid: 'string',
-//     id: 'string',
-//     fdtid: 'string',
-//     ref_fdtid: 'string',
-//     ref_field: 'string',
-//     keepFdtID: true,
-//     blockDuplicate: true,
-//     checkUserDuplicate: true,
-//     checkTemplateDuplicate: true,
-//     ukField: 'string',
-//     executeAction: true,
-//     fdtCheckTemplates: ['string'],
-//     addCfgViewGroup: ['string'],
-//     removeCfgViewGroup: ['string'],
-//     addCfgViewUsr: ['string'],
-//     removeCfgViewUsr: ['string'],
-//     addCfgViewRole: ['string'],
-//     removeCfgViewRole: ['string'],
-//     SessionProcessID: 'string',
-//     ProcessExecutionID: 'string',
-//     geo: {
-//         cep: 'string',
-//         location: 'string',
-//     },
-//     dataFilter: 'string',
-//     hookSession: 'string',
-//     hookResultWhenComeInFdtid: 'string',
-//     approv: {
-//         dtAccept: '2022-10-26T23:30:55.673Z',
-//         rejection: 'string',
-//         accepted: true,
-//     },
-// };
-
 /**ENV_NODE**
  * node:test (find and replace)
- * /*async*/ /**
- * /*await*/ /**
+ * async /**
+ * await /**
  */
 const { date } = require('assert-plus');
 const { formatDate } = require('tough-cookie');
@@ -48,45 +11,45 @@ const { resolve } = require('path');
 const { type } = require('os');
 const axios = require('axios');
 const fs = require('fs');
-const jsuser = require('../../onergy/onergy-utils');
-const onergy = require('../../onergy/onergy-client');
-const utils = require('../../onergy/onergy-utils');
-/*async*/ function ajax(args) {
-    return /*await*/ onergy.ajax(args);
+const jsuser = require('../onergy/onergy-utils');
+const onergy = require('../onergy/onergy-client');
+const utils = require('../onergy/onergy-utils');
+async function ajax(args) {
+    return await onergy.ajax(args);
 }
-/*async*/ function ajaxPost(args) {
-    return /*await*/ onergy.ajaxPost(args);
+async function ajaxPost(args) {
+    return await onergy.ajaxPost(args);
 }
-/*async*/ function hashMd5(args) {
-    return /*await*/ onergy.hashMd5(args);
+async function hashMd5(args) {
+    return await onergy.hashMd5(args);
 }
-/*async*/ function increment(args) {
-    return /*await*/ onergy.increment(args);
+async function increment(args) {
+    return await onergy.increment(args);
 }
-/*async*/ function onergy_countdocs(args) {
-    return /*await*/ onergy.onergy_countdocs(args);
+async function onergy_countdocs(args) {
+    return await onergy.onergy_countdocs(args);
 }
-/*async*/ function onergy_get(args) {
-    let r = /*await*/ onergy.onergy_get(args);
+async function onergy_get(args) {
+    let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_save(args) {
-    return /*await*/ onergy.onergy_save(args);
+async function onergy_save(args) {
+    return await onergy.onergy_save(args);
 }
-/*async*/ function ReadExcelToJson(args) {
-    return /*await*/ onergy.ReadExcelToJson(args);
+async function ReadExcelToJson(args) {
+    return await onergy.ReadExcelToJson(args);
 }
-/*async*/ function ReadTextPdf(args) {
-    return /*await*/ onergy.ReadTextPdf(args);
+async function ReadTextPdf(args) {
+    return await onergy.ReadTextPdf(args);
 }
-/*async*/ function sendmail(args) {
-    return /*await*/ onergy.sendmail(args);
+async function sendmail(args) {
+    return await onergy.sendmail(args);
 }
-/*async*/ function onergy_sendto(args) {
-    let r = /*await*/ onergy.onergy_sendto(args);
+async function onergy_sendto(args) {
+    let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_updatemany(data) {
+async function onergy_updatemany(data) {
     return data;
 }
 function failureCallback(error) {
@@ -102,9 +65,14 @@ function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
 /**CLI_SCRIPT**
+ * Instruções de uso:
+ * 1. Capture o usrid e assid no console -> Minha Assinatura e cole no json abaixo
+ * 2. Capture o id do processo que deseja cutucar e cole no json abaixo
+ * 3. Em data pode colocar o que quiser, a mensagem abaixo já está no formato correto
+ * 4. Execute o script e verifique o log, a variável "x" deve retornar um id de processo
  */
-/*async*/ function teste() {
-    let x = /*await*/ onergy.onergy_save(json);
+async function teste() {
+    let x = await onergy.onergy_save(json);
     debugger;
 }
 /**STD_METHODS**
