@@ -103,8 +103,8 @@ function successCallback(result) {
 }
 /**CLI_SCRIPT**
  */
-async function teste() {
-    let x = await onergy.onergy_save(json);
+/*async*/ function teste() {
+    let x = /*await*/ onergy.onergy_save(json);
     debugger;
 }
 /**STD_METHODS**
