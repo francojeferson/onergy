@@ -104,8 +104,8 @@
 
 /**ENV_NODE**
  * node:test (find and replace)
- * /*async*/ /**
- * /*await*/ /**
+ * async /**
+ * await /**
  */
 const { date } = require('assert-plus');
 const { formatDate } = require('tough-cookie');
@@ -118,42 +118,42 @@ const fs = require('fs');
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
 const utils = require('../../onergy/onergy-utils');
-/*async*/ function ajax(args) {
-    return /*await*/ onergy.ajax(args);
+async function ajax(args) {
+    return await onergy.ajax(args);
 }
-/*async*/ function ajaxPost(args) {
-    return /*await*/ onergy.ajaxPost(args);
+async function ajaxPost(args) {
+    return await onergy.ajaxPost(args);
 }
-/*async*/ function hashMd5(args) {
-    return /*await*/ onergy.hashMd5(args);
+async function hashMd5(args) {
+    return await onergy.hashMd5(args);
 }
-/*async*/ function increment(args) {
-    return /*await*/ onergy.increment(args);
+async function increment(args) {
+    return await onergy.increment(args);
 }
-/*async*/ function onergy_countdocs(args) {
-    return /*await*/ onergy.onergy_countdocs(args);
+async function onergy_countdocs(args) {
+    return await onergy.onergy_countdocs(args);
 }
-/*async*/ function onergy_get(args) {
-    let r = /*await*/ onergy.onergy_get(args);
+async function onergy_get(args) {
+    let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_save(args) {
-    return /*await*/ onergy.onergy_save(args);
+async function onergy_save(args) {
+    return await onergy.onergy_save(args);
 }
-/*async*/ function ReadExcelToJson(args) {
-    return /*await*/ onergy.ReadExcelToJson(args);
+async function ReadExcelToJson(args) {
+    return await onergy.ReadExcelToJson(args);
 }
-/*async*/ function ReadTextPdf(args) {
-    return /*await*/ onergy.ReadTextPdf(args);
+async function ReadTextPdf(args) {
+    return await onergy.ReadTextPdf(args);
 }
-/*async*/ function sendmail(args) {
-    return /*await*/ onergy.sendmail(args);
+async function sendmail(args) {
+    return await onergy.sendmail(args);
 }
-/*async*/ function onergy_sendto(args) {
-    let r = /*await*/ onergy.onergy_sendto(args);
+async function onergy_sendto(args) {
+    let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_updatemany(data) {
+async function onergy_updatemany(data) {
     return data;
 }
 function failureCallback(error) {
@@ -175,13 +175,13 @@ function successCallback(result) {
  * Condicional: nenhum
  * Aprovação: nenhum
  */
-/*async*/ function getOnergyItem(fdtid, assid, usrid, filtro) {
+async function getOnergyItem(fdtid, assid, usrid, filtro) {
     let keepSearching = true;
     let skip = 0;
     let take = 500;
     let result = [];
     while (keepSearching) {
-        let strPageResp = /*await*/ onergy_get({
+        let strPageResp = await onergy_get({
             fdtid: fdtid,
             assid: assid,
             usrid: usrid,
@@ -200,7 +200,7 @@ function successCallback(result) {
     }
     return result;
 }
-/*async*/ function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
+async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
     let onergySaveData = {
         fdtid: templateid,
         assid: assid,
@@ -224,7 +224,7 @@ function successCallback(result) {
     if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
         onergySaveData.addCfgViewGroup = addCfgViewGroup;
     }
-    return /*await*/ onergy_save(onergySaveData);
+    return await onergy_save(onergySaveData);
 }
 function gerarFiltro(fielNameP, valueP) {
     return JSON.stringify([
@@ -242,33 +242,33 @@ function gerarData(dataHoje) {
     let dataHojeFormatada = arrayData[0] + '-' + arrayData[1].padStart(2, '0') + '-' + arrayData[2].padStart(2, '0');
     return dataHojeFormatada;
 }
-/*async*/ function init(json) {
+async function init(json) {
     let data = JSON.parse(json);
 
     //*pesq.ref:constantes
     let idConstantes = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
-    let getConstantes = /*await*/ getOnergyItem(idConstantes, data.assid, data.usrid, null);
+    let getConstantes = await getOnergyItem(idConstantes, data.assid, data.usrid, null);
     let isConstAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura');
     let isConstBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
     let isConstDiaCorte = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dia_corte');
 
     //*pesq.ref:estado_cuenta
     let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
-    let getEstadoCuenta = /*await*/ getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
+    let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
     let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta != 'INACTIVO');
 
     //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
     let strEstadoCuenta = isEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == data.sta_cont_status_conta)[0].UrlJsonContext.status_conta;
     let ftrEstadoCuenta = gerarFiltro('sta_cont_status_conta', strEstadoCuenta);
-    let getInformacionCuenta = /*await*/ getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrEstadoCuenta);
+    let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.assid, data.usrid, ftrEstadoCuenta);
     if (getInformacionCuenta.length > 0) {
         for (let i in getInformacionCuenta) {
             let objPost = getInformacionCuenta[i].UrlJsonContext;
 
             //*pesq.ref:tipo_cuenta
             let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
-            let getTipoCuenta = /*await*/ getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
+            let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
             let isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta);
 
             //*tipo_cuenta == P || PH || I, calcula ProximoPago e ProximaCaptura
@@ -281,14 +281,14 @@ function gerarData(dataHoje) {
             ) {
                 //*pesq.ref:frecuencia_pago
                 let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
-                let getFrecuenciaPago = /*await*/ getOnergyItem(idFrecuenciaPago, data.assid, data.usrid, null);
+                let getFrecuenciaPago = await getOnergyItem(idFrecuenciaPago, data.assid, data.usrid, null);
                 let isFrecuenciaPago = getFrecuenciaPago.filter((j) => j.UrlJsonContext.frequencia == objPost.fre_pag_frequencia__frequencia_de_pagamento);
 
                 //*frecuencia_pago
                 if (isFrecuenciaPago.length > 0) {
                     //*pesq.ref:estado_captura_cuenta
                     let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
-                    let getEstadoCapturaCuenta = /*await*/ getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
+                    let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
                     let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter(
                         (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago
                     );
@@ -337,7 +337,7 @@ function gerarData(dataHoje) {
                             // onergy.log(
                             //     `[JFS] asset_number: ${objPost.asset_number} - proximo_pago: ${objPost.prcs__proximo_pagamento} - proxima_captura: ${objPost.prcs__proxima_captura} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
                             // );
-                            let resultPost = /*await*/ sendItemToOnergy(
+                            let resultPost = await sendItemToOnergy(
                                 idInformacionCuenta,
                                 data.usrid,
                                 data.assid,
@@ -375,7 +375,7 @@ function gerarData(dataHoje) {
                                 // onergy.log(
                                 //     `[JFS] asset_number: ${objPost.asset_number} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
                                 // );
-                                let resultPost = /*await*/ sendItemToOnergy(
+                                let resultPost = await sendItemToOnergy(
                                     idInformacionCuenta,
                                     data.usrid,
                                     data.assid,
@@ -406,7 +406,7 @@ function gerarData(dataHoje) {
                                     // onergy.log(
                                     //     `[JFS] asset_number: ${objPost.asset_number} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
                                     // );
-                                    let resultPost = /*await*/ sendItemToOnergy(
+                                    let resultPost = await sendItemToOnergy(
                                         idInformacionCuenta,
                                         data.usrid,
                                         data.assid,
@@ -441,7 +441,7 @@ function gerarData(dataHoje) {
                     // onergy.log(
                     //     `[JFS] asset_number: ${objPost.asset_number} cuenta_padre: ${objPost.prcs__conta_pai} - proximo_pago: ${objPost.prcs__proximo_pagamento} - proxima_captura: ${objPost.prcs__proxima_captura} - estado_captura_cuenta: ${objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago}`
                     // );
-                    let resultPost = /*await*/ sendItemToOnergy(idInformacionCuenta, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
+                    let resultPost = await sendItemToOnergy(idInformacionCuenta, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
                 } else {
                     onergy.log(`[JFS] asset_number: ${objPost.asset_number} - Cuenta Padre no encontrada`);
                 }
