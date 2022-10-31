@@ -1,10 +1,11 @@
 let mainMethod = async () => {
-    await validarTipoConta();
+    await validarAssetNumber();
     await validarContaPai();
+    await validarTipoContaHH();
 };
 
-//*validar tipo_cuenta e determinar valor de asset_number
-let validarTipoConta = async () => {
+//*determinar valor de asset_number
+let validarAssetNumber = async () => {
     let tipoConta = mtdOnergy.JsEvtGetItemValue('TCprcs__tipo_de_conta_id');
     let tipoContaCache = mtdOnergy.JsEvtGetItemValue('prcs__tipo_de_conta_cache');
 
@@ -23,7 +24,7 @@ let validarTipoConta = async () => {
     }
 };
 
-//*validar tipo_cuenta e determinar valor de prcs__conta_pai
+//*determinar valor de prcs__conta_pai
 let validarContaPai = async () => {
     let contaInternaNIC = mtdOnergy.JsEvtGetItemValue('conta_interna_nic');
     let contaPai = mtdOnergy.JsEvtGetItemValue('prcs__conta_pai');
@@ -55,6 +56,48 @@ let validarContaPai = async () => {
         }
         return true;
     }
+};
+
+//*determinar tipo_cuenta HH (Hija Hibrida) duplicado
+let validarTipoContaHH = async () => {
+    let informacionCuentaID = '21672360-869c-4c29-8cf8-2bafa8530923';
+    let contaInternaNIC = mtdOnergy.JsEvtGetItemValue('conta_interna_nic');
+    let tipoContaValue = mtdOnergy.JsEvtGetItemValue('TCTC_tipo_de_conta__TC_tipo_de_conta_valor');
+
+    //*se tipo_cuenta for HH (Hija Hibrida), verificar se já existe conta com o mesmo valor de conta_interna_nic
+    if (tipoContaValue == 'HH') {
+        let objInformacionCuenta = await mtdOnergy.JsEvtGetFeedData({
+            fdtID: informacionCuentaID,
+            filter: gerarFiltro('_id', contaInternaNIC),
+        });
+
+        //*se já existir conta com o mesmo valor de conta_interna_nic e mesmo tipo_cuenta HH, exibe mensagem de erro e retorna false
+        if (objInformacionCuenta && objInformacionCuenta.length > 0) {
+            let objInformacionCuentaFiltrado = objInformacionCuenta.filter((item) => {
+                return item.TCTC_tipo_de_conta__TC_tipo_de_conta_valor == 'HH';
+            });
+
+            if (objInformacionCuentaFiltrado && objInformacionCuentaFiltrado.length > 0) {
+                mtdOnergy.JsEvtShowMessage('error', 'Ya existe una Cuenta con el mismo valor de Cuenta Interna NIC y Tipo de Cuenta Hija Hibrida');
+                mtdOnergy.JsEvtSetItemValue('conta_interna_nic', '');
+                mtdOnergy.JsEvtShowHideLoading(false);
+                return false;
+            }
+        }
+    }
+    return true;
+};
+
+//*gerar filtro com tipo texto ou número
+const gerarFiltro = (fielNameP, valueP) => {
+    return JSON.stringify([
+        {
+            FielName: fielNameP,
+            Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
+            FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
+            Value1: valueP,
+        },
+    ]);
 };
 
 mainMethod();
