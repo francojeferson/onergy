@@ -71,7 +71,7 @@ let naoApagarContaPai = async () => {
         fdtID: informacoesContaID,
     });
 
-    if (tipoContaValue == 'P' || tipoContaValue == 'PH') {
+    if (tipoContaValue == 'P' || tipoContaValue == 'PH' || tipoContaValue == 'HH') {
         let objNomeProvedor = await mtdOnergy.JsEvtGetFeedData({
             fdtID: informacoesContaID,
             filter: gerarFiltro('prvd_id', nomeProvedor),
