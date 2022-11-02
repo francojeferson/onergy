@@ -1,7 +1,7 @@
 /**ENV_NODE**
  * node:test (find and replace)
- * /*async*/ /**
- * /*await*/ /**
+ * async /**
+ * await /**
  */
 const { date } = require('assert-plus');
 const { formatDate } = require('tough-cookie');
@@ -14,43 +14,43 @@ const fs = require('fs');
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
 const utils = require('../../onergy/onergy-utils');
-/*async*/ function ajax(args) {
-    return /*await*/ onergy.ajax(args);
+async function ajax(args) {
+    return await onergy.ajax(args);
 }
-/*async*/ function ajaxPost(args) {
-    return /*await*/ onergy.ajaxPost(args);
+async function ajaxPost(args) {
+    return await onergy.ajaxPost(args);
 }
-/*async*/ function hashMd5(args) {
-    return /*await*/ onergy.hashMd5(args);
+async function hashMd5(args) {
+    return await onergy.hashMd5(args);
 }
-/*async*/ function increment(args) {
-    return /*await*/ onergy.increment(args);
+async function increment(args) {
+    return await onergy.increment(args);
 }
-/*async*/ function onergy_countdocs(args) {
-    return /*await*/ onergy.onergy_countdocs(args);
+async function onergy_countdocs(args) {
+    return await onergy.onergy_countdocs(args);
 }
-/*async*/ function onergy_get(args) {
-    let r = /*await*/ onergy.onergy_get(args);
+async function onergy_get(args) {
+    let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_save(args) {
-    return /*await*/ onergy.onergy_save(args);
+async function onergy_save(args) {
+    return await onergy.onergy_save(args);
 }
-/*async*/ function ReadExcelToJson(args) {
-    return /*await*/ onergy.ReadExcelToJson(args);
+async function ReadExcelToJson(args) {
+    return await onergy.ReadExcelToJson(args);
 }
-/*async*/ function ReadTextPdf(args) {
-    return /*await*/ onergy.ReadTextPdf(args);
+async function ReadTextPdf(args) {
+    return await onergy.ReadTextPdf(args);
 }
-/*async*/ function sendmail(args) {
-    return /*await*/ onergy.sendmail(args);
+async function sendmail(args) {
+    return await onergy.sendmail(args);
 }
-/*async*/ function onergy_sendto(args) {
-    let r = /*await*/ onergy.onergy_sendto(args);
+async function onergy_sendto(args) {
+    let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_updatemany(data) {
-    return data;
+async function onergy_updatemany(args) {
+    return await onergy.onergy_save(args);
 }
 function failureCallback(error) {
     console.log('It failed with ' + error);
@@ -71,13 +71,13 @@ function successCallback(result) {
  * Condicional: nenhum
  * Aprovação: nenhum
  */
-/*async*/ function getOnergyItem(fdtid, assid, usrid, filtro) {
+async function getOnergyItem(fdtid, assid, usrid, filtro) {
     let keepSearching = true;
     let skip = 0;
     let take = 500;
     let result = [];
     while (keepSearching) {
-        let strPageResp = /*await*/ onergy_get({
+        let strPageResp = await onergy_get({
             fdtid: fdtid,
             assid: assid,
             usrid: usrid,
@@ -96,32 +96,6 @@ function successCallback(result) {
     }
     return result;
 }
-/*async*/ function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
-    let onergySaveData = {
-        fdtid: templateid,
-        assid: assid,
-        usrid: usrid,
-        data: JSON.stringify(data),
-        //executeAction: false
-    };
-    if (!execAction) {
-        onergySaveData.executeAction = false;
-    }
-    if (fedid != undefined && fedid != '') {
-        onergySaveData.id = fedid;
-    }
-    if (ukField != undefined && ukField != '') {
-        onergySaveData.ukField = ukField;
-        onergySaveData.blockDuplicate = true;
-    }
-    if (checkTemplateDuplicate != undefined && checkTemplateDuplicate != '') {
-        onergySaveData.checkTemplateDuplicate = true;
-    }
-    if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
-        onergySaveData.addCfgViewGroup = addCfgViewGroup;
-    }
-    return /*await*/ onergy_save(onergySaveData);
-}
 function gerarFiltro(fielNameP, valueP) {
     return JSON.stringify([
         {
@@ -132,32 +106,54 @@ function gerarFiltro(fielNameP, valueP) {
         },
     ]);
 }
-/*async*/ function init(json) {
+async function init(json) {
     let data = JSON.parse(json);
+    debugger;
 
     let idSeleccionDeCarga = 'ec2d14aa-a0c9-4e33-8856-4e16d703f0b8';
-    let getSeleccionDeCarga = /*await*/ getOnergyItem(idSeleccionDeCarga, data.assid, data.usrid, null);
+    let getSeleccionDeCarga = await getOnergyItem(
+        idSeleccionDeCarga,
+        data.onergy_js_ctx.assid,
+        data.onergy_js_ctx.usrid,
+        gerarFiltro('ID_ONE_REF', data.onergy_js_ctx.fedid)
+    );
 
-    let idCargarExcel = 'af7df2b1-1962-4157-bd19-4c70271945ca';
-    let getCargarExcel = /*await*/ getOnergyItem(idCargarExcel, data.assid, data.usrid, null);
-
-    let idAsignarActividadPorLotes = '8a46f1a6-e2ae-48a2-9480-352493d9cb17';
-    let getAsignarActividadPorLotes = /*await*/ getOnergyItem(idAsignarActividadPorLotes, data.assid, data.usrid, null);
-
-    for (let i in getAsignarActividadPorLotes) {
-        let item = getAsignarActividadPorLotes[i].UrlJsonContext;
-        if (item.CDE__atualizar_status_legalizacao == '1') {
-            //TODO: atualizar Estado Legalizacion == ENVIADO
+    for (let fatura of getSeleccionDeCarga) {
+        if (data.CDE__atualizar_status_legalizacao == '1') {
+            let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
+            await onergy_updatemany({
+                fdtid: idFaturaHijaIndividual,
+                assid: data.onergy_js_ctx.assid,
+                usrid: data.onergy_js_ctx.usrid,
+                id: fatura.UrlJsonContext.one_copied_from,
+                data: JSON.stringify({
+                    UrlJsonContext: {
+                        ESTLlegalizacao_do_status_id: '598756cb-de3a-fbdf-7e1d-4b84b4effff3',
+                        ESTLstatus__legalizacao_do_status: 'ENVIADO',
+                    },
+                }),
+            });
         }
-        if (item.CDE__atualizar_status_pagamento == '1') {
-            //TODO: se Valor Pago Parcial == 0, atualizar Estado Pago == ENVIADO TOTAL
-            //TODO: se Valor Pago Parcial != 0, atualizar Estado Pago == ENVIADO PARCIAL
+        if (data.CDE__atualizar_status_pagamento == '1') {
+            let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
+            await onergy_updatemany({
+                fdtid: idFaturaHijaIndividual,
+                assid: data.onergy_js_ctx.assid,
+                usrid: data.onergy_js_ctx.usrid,
+                id: fatura.UrlJsonContext.one_copied_from,
+                data: JSON.stringify({
+                    UrlJsonContext: {
+                        ESTPstatus__status_pagamento: fatura.UrlJsonContext.CDE__valor_a_pagar_parcial ? 'ENVIADO PARCIAL' : 'ENVIADO TOTAL',
+                        ESTPstatus_pagamento_id: fatura.UrlJsonContext.CDE__valor_a_pagar_parcial
+                            ? 'a318f2ec-770f-aa2a-759b-f760850de465'
+                            : '9a5e2aa8-27b4-93bc-5772-b456f1bbffa2',
+                    },
+                }),
+            });
         }
-        debugger;
     }
 
-    // return true;
-    return SetObjectResponse(true, data, true);
+    return false;
 }
 function initBefore(json) {
     //return true;
@@ -180,8 +176,8 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
 let json = {
     planilla_legalizacion_y_pago: null,
     seleccion_de_carga: null,
-    CDE__atualizar_status_legalizacao: '1',
-    CDE__atualizar_status_pagamento: '1',
+    CDE__atualizar_status_legalizacao: '0',
+    CDE__atualizar_status_pagamento: '0',
     CDE__mes_processo: 'nov',
     forma_de_pagamento: null,
     ESTLlegalizacao_do_status_id: ['2fca9ef9-6b49-6f7a-ce52-3ad1a426244a'],
@@ -194,13 +190,34 @@ let json = {
     tipo_de_conta: null,
     cargar_excel: ' ',
     registro_salvo: 'sim',
-    CDE__atualizar_status_legalizacao_desc: 'Sim',
-    CDE__atualizar_status_pagamento_desc: 'Sim',
+    CDE__atualizar_status_legalizacao_desc: 'Não',
+    CDE__atualizar_status_pagamento_desc: 'Não',
     oneTemplateTitle: '',
-};
-let idATC = {
+    ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+    fedid: '7780abfc-3e0f-4183-5cfe-fdc71da022d9',
+    fdtid: '8a46f1a6-e2ae-48a2-9480-352493d9cb17',
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+    email: 'admin-colombia@atc.com.co',
+    onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
+    timezone: null,
+    onergy_js_ctx: {
+        assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+        fedid: '7780abfc-3e0f-4183-5cfe-fdc71da022d9',
+        fdtid: '8a46f1a6-e2ae-48a2-9480-352493d9cb17',
+        usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+        insertDt: '2022-11-02T16:42:26.506Z',
+        updateDt: '2022-11-02T16:42:26.506Z',
+        cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+        email: 'admin-colombia@atc.com.co',
+        user_name: 'Administrador Colômbia',
+        onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
+        praid: 'd8e84497-2700-441f-9994-264368e48893',
+        pcvid: '544541f8-0c5f-45e2-8cd4-e950bb8b490c',
+        prcid: '2c136341-fc64-c751-5cf4-0b92500c7a1e',
+        timezone: null,
+        timezone_value: '-03:00',
+        pubNubHook: null,
+    },
 };
-json = Object.assign(json, idATC);
 init(JSON.stringify(json));
