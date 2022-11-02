@@ -104,12 +104,16 @@ exports.DowloadFile = async function (url, filename, file) {
 
 exports.getInMemory = function (args) {
     return new Promise((resolve, reject) => {
-        request('https://gateway.onetech.com.br/ocs/api/cache?subscription-key=b30026bf1e1c40bda7777c64050fceb6&key=' + args.key, { json: false }, (err, res, body) => {
-            if (err) {
-                return console.log(err);
+        request(
+            'https://gateway.onetech.com.br/ocs/api/cache?subscription-key=b30026bf1e1c40bda7777c64050fceb6&key=' + args.key,
+            { json: false },
+            (err, res, body) => {
+                if (err) {
+                    return console.log(err);
+                }
+                if (resolve != null) resolve(body);
             }
-            if (resolve != null) resolve(body);
-        });
+        );
     });
 };
 
@@ -208,7 +212,16 @@ exports.onergy_get_internal = function (usrid, fdtid, assid, filter, vtake, vski
     var skip = vskip;
     var url = '';
     if (fedid != null && fedid != undefined)
-        url = Uri + '/api/Feed/OpenFeedMongo?subscription-key=f8da69f006064cb69814963c3f768715&usrID=' + usrid + '&assId=' + assid + '&fdtID=' + fdtid + '&fedid=' + fedid;
+        url =
+            Uri +
+            '/api/Feed/OpenFeedMongo?subscription-key=f8da69f006064cb69814963c3f768715&usrID=' +
+            usrid +
+            '&assId=' +
+            assid +
+            '&fdtID=' +
+            fdtid +
+            '&fedid=' +
+            fedid;
     else
         url =
             Uri +
@@ -248,7 +261,17 @@ exports.onergy_save = function (args) {
             SaveDataByTemplate.deleteFeed = args.deleteFeed;
         }
         if (args.data != undefined) {
-            SaveDataByTemplate.jsondata = args.data;
+            let data = JSON.parse(args.data);
+            if (data.urlJsonContext) {
+                data = data.urlJsonContext;
+                data = JSON.stringify(data);
+            } else if (data.UrlJsonContext) {
+                data = data.UrlJsonContext;
+                data = JSON.stringify(data);
+            } else {
+                data = JSON.stringify(data);
+            }
+            SaveDataByTemplate.jsondata = data;
         }
         if (args.ukField != undefined) {
             SaveDataByTemplate.ukField = args.ukField;
@@ -282,7 +305,15 @@ exports.onergy_sendto = function (args) {
         //const data = JSON.stringify(SaveDataByTemplate);
         //https://api.onergy.com.br/api/Feed/SendFeedItemToTemplate?usrid=9eb545b7-ef0e-4c79-b1a9-e706dfd63d1b&assid=7bc8ee17-f738-4085-958f-9fc27a737cc7&newfdtid=968cf322-ea7b-4c59-96f9-f278fe8b5bfc&resetFdtData=true&fedid=2a7186f6-784f-1dbc-30ab-c9a8ea76fb52
         try {
-            var url = 'https://api.onergy.com.br/api/Feed/SendFeedItemToTemplate?usrid=' + args.usrid + '&assid=' + args.assid + '&newfdtid=' + args.fdtid + '&resetFdtData=true&fedid=' + args.fedid;
+            var url =
+                'https://api.onergy.com.br/api/Feed/SendFeedItemToTemplate?usrid=' +
+                args.usrid +
+                '&assid=' +
+                args.assid +
+                '&newfdtid=' +
+                args.fdtid +
+                '&resetFdtData=true&fedid=' +
+                args.fedid;
             request(url, { json: true }, (err, res, body) => {
                 if (err) {
                     return console.log(err);
