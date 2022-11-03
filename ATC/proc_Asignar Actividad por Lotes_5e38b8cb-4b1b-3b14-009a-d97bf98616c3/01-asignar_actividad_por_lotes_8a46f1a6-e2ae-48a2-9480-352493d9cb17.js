@@ -108,19 +108,16 @@ function gerarFiltro(fielNameP, valueP) {
 }
 async function init(json) {
     let data = JSON.parse(json);
-    debugger;
 
     let idSeleccionDeCarga = 'ec2d14aa-a0c9-4e33-8856-4e16d703f0b8';
-    let getSeleccionDeCarga = await getOnergyItem(
-        idSeleccionDeCarga,
-        data.onergy_js_ctx.assid,
-        data.onergy_js_ctx.usrid,
-        gerarFiltro('ID_ONE_REF', data.onergy_js_ctx.fedid)
-    );
+    let getSeleccionDeCarga = await getOnergyItem(idSeleccionDeCarga, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('ID_ONE_REF', data.onergy_js_ctx.fedid));
 
     for (let fatura of getSeleccionDeCarga) {
+        //TODO: Verificar se a fatura precisa ser salva em Facturas Padre
+        let idFaturaPadre = '822245f3-b0de-4f74-830b-90c8c8efee15';
+        let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
+
         if (data.CDE__atualizar_status_legalizacao == '1') {
-            let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
             await onergy_updatemany({
                 fdtid: idFaturaHijaIndividual,
                 assid: data.onergy_js_ctx.assid,
@@ -135,7 +132,6 @@ async function init(json) {
             });
         }
         if (data.CDE__atualizar_status_pagamento == '1') {
-            let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
             await onergy_updatemany({
                 fdtid: idFaturaHijaIndividual,
                 assid: data.onergy_js_ctx.assid,
@@ -144,9 +140,7 @@ async function init(json) {
                 data: JSON.stringify({
                     UrlJsonContext: {
                         ESTPstatus__status_pagamento: fatura.UrlJsonContext.CDE__valor_a_pagar_parcial ? 'ENVIADO PARCIAL' : 'ENVIADO TOTAL',
-                        ESTPstatus_pagamento_id: fatura.UrlJsonContext.CDE__valor_a_pagar_parcial
-                            ? 'a318f2ec-770f-aa2a-759b-f760850de465'
-                            : '9a5e2aa8-27b4-93bc-5772-b456f1bbffa2',
+                        ESTPstatus_pagamento_id: fatura.UrlJsonContext.CDE__valor_a_pagar_parcial ? 'a318f2ec-770f-aa2a-759b-f760850de465' : '9a5e2aa8-27b4-93bc-5772-b456f1bbffa2',
                     },
                 }),
             });
