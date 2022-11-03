@@ -1,7 +1,7 @@
 /**ENV_NODE**
  * node:test (find and replace)
- * /*async*/ /**
- * /*await*/ /**
+ * async /**
+ * await /**
  */
 const { date } = require('assert-plus');
 const { formatDate } = require('tough-cookie');
@@ -14,43 +14,43 @@ const fs = require('fs');
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
 const utils = require('../../onergy/onergy-utils');
-/*async*/ function ajax(args) {
-    return /*await*/ onergy.ajax(args);
+async function ajax(args) {
+    return await onergy.ajax(args);
 }
-/*async*/ function ajaxPost(args) {
-    return /*await*/ onergy.ajaxPost(args);
+async function ajaxPost(args) {
+    return await onergy.ajaxPost(args);
 }
-/*async*/ function hashMd5(args) {
-    return /*await*/ onergy.hashMd5(args);
+async function hashMd5(args) {
+    return await onergy.hashMd5(args);
 }
-/*async*/ function increment(args) {
-    return /*await*/ onergy.increment(args);
+async function increment(args) {
+    return await onergy.increment(args);
 }
-/*async*/ function onergy_countdocs(args) {
-    return /*await*/ onergy.onergy_countdocs(args);
+async function onergy_countdocs(args) {
+    return await onergy.onergy_countdocs(args);
 }
-/*async*/ function onergy_get(args) {
-    let r = /*await*/ onergy.onergy_get(args);
+async function onergy_get(args) {
+    let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_save(args) {
-    return /*await*/ onergy.onergy_save(args);
+async function onergy_save(args) {
+    return await onergy.onergy_save(args);
 }
-/*async*/ function ReadExcelToJson(args) {
-    return /*await*/ onergy.ReadExcelToJson(args);
+async function ReadExcelToJson(args) {
+    return await onergy.ReadExcelToJson(args);
 }
-/*async*/ function ReadTextPdf(args) {
-    return /*await*/ onergy.ReadTextPdf(args);
+async function ReadTextPdf(args) {
+    return await onergy.ReadTextPdf(args);
 }
-/*async*/ function sendmail(args) {
-    return /*await*/ onergy.sendmail(args);
+async function sendmail(args) {
+    return await onergy.sendmail(args);
 }
-/*async*/ function onergy_sendto(args) {
-    let r = /*await*/ onergy.onergy_sendto(args);
+async function onergy_sendto(args) {
+    let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
 }
-/*async*/ function onergy_updatemany(data) {
-    return data;
+async function onergy_updatemany(args) {
+    return await onergy.onergy_save(args);
 }
 function failureCallback(error) {
     console.log('It failed with ' + error);
@@ -71,7 +71,7 @@ function successCallback(result) {
  * Condicional: nenhum
  * Aprovação: nenhum
  */
-/*async*/ function getOnergyItem(fdtid, assid, usrid, filtro, fedid) {
+async function getOnergyItem(fdtid, assid, usrid, filtro, fedid) {
     let keepSearching = true;
     let skip = 0;
     let take = 500;
@@ -88,7 +88,7 @@ function successCallback(result) {
         if (fedid) {
             onergyGetObj.fedid = fedid;
         }
-        let strPageResp = /*await*/ onergy_get(onergyGetObj);
+        let strPageResp = await onergy_get(onergyGetObj);
         skip += take;
         let pageResp = JSON.parse(strPageResp);
         if (pageResp != null && pageResp.length > 0) {
@@ -100,7 +100,7 @@ function successCallback(result) {
     }
     return result;
 }
-/*async*/ function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
+async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
     let onergySaveData = {
         fdtid: templateid,
         assid: assid,
@@ -124,9 +124,9 @@ function successCallback(result) {
     if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
         onergySaveData.addCfgViewGroup = addCfgViewGroup;
     }
-    return /*await*/ onergy_save(onergySaveData);
+    return await onergy_save(onergySaveData);
 }
-/*async*/ function postStatus(status_desc, statusPost, data) {
+async function postStatus(status_desc, statusPost, data) {
     let postInfo = {
         processamento: status_desc,
         horas: data.time,
@@ -135,12 +135,12 @@ function successCallback(result) {
 
     //*consulta id do status e envia update para card de carga
     let idCargaGeral = '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f';
-    let getCargaGeral = /*await*/ getOnergyItem(idCargaGeral, data.assid, data.usrid, '', data.id_upload_planilha);
+    let getCargaGeral = await getOnergyItem(idCargaGeral, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, '', data.id_upload_planilha);
 
     //!node:test (unhide log + return)
     // onergy.log(`JFS: postStatus sendItem=>postInfo: ${JSON.stringify(postInfo)}`);
     // return true;
-    /*await*/ sendItemToOnergy(idCargaGeral, data.usrid, data.assid, postInfo, data.id_upload_planilha, '', true, false, false);
+    await sendItemToOnergy(idCargaGeral, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, postInfo, data.id_upload_planilha, '', true, false, false);
 }
 function gerarFiltro(fielNameP, valueP) {
     return JSON.stringify([
@@ -164,27 +164,27 @@ function gerarDataHora(dataHoje, utc) {
     let horaTimezoneFormat = JSON.stringify(horaTimezone24h).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
     return dataHojeFormatada + ' ' + horaTimezoneFormat;
 }
-/*async*/ function init(json) {
+async function init(json) {
     let data = JSON.parse(json);
 
-    //*cloud:onergy segue UTC+0, node:test segue UTC-3
+    //*cloud:onergy == UTC+0, node:test == UTC-3
     let dataHoje = new Date();
     let time = gerarDataHora(dataHoje, -5); //?Bogota
     let arrPost = [];
     let statusPost = [];
     let status_desc;
 
+    //*upload planilha
+    let strArrExcel = await ReadExcelToJson({
+        url: data.planilha[0].UrlAzure,
+    });
+    let dataExcel = JSON.parse(strArrExcel);
+
     //*pesq.ref:indice_carga
     let idTabExcel = data.load_index_id_do_card;
     let idIndiceCarga = '9a6e262f-e463-4c5d-9d8b-0fd8343b2f02';
     let strFiltro = gerarFiltro('id_do_card', idTabExcel);
-    let getTabExcel = /*await*/ getOnergyItem(idIndiceCarga, data.assid, data.usrid, strFiltro);
-
-    //*upload planilha
-    let strArrExcel = /*await*/ ReadExcelToJson({
-        url: data.planilha[0].UrlAzure,
-    });
-    let dataExcel = JSON.parse(strArrExcel);
+    let getTabExcel = await getOnergyItem(idIndiceCarga, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
     //*se tab excel não existir em carga indice, gera erro
     let tabExcel = data.load_index_tab_excel;
@@ -206,7 +206,7 @@ function gerarDataHora(dataHoje, utc) {
                 time = gerarDataHora(dataHoje, -5); //?Bogota
                 status_desc = `Cargando ${ctxExcel.length} registros de ${tabExcel}`;
                 statusPost.push(`${time}, ${status_desc}`);
-                /*await*/ postStatus(status_desc, statusPost, data);
+                await postStatus(status_desc, statusPost, data);
                 statusPost = statusPost.concat('\n');
 
                 //*para cada linha da planilha (exceto cabeçalho) gera objeto
@@ -246,17 +246,18 @@ function gerarDataHora(dataHoje, utc) {
 
                 //*se não existir dados no array de post, gera erro
                 if (arrPost.length > 0) {
-                    let getTabExcel = /*await*/ getOnergyItem(idTabExcel, data.assid, data.usrid, null);
+                    let getTabExcel = await getOnergyItem(idTabExcel, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
 
                     //*status:processando
                     dataHoje = new Date();
                     time = gerarDataHora(dataHoje, -5); //?Bogota
                     status_desc = `Manejando ${arrPost.length} registros de ${tabExcel}`;
                     statusPost.push(`${time}, ${status_desc}`);
-                    /*await*/ postStatus(status_desc, statusPost, data);
+                    await postStatus(status_desc, statusPost, data);
                     statusPost = statusPost.concat('\n');
 
                     //*para cada linha do array de post, verifica se existe registro no grid destino
+                    let countFor = 0;
                     for (let y in arrPost) {
                         let objPost = arrPost[y];
                         objPost.onergyteam_equipe = objPost.equipe;
@@ -272,7 +273,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: categorias sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'categorias', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'categorias', true, false, false);
                         }
 
                         //*aba:departamento
@@ -287,19 +288,19 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: departamento sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'uf', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'uf', true, false, false);
                         }
 
                         //*aba:municipio
                         if (tabExcel == 'municipio') {
                             //*pesq.ref:departamento
                             let idDepartamento = '132b8394-2193-4d83-a399-08f4cde70873';
-                            let getDepartamento = /*await*/ getOnergyItem(idDepartamento, data.assid, data.usrid, null);
+                            let getDepartamento = await getOnergyItem(idDepartamento, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isDepartamento = getDepartamento.filter((j) => j.UrlJsonContext.uf == objPost.departamento);
                             if (!isDepartamento) {
                                 status_desc = `ERROR: no hay "${objPost.departamento}" registrado para ${tabExcel} de "${objPost.municipio}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -314,7 +315,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: municipio sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'municipio', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'municipio', true, false, false);
                         }
 
                         //*aba:compania_atc
@@ -328,7 +329,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: compania_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'site', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'site', true, false, false);
                         }
 
                         //*aba:forma_pago
@@ -341,26 +342,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: forma_pago sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'formas_de_pagamentos', true, false, false);
-                        }
-
-                        //*aba:frecuencia_pago
-                        if (tabExcel == 'frecuencia_pago') {
-                            let isFrequencia = getTabExcel.filter((j) => j.UrlJsonContext.frequencia == objPost.frecuencia_pago);
-                            if (!isFrequencia || data.em_caso_de_duplicidade == '1') {
-                                objPost.frequencia = objPost.frecuencia_pago;
-                                delete objPost.frecuencia_pago;
-                            }
-
-                            let isFrequenciaMeses = getTabExcel.filter((j) => j.UrlJsonContext.frequencia_em_meses == objPost.frecuencia_meses);
-                            if (!isFrequenciaMeses || data.em_caso_de_duplicidade == '1') {
-                                objPost.frequencia_em_meses = objPost.frecuencia_meses;
-                                delete objPost.frecuencia_meses;
-                            }
-
-                            //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: frecuencia_pago sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'frequencia', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'formas_de_pagamentos', true, false, false);
                         }
 
                         //*aba:lecturas
@@ -373,7 +355,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: lecturas sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'LCT_ferramentas', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'LCT_ferramentas', true, false, false);
                         }
 
                         //*aba:portafolio_atc
@@ -386,7 +368,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: portafolio_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'tipo_portifolio', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipo_portifolio', true, false, false);
                         }
 
                         //*aba:regional_atc
@@ -399,7 +381,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: regional_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'regional', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'regional', true, false, false);
                         }
 
                         //*aba:servicios
@@ -412,7 +394,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: servicios sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'servicos', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'servicos', true, false, false);
                         }
 
                         //*aba:estado_cuenta
@@ -425,7 +407,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: estado_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'status_conta', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'status_conta', true, false, false);
                         }
 
                         //*aba:estado_sitio
@@ -438,7 +420,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: estado_sitio sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'status', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'status', true, false, false);
                         }
 
                         //*aba:sujeto_pasivo
@@ -451,7 +433,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: sujeto_pasivo sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'sujeito', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'sujeito', true, false, false);
                         }
 
                         //*aba:tipo_cobro
@@ -464,7 +446,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_cobro sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'tipos_cobrancas', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipos_cobrancas', true, false, false);
                         }
 
                         //*aba:tipo_tercero
@@ -477,7 +459,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_tercero sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'tipo_de_terceiro', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipo_de_terceiro', true, false, false);
                         }
 
                         //*aba:tipo_acceso
@@ -490,7 +472,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_acceso sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'tipo_de_acesso', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipo_de_acesso', true, false, false);
                         }
 
                         //*aba:tipo_cuenta
@@ -503,7 +485,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'TC_tipo_de_conta', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'TC_tipo_de_conta', true, false, false);
                         }
 
                         //*aba:proveedores
@@ -533,12 +515,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:tipo_tercero
                             let idTipoTercero = '70110b99-aa96-4e25-b1b2-177484668700';
-                            let getTipoTercero = /*await*/ getOnergyItem(idTipoTercero, data.assid, data.usrid, null);
+                            let getTipoTercero = await getOnergyItem(idTipoTercero, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isTipoTercero = getTipoTercero.filter((j) => j.UrlJsonContext.tipo_de_terceiro == objPost.tipo_tercero);
                             if (!isTipoTercero) {
                                 status_desc = `ERROR: no hay "${objPost.tipo_tercero}" registrado para ${tabExcel} de "${objPost.nit_proveedor}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -567,12 +549,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:tipo_acceso
                             let idTipoAcceso = '62e9a129-73b5-4819-9c16-f1d4bdababde';
-                            let getTipoAcceso = /*await*/ getOnergyItem(idTipoAcceso, data.assid, data.usrid, null);
+                            let getTipoAcceso = await getOnergyItem(idTipoAcceso, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isTipoAcceso = getTipoAcceso.filter((j) => j.UrlJsonContext.tipo_de_acesso == objPost.tipo_acceso);
                             if (!isTipoAcceso) {
                                 status_desc = `ERROR: no hay "${objPost.tipo_acceso}" registrado para ${tabExcel} de "${objPost.nit_proveedor}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -608,7 +590,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: proveedores sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'nit_provedor', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'nit_provedor', true, false, false);
                         }
 
                         //*aba:estrato
@@ -621,7 +603,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: estrato sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'LST_estrato', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'LST_estrato', true, false, false);
                         }
 
                         //*aba:nivel_tension
@@ -634,7 +616,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: nivel_tension sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'NVT_nivel', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'NVT_nivel', true, false, false);
                         }
 
                         //*aba:clasificacion_passthru
@@ -656,177 +638,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: clasificacion_passthru sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'classificacao_passthru', true, false, false);
-                        }
-
-                        //*aba:clientes
-                        if (tabExcel == 'clientes') {
-                            let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.COLC_nit_cliente == objPost.nit_cliente);
-                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.COLC_nit_cliente = objPost.nit_cliente.toString();
-                                delete objPost.nit_cliente;
-                            }
-
-                            let isNombreCliente = getTabExcel.filter((j) => j.UrlJsonContext.COLC_nome_cliente == objPost.nombre_cliente);
-                            if (!isNombreCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.COLC_nome_cliente = objPost.nombre_cliente;
-                                delete objPost.nombre_cliente;
-                            }
-
-                            let isNombreOficial = getTabExcel.filter((j) => j.UrlJsonContext.COLC_nome_oficial == objPost.nombre_oficial);
-                            if (!isNombreOficial || data.em_caso_de_duplicidade == '1') {
-                                objPost.COLC_nome_oficial = objPost.nombre_oficial;
-                                delete objPost.nombre_oficial;
-                            }
-
-                            let isCodigoCliente = getTabExcel.filter((j) => j.UrlJsonContext.COLC_codigo_cliente == objPost.codigo_cliente);
-                            if (!isCodigoCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.COLC_codigo_cliente = objPost.codigo_cliente.toString();
-                                delete objPost.codigo_cliente;
-                            }
-
-                            let isDireccion = getTabExcel.filter((j) => j.UrlJsonContext.COLC_endereco == objPost.direccion);
-                            if (!isDireccion || data.em_caso_de_duplicidade == '1') {
-                                objPost.COLC_endereco = objPost.direccion;
-                                delete objPost.direccion;
-                            }
-
-                            //*pesq.ref:municipio
-                            let idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
-                            let getMunicipio = /*await*/ getOnergyItem(idMunicipio, data.assid, data.usrid, null);
-                            let isMunicipio = getMunicipio.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
-                            if (!isMunicipio) {
-                                status_desc = `ERROR: no hay "${objPost.municipio}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
-                                statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
-                                statusPost = statusPost.concat('\n');
-                                return false;
-                            }
-
-                            let isColcMunicipio = getTabExcel.filter((j) => j.UrlJsonContext.loca_cida_municipio__COLC_cidade == objPost.municipio);
-                            if (!isColcMunicipio || data.em_caso_de_duplicidade == '1') {
-                                objPost.loca_cida_municipio__COLC_cidade = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.municipio : '';
-                                objPost.loca_cida_COLC_cidade_id = isMunicipio.length > 0 ? isMunicipio[0].ID : '';
-                                objPost.loca_cida_loca_uf_uf = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.loca_uf_uf : '';
-                                delete objPost.municipio;
-                                delete objPost.departamento;
-                            }
-
-                            //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'COLC_nit_cliente', true, false, false);
-                        }
-
-                        //*aba:regional_clientes
-                        if (tabExcel == 'regional_clientes') {
-                            //*id_one_ref:clientes
-                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
-                            let strFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente.toString());
-                            let paiRegistro = /*await*/ getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
-
-                            let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.RCS_nit_cliente == objPost.nit_cliente);
-                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
-                                objPost.RCS_nit_cliente = objPost.nit_cliente.toString();
-                                delete objPost.nit_cliente;
-                            }
-
-                            let isNombreRegional = getTabExcel.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
-                            if (!isNombreRegional || data.em_caso_de_duplicidade == '1') {
-                                objPost.RCS_nome_regional = objPost.nombre_regional;
-                                delete objPost.nombre_regional;
-                            }
-
-                            //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: contactos_clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'RCS_nit_cliente', true, false, false);
-                        }
-
-                        //*aba:contactos_clientes
-                        if (tabExcel == 'contactos_clientes') {
-                            //*id_one_ref:clientes
-                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
-                            let strFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente.toString());
-                            let paiRegistro = /*await*/ getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
-
-                            let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.CCS_nit_cliente == objPost.nit_cliente);
-                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
-                                objPost.CCS_nit_cliente = objPost.nit_cliente.toString();
-                                delete objPost.nit_cliente;
-                            }
-
-                            //*pesq.ref:regional_clientes
-                            let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
-                            let getRegionalClientes = /*await*/ getOnergyItem(idRegionalClientes, data.assid, data.usrid, null);
-                            let isRegionalClientes = getRegionalClientes.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
-                            if (!isRegionalClientes) {
-                                status_desc = `ERROR: no hay "${objPost.nombre_regional}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
-                                statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
-                                statusPost = statusPost.concat('\n');
-                                return false;
-                            }
-
-                            let isRcsRegionalClientes = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional);
-                            if (!isRcsRegionalClientes || data.em_caso_de_duplicidade == '1') {
-                                objPost.RCSRCS_nome_regional__CCS_nombre_regional = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
-                                objPost.RCSCCS_nombre_regional_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
-                                delete objPost.nombre_regional;
-                            }
-
-                            let isNombreContacto = getTabExcel.filter((j) => j.UrlJsonContext.CCS_nombre_contacto == objPost.nombre_contacto);
-                            if (!isNombreContacto || data.em_caso_de_duplicidade == '1') {
-                                objPost.CCS_nombre_contacto = objPost.nombre_contacto;
-                                delete objPost.nombre_contacto;
-                            }
-
-                            let isTelefonoCelular = getTabExcel.filter((j) => j.UrlJsonContext.CCS_telefono_celular == objPost.telefono_celular);
-                            if (!isTelefonoCelular || data.em_caso_de_duplicidade == '1') {
-                                objPost.CCS_telefono_celular = objPost.telefono_celular;
-                                delete objPost.telefono_celular;
-                            }
-
-                            let isTelefonoFijo = getTabExcel.filter((j) => j.UrlJsonContext.CCS_telefono_fijo == objPost.telefono_fijo);
-                            if (!isTelefonoFijo || data.em_caso_de_duplicidade == '1') {
-                                objPost.CCS_telefono_fijo = objPost.telefono_fijo;
-                                delete objPost.telefono_fijo;
-                            }
-
-                            let isCorreoElectronico = getTabExcel.filter((j) => j.UrlJsonContext.CCS_correo_eletronico == objPost.correo_electronico);
-                            if (!isCorreoElectronico || data.em_caso_de_duplicidade == '1') {
-                                objPost.CCS_correo_eletronico = objPost.correo_electronico;
-                                delete objPost.correo_electronico;
-                            }
-
-                            //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: contactos_clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'CCS_nit_cliente', true, false, false);
-                        }
-
-                        //*aba:portafolio_clientes
-                        if (tabExcel == 'portafolio_clientes') {
-                            //*id_one_ref:clientes
-                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
-                            let strFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente.toString());
-                            let paiRegistro = /*await*/ getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
-
-                            let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCS_nit_cliente == objPost.nit_cliente);
-                            if (!isNITCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
-                                objPost.PCS_nit_cliente = objPost.nit_cliente.toString();
-                                delete objPost.nit_cliente;
-                            }
-
-                            let isPortafolioCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente);
-                            if (!isPortafolioCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.PCS_portafolio_cliente = objPost.portafolio_cliente;
-                                delete objPost.portafolio_cliente;
-                            }
-
-                            //!node:test (unhide log and hide sendItem)
-                            // onergy.log(`JFS: portafolio_clientes sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'PCS_nit_cliente', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'classificacao_passthru', true, false, false);
                         }
 
                         //*aba:sitios
@@ -852,12 +664,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:compania_atc
                             let idCompaniaATC = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
-                            let getCompaniaATC = /*await*/ getOnergyItem(idCompaniaATC, data.assid, data.usrid, null);
+                            let getCompaniaATC = await getOnergyItem(idCompaniaATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isCompaniaATC = getCompaniaATC.filter((j) => j.UrlJsonContext.site == objPost.compania_atc);
                             if (!isCompaniaATC) {
                                 status_desc = `ERROR: no hay "${objPost.compania_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -872,19 +684,18 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:municipio
                             let idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
-                            let getMunicipio = /*await*/ getOnergyItem(idMunicipio, data.assid, data.usrid, null);
+                            let getMunicipio = await getOnergyItem(idMunicipio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isMunicipio = getMunicipio.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
                             if (!isMunicipio) {
                                 status_desc = `ERROR: no hay "${objPost.municipio}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
                             let isSitMunicipio = getTabExcel.filter((j) => j.UrlJsonContext.loca_cida_municipio == objPost.municipio);
                             if (!isSitMunicipio || data.em_caso_de_duplicidade == '1') {
-                                //TODO: tabela-base divergente do campo inspecionado (uf)
                                 objPost.loca_cida_municipio = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.municipio : '';
                                 objPost.loca_cida_id = isMunicipio.length > 0 ? isMunicipio[0].ID : '';
                                 objPost.loca_cida_loca_uf_uf = isMunicipio.length > 0 ? isMunicipio[0].UrlJsonContext.loca_uf_uf : '';
@@ -907,12 +718,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:estado_sitio
                             let idEstadoSitio = 'f0ee1dd9-bb48-4aef-9f77-43e357870a31';
-                            let getEstadoSitio = /*await*/ getOnergyItem(idEstadoSitio, data.assid, data.usrid, null);
+                            let getEstadoSitio = await getOnergyItem(idEstadoSitio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isEstadoSitio = getEstadoSitio.filter((j) => j.UrlJsonContext.status == objPost.estado_sitio);
                             if (!isEstadoSitio) {
                                 status_desc = `ERROR: no hay "${objPost.municipio}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -927,18 +738,19 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:portafolio_atc
                             let idPortafolioATC = '18615527-c678-4f1c-87e0-d7a9735d0c6e';
-                            let getPortafolioATC = /*await*/ getOnergyItem(idPortafolioATC, data.assid, data.usrid, null);
+                            let getPortafolioATC = await getOnergyItem(idPortafolioATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isPortafolioATC = getPortafolioATC.filter((j) => j.UrlJsonContext.tipo_portifolio == objPost.portafolio_atc);
                             if (!isPortafolioATC) {
                                 status_desc = `ERROR: no hay "${objPost.portafolio_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
 
                             let isSitPortafolioATC = getTabExcel.filter((j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == objPost.portafolio_atc);
                             if (!isSitPortafolioATC || data.em_caso_de_duplicidade == '1') {
+                                //TODO: carga não preenche item (ATC)
                                 objPost.tppf_tipo_portifolio__portfolio = isPortafolioATC.length > 0 ? isPortafolioATC[0].UrlJsonContext.tipo_portifolio : '';
                                 objPost.tppf_tipo_portifolio = isPortafolioATC.length > 0 ? isPortafolioATC[0].UrlJsonContext.tipo_portifolio : '';
                                 objPost.tppf_portfolio_id = isPortafolioATC.length > 0 ? isPortafolioATC[0].ID : '';
@@ -947,12 +759,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:regional_atc
                             let idRegionalATC = '74d8a818-46a7-4d56-8a18-2369bdd00589';
-                            let getRegionalATC = /*await*/ getOnergyItem(idRegionalATC, data.assid, data.usrid, null);
+                            let getRegionalATC = await getOnergyItem(idRegionalATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isRegionalATC = getRegionalATC.filter((j) => j.UrlJsonContext.regional == objPost.regional_atc);
                             if (!isRegionalATC) {
                                 status_desc = `ERROR: no hay "${objPost.regional_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -968,7 +780,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: sitios sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number', true, false, false);
                         }
 
                         //*aba:informacion_cuenta
@@ -976,7 +788,7 @@ function gerarDataHora(dataHoje, utc) {
                             //*id_one_ref:sitios
                             let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
-                            let paiRegistro = /*await*/ getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             let isProfitCostCenter = getTabExcel.filter((j) => j.UrlJsonContext.profit_cost_center == objPost.profit_cost_center);
                             if (!isProfitCostCenter || data.em_caso_de_duplicidade == '1') {
@@ -1022,12 +834,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:tipo_cuenta
                             let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
-                            let getTipoCuenta = /*await*/ getOnergyItem(idTipoCuenta, data.assid, data.usrid, null);
+                            let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.tipo_cuenta);
                             if (!isTipoCuenta) {
                                 status_desc = `ERROR: no hay "${objPost.tipo_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1049,12 +861,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:suscriptor
                             let idCompaniaATC = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
-                            let getCompaniaATC = /*await*/ getOnergyItem(idCompaniaATC, data.assid, data.usrid, null);
+                            let getCompaniaATC = await getOnergyItem(idCompaniaATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isSuscriptor = getCompaniaATC.filter((j) => j.UrlJsonContext.site == objPost.suscriptor);
                             if (!isSuscriptor) {
                                 status_desc = `ERROR: no hay "${objPost.suscriptor}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1068,12 +880,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:estado_cuenta
                             let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
-                            let getEstadoCuenta = /*await*/ getOnergyItem(idEstadoCuenta, data.assid, data.usrid, null);
+                            let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isEstadoCuenta = getEstadoCuenta.filter((j) => j.UrlJsonContext.status_conta == objPost.estado_cuenta);
                             if (!isEstadoCuenta) {
                                 status_desc = `ERROR: no hay "${objPost.estado_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1087,12 +899,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:nombre_proveedor
                             let idProveedores = '4783ca0b-357d-42ab-a5c8-3328ee315f86';
-                            let getProveedores = /*await*/ getOnergyItem(idProveedores, data.assid, data.usrid, null);
+                            let getProveedores = await getOnergyItem(idProveedores, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isProveedores = getProveedores.filter((j) => j.UrlJsonContext.nome_provedor == objPost.nombre_proveedor);
                             if (!isProveedores) {
                                 status_desc = `ERROR: no hay "${objPost.nombre_proveedor}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1122,12 +934,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:servicios
                             let idServicios = '8e284e84-b8f9-45c1-abe2-991555441ea2';
-                            let getServicios = /*await*/ getOnergyItem(idServicios, data.assid, data.usrid, null);
+                            let getServicios = await getOnergyItem(idServicios, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isServicios = getServicios.filter((j) => j.UrlJsonContext.servicos == objPost.servicios);
                             if (!isServicios) {
                                 status_desc = `ERROR: no hay "${objPost.servicios}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1147,12 +959,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:sujeto_pasivo
                             let idSujetoPasivo = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
-                            let getSujetoPasivo = /*await*/ getOnergyItem(idSujetoPasivo, data.assid, data.usrid, null);
+                            let getSujetoPasivo = await getOnergyItem(idSujetoPasivo, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isSujetoPasivo = getSujetoPasivo.filter((j) => j.UrlJsonContext.sujeito == objPost.sujeto_pasivo);
                             if (!isSujetoPasivo) {
                                 status_desc = `ERROR: no hay "${objPost.sujeto_pasivo}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1172,12 +984,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:tipo_cobro
                             let idTipoCobro = '22538843-147f-4d41-9534-20a6d674f4b6';
-                            let getTipoCobro = /*await*/ getOnergyItem(idTipoCobro, data.assid, data.usrid, null);
+                            let getTipoCobro = await getOnergyItem(idTipoCobro, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isTipoCobro = getTipoCobro.filter((j) => j.UrlJsonContext.tipos_cobrancas == objPost.tipo_cobro);
                             if (!isTipoCobro) {
                                 status_desc = `ERROR: no hay "${objPost.tipo_cobro}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1203,12 +1015,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:frecuencia_pago
                             let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
-                            let getFrecuenciaPago = /*await*/ getOnergyItem(idFrecuenciaPago, data.assid, data.usrid, null);
+                            let getFrecuenciaPago = await getOnergyItem(idFrecuenciaPago, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isFrecuenciaPago = getFrecuenciaPago.filter((j) => j.UrlJsonContext.frequencia == objPost.frecuencia_pago);
                             if (!isFrecuenciaPago) {
                                 status_desc = `ERROR: no hay "${objPost.frecuencia_pago}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1222,12 +1034,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:forma_pago
                             let idFormaPago = '0e8a4463-28db-474f-926b-39fa1bd0c9bc';
-                            let getFormaPago = /*await*/ getOnergyItem(idFormaPago, data.assid, data.usrid, null);
+                            let getFormaPago = await getOnergyItem(idFormaPago, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isFormaPago = getFormaPago.filter((j) => j.UrlJsonContext.formas_de_pagamentos == objPost.forma_pago);
                             if (!isFormaPago) {
                                 status_desc = `ERROR: no hay "${objPost.forma_pago}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1241,12 +1053,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:clasificacion_passthru
                             let idClasificacionPassthru = 'ad62c737-2abc-4c71-a572-e11933114ed8';
-                            let getClasificacionPassthru = /*await*/ getOnergyItem(idClasificacionPassthru, data.assid, data.usrid, null);
+                            let getClasificacionPassthru = await getOnergyItem(idClasificacionPassthru, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isClasificacionPassthru = getClasificacionPassthru.filter((j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru);
                             if (!isClasificacionPassthru) {
                                 status_desc = `ERROR: no hay "${objPost.clasificacion_passthru}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1261,12 +1073,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:estado_captura_cuenta
                             let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
-                            let getEstadoCapturaCuenta = /*await*/ getOnergyItem(idEstadoCapturaCuenta, data.assid, data.usrid, null);
+                            let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter((j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta);
                             if (!isEstadoCapturaCuenta) {
                                 status_desc = `ERROR: no hay "${objPost.estado_captura_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1293,7 +1105,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: informacion_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'asset_number_IDC', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number_IDC', true, false, false);
                         }
 
                         //*aba:informacion_tecnica
@@ -1301,16 +1113,16 @@ function gerarDataHora(dataHoje, utc) {
                             //*id_one_ref:sitios
                             let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
-                            let paiRegistro = /*await*/ getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*pesq.ref:categorias
                             let idCategorias = '55ec978d-7dbe-4a6f-8cb4-536b53361d54';
-                            let getCategorias = /*await*/ getOnergyItem(idCategorias, data.assid, data.usrid, null);
+                            let getCategorias = await getOnergyItem(idCategorias, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isCategorias = getCategorias.filter((j) => j.UrlJsonContext.categorias == objPost.categorias);
                             if (!isCategorias) {
                                 status_desc = `ERROR: no hay "${objPost.categorias}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1324,12 +1136,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:estrato
                             let idEstrato = '34f26407-6afe-41c8-8420-7dbcd4f1aed4';
-                            let getEstrato = /*await*/ getOnergyItem(idEstrato, data.assid, data.usrid, null);
+                            let getEstrato = await getOnergyItem(idEstrato, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isEstrato = getEstrato.filter((j) => j.UrlJsonContext.LST_estrato == objPost.estrato);
                             if (!isEstrato) {
                                 status_desc = `ERROR: no hay "${objPost.estrato}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1343,12 +1155,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:nivel_tension
                             let idNivelTension = '4056b8c5-29c0-47ff-b5b1-cfc3c7f39018';
-                            let getNivelTension = /*await*/ getOnergyItem(idNivelTension, data.assid, data.usrid, null);
+                            let getNivelTension = await getOnergyItem(idNivelTension, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isNivelTension = getNivelTension.filter((j) => j.UrlJsonContext.NVT_nivel == objPost.nivel_tension);
                             if (!isNivelTension) {
                                 status_desc = `ERROR: no hay "${objPost.nivel_tension}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1362,12 +1174,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:lecturas
                             let idLecturas = '0d3b6287-8f3a-4ad7-acdd-e1c60426f73f';
-                            let getLecturas = /*await*/ getOnergyItem(idLecturas, data.assid, data.usrid, null);
+                            let getLecturas = await getOnergyItem(idLecturas, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isLecturas = getLecturas.filter((j) => j.UrlJsonContext.LCT_ferramentas == objPost.lectura_atc);
                             if (!isLecturas) {
                                 status_desc = `ERROR: no hay "${objPost.lectura_atc}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1423,7 +1235,6 @@ function gerarDataHora(dataHoje, utc) {
                             arr00.push(objPost.motogenerador);
                             let isMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.gerador == arr00);
                             if (!isMotogenerador || data.em_caso_de_duplicidade == '1') {
-                                //TODO: carga não preenche btn.check
                                 objPost.gerador = arr00;
                                 objPost.gerador_desc = objPost.motogenerador == '1' ? 'Sim' : 'Não';
                                 delete objPost.motogenerador;
@@ -1435,7 +1246,6 @@ function gerarDataHora(dataHoje, utc) {
                             arr01.push(objPost.tablero_independiente);
                             let isTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.diretoria_independente == arr01);
                             if (!isTableroIndependiente || data.em_caso_de_duplicidade == '1') {
-                                //TODO: carga não preenche btn.check
                                 objPost.diretoria_independente = arr01;
                                 objPost.diretoria_independente_desc = objPost.tablero_independiente == '1' ? 'Sim' : 'Não';
                                 delete objPost.tablero_independiente;
@@ -1447,7 +1257,6 @@ function gerarDataHora(dataHoje, utc) {
                             arr02.push(objPost.barter);
                             let isBarter = getTabExcel.filter((j) => j.UrlJsonContext.escambo == arr02);
                             if (!isBarter || data.em_caso_de_duplicidade == '1') {
-                                //TODO: carga não preenche btn.check
                                 objPost.escambo = arr02;
                                 objPost.escambo_desc = objPost.barter == '1' ? 'Sim' : 'Não';
                                 delete objPost.barter;
@@ -1459,7 +1268,6 @@ function gerarDataHora(dataHoje, utc) {
                             arr03.push(objPost.provisional);
                             let isProvisional = getTabExcel.filter((j) => j.UrlJsonContext.provisorio == arr03);
                             if (!isProvisional || data.em_caso_de_duplicidade == '1') {
-                                //TODO: carga não preenche btn.check
                                 objPost.provisorio = arr03;
                                 objPost.provisorio_desc = objPost.provisional == '1' ? 'Sim' : 'Não';
                                 delete objPost.provisional;
@@ -1473,7 +1281,7 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: informacion_tecnica sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number', true, false, false);
                         }
 
                         //*aba:clientes_sitio
@@ -1481,16 +1289,16 @@ function gerarDataHora(dataHoje, utc) {
                             //*id_one_ref:sitios
                             let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
-                            let paiRegistro = /*await*/ getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*pesq.ref:nit_cliente
                             let idClientes = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
-                            let getClientes = /*await*/ getOnergyItem(idClientes, data.assid, data.usrid, null);
+                            let getClientes = await getOnergyItem(idClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isClientes = getClientes.filter((j) => j.UrlJsonContext.COLC_nit_cliente == objPost.nit_cliente);
                             if (!isClientes) {
                                 status_desc = `ERROR: no hay "${objPost.nit_cliente}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1515,12 +1323,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:nombre_regional
                             let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
-                            let getRegionalClientes = /*await*/ getOnergyItem(idRegionalClientes, data.assid, data.usrid, null);
+                            let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isRegionalClientes = getRegionalClientes.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
                             if (!isRegionalClientes) {
                                 status_desc = `ERROR: no hay "${objPost.nombre_regional}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1534,12 +1342,12 @@ function gerarDataHora(dataHoje, utc) {
 
                             //*pesq.ref:portafolio_cliente
                             let idPortafolioCliente = 'b36cf260-c691-4d36-9339-137041e6fb63';
-                            let getPortafolioCliente = /*await*/ getOnergyItem(idPortafolioCliente, data.assid, data.usrid, null);
+                            let getPortafolioCliente = await getOnergyItem(idPortafolioCliente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isPortafolioCliente = getPortafolioCliente.filter((j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente);
                             if (!isPortafolioCliente) {
                                 status_desc = `ERROR: no hay "${objPost.portafolio_cliente}" registrado para ${tabExcel} de "${objPost.nit_cliente}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
-                                /*await*/ postStatus(status_desc, statusPost, data);
+                                await postStatus(status_desc, statusPost, data);
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
@@ -1599,15 +1407,17 @@ function gerarDataHora(dataHoje, utc) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: clientes_sitio sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            /*await*/ sendItemToOnergy(idTabExcel, data.usrid, data.assid, objPost, '', 'asset_number', true, false, false);
+                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number', true, false, false);
                         }
+                        countFor++;
+                        onergy.log(`JFS: countFor: ${countFor}`);
                     }
                 } else {
                     dataHoje = new Date();
                     time = gerarDataHora(dataHoje, -5); //?Bogota
                     status_desc = `ERROR: los datos de ${tabExcel} no fueron procesados`;
                     statusPost.push(`${time}, ${status_desc}`);
-                    /*await*/ postStatus(status_desc, statusPost, data);
+                    await postStatus(status_desc, statusPost, data);
                     statusPost = statusPost.concat('\n');
                     return false;
                 }
@@ -1616,7 +1426,7 @@ function gerarDataHora(dataHoje, utc) {
                 time = gerarDataHora(dataHoje, -5); //?Bogota
                 status_desc = `ERROR: no se encontraron datos en ${tabExcel}`;
                 statusPost.push(`${time}, ${status_desc}`);
-                /*await*/ postStatus(status_desc, statusPost, data);
+                await postStatus(status_desc, statusPost, data);
                 statusPost = statusPost.concat('\n');
                 return false;
             }
@@ -1625,7 +1435,7 @@ function gerarDataHora(dataHoje, utc) {
             time = gerarDataHora(dataHoje, -5); //?Bogota
             status_desc = `ERROR: No hay registros en ${nomePlanilha}`;
             statusPost.push(`${time}, ${status_desc}`);
-            /*await*/ postStatus(status_desc, statusPost, data);
+            await postStatus(status_desc, statusPost, data);
             statusPost = statusPost.concat('\n');
             return false;
         }
@@ -1634,7 +1444,7 @@ function gerarDataHora(dataHoje, utc) {
         time = gerarDataHora(dataHoje, -5); //?Bogota
         status_desc = `ERROR: El índice carga ${cargaIndiceNome} no coincide con ${tabExcel}`;
         statusPost.push(`${time}, ${status_desc}`);
-        /*await*/ postStatus(status_desc, statusPost, data);
+        await postStatus(status_desc, statusPost, data);
         statusPost = statusPost.concat('\n');
         return false;
     }
@@ -1644,7 +1454,7 @@ function gerarDataHora(dataHoje, utc) {
     time = gerarDataHora(dataHoje, -5); //?Bogota
     status_desc = `Carga de ${tabExcel} finalizada`;
     statusPost.push(`${time}, ${status_desc}`);
-    /*await*/ postStatus(status_desc, statusPost, data);
+    await postStatus(status_desc, statusPost, data);
     statusPost = statusPost.concat('\n');
 
     //!node:test (unhide return)
@@ -1669,42 +1479,53 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
 /**STD_METHODS**
  */
 let json = {
-    processo: [
-        '23/10/2022 12:00:12, Cargando 2042 registros de informacion_cuenta',
-        '\n',
-        '23/10/2022 12:01:26, Manejando 2042 registros de informacion_cuenta',
-        '\n',
-        '23/10/2022 12:38:52, Carga de informacion_cuenta finalizada',
-    ],
-    horas: '13:59',
-    dataDate: '2022-10-23 16:59:55',
-    data: '2022-10-23 13:59:55',
+    processo: '',
+    horas: '',
+    dataDate: '2022-11-03T16:21:37Z',
+    data: '2022-11-03 13:21:37',
     load_index_equipe: 'COL',
-    load_index_id_equipe: '',
-    load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
+    load_index_id_do_card: 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx83acfd03-3dff-4d7d-bae0-4efd20216ed0.xlsx?sv=2018-03-28&sr=b&sig=6a%2BeJ1G0Nxc61X%2BTscdt9HmdzxyR1CRlNABTpALKkhk%3D&se=2023-05-11T16%3A59%3A42Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v4.xlsxaa27942e-a807-4547-8376-37f9dd1590c8.xlsx?sv=2018-03-28&sr=b&sig=mIuWXpR%2F9Jcjgf50oClFkKg%2F8KH4ZnMK6ZlbSgJcrxE%3D&se=2023-05-22T16%3A21%3A20Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v3.xlsx83acfd03-3dff-4d7d-bae0-4efd20216ed0.xlsx?sv=2018-03-28&sr=b&sig=6a%2BeJ1G0Nxc61X%2BTscdt9HmdzxyR1CRlNABTpALKkhk%3D&se=2023-05-11T16%3A59%3A42Z&sp=r',
-            Name: 'tablas_maestras_v3.xlsx',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v4.xlsxaa27942e-a807-4547-8376-37f9dd1590c8.xlsx?sv=2018-03-28&sr=b&sig=mIuWXpR%2F9Jcjgf50oClFkKg%2F8KH4ZnMK6ZlbSgJcrxE%3D&se=2023-05-22T16%3A21%3A20Z&sp=r',
+            Name: 'tablas_maestras_v4.xlsx',
         },
     ],
-    load_index_tab_excel: 'informacion_cuenta',
-    load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
+    load_index_tab_excel: 'sitios',
+    load_index_id: 'ea2c764b-d958-4905-af1e-669239bce62e',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de informacion_cuenta finalizada',
-    time: '13:59',
+    processamento: 'Carga de sitios iniciada',
+    time: '13:21',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
-    oneTemplateTitle: 'Carga Geral',
+    oneTemplateTitle: '',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+    fedid: '35feaa8a-e157-41b6-83a9-0aa2d8708385',
+    fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
+    usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
     email: 'admin-colombia@atc.com.co',
-    fdtid: '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f',
-    fedid: 'cd8fbec2-64c4-77d4-f491-5ad096ec0fba',
-    id_upload_planilha: 'cd8fbec2-64c4-77d4-f491-5ad096ec0fba',
     onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
     timezone: null,
-    usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+    onergy_js_ctx: {
+        assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+        fedid: '35feaa8a-e157-41b6-83a9-0aa2d8708385',
+        fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
+        usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+        insertDt: '2022-11-03T16:21:32.646Z',
+        updateDt: '2022-11-03T16:21:32.646Z',
+        cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+        email: 'admin-colombia@atc.com.co',
+        user_name: 'Administrador Colômbia',
+        onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
+        praid: '271375f3-86c8-4ca2-a775-cd2581b9177f',
+        pcvid: '7e93e307-2ae0-4376-a428-e07a2dfa578d',
+        prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
+        timezone: null,
+        timezone_value: '-03:00',
+        pubNubHook: null,
+    },
+    id_upload_planilha: '0e005c69-4915-cb97-89af-54ad61654ddc',
 };
 init(JSON.stringify(json));
