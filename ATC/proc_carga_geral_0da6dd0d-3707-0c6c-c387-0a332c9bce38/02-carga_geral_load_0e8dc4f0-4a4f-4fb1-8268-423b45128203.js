@@ -71,99 +71,6 @@ function successCallback(result) {
  * Condicional: nenhum
  * Aprovação: nenhum
  */
-async function getOnergyItem(fdtid, assid, usrid, filtro, fedid) {
-    let keepSearching = true;
-    let skip = 0;
-    let take = 500;
-    let result = [];
-    while (keepSearching) {
-        let onergyGetObj = {
-            fdtid: fdtid,
-            assid: assid,
-            usrid: usrid,
-            filter: filtro,
-            skip: skip,
-            take: take,
-        };
-        if (fedid) {
-            onergyGetObj.fedid = fedid;
-        }
-        let strPageResp = await onergy_get(onergyGetObj);
-        skip += take;
-        let pageResp = JSON.parse(strPageResp);
-        if (pageResp != null && pageResp.length > 0) {
-            keepSearching = pageResp.length == take;
-            result = result.concat(pageResp);
-        } else {
-            keepSearching = false;
-        }
-    }
-    return result;
-}
-async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
-    let onergySaveData = {
-        fdtid: templateid,
-        assid: assid,
-        usrid: usrid,
-        data: JSON.stringify(data),
-        //executeAction: false
-    };
-    if (!execAction) {
-        onergySaveData.executeAction = false;
-    }
-    if (fedid != undefined && fedid != '') {
-        onergySaveData.id = fedid;
-    }
-    if (ukField != undefined && ukField != '') {
-        onergySaveData.ukField = ukField;
-        onergySaveData.blockDuplicate = true;
-    }
-    if (checkTemplateDuplicate != undefined && checkTemplateDuplicate != '') {
-        onergySaveData.checkTemplateDuplicate = true;
-    }
-    if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
-        onergySaveData.addCfgViewGroup = addCfgViewGroup;
-    }
-    return await onergy_save(onergySaveData);
-}
-async function postStatus(status_desc, statusPost, data) {
-    let postInfo = {
-        processamento: status_desc,
-        horas: data.time,
-        processo: statusPost,
-    };
-
-    //*consulta id do status e envia update para card de carga
-    let idCargaGeral = '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f';
-    let getCargaGeral = await getOnergyItem(idCargaGeral, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, '', data.id_upload_planilha);
-
-    //!node:test (unhide log + return)
-    // onergy.log(`JFS: postStatus sendItem=>postInfo: ${JSON.stringify(postInfo)}`);
-    // return true;
-    await sendItemToOnergy(idCargaGeral, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, postInfo, data.id_upload_planilha, '', true, false, false);
-}
-function gerarFiltro(fielNameP, valueP) {
-    return JSON.stringify([
-        {
-            FielName: fielNameP,
-            Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            Value1: valueP,
-        },
-    ]);
-}
-function gerarDataHora(dataHoje, utc) {
-    let dataHojeFormat = dataHoje.getFullYear() + '-' + (dataHoje.getMonth() + 1) + '-' + dataHoje.getDate();
-    let arrayData = dataHojeFormat.split('-');
-    let dataHojeFormatada = arrayData[2].padStart(2, '0') + '/' + arrayData[1].padStart(2, '0') + '/' + arrayData[0];
-    let horaFormat = dataHoje.getHours() + ':' + dataHoje.getMinutes() + ':' + dataHoje.getSeconds();
-    let arrayHora = horaFormat.split(':');
-    let horaTimezone = parseInt(arrayHora[0]) + utc;
-    let horaTimezone24h = horaTimezone > 24 ? horaTimezone - 24 : horaTimezone;
-    horaTimezone24h = horaTimezone24h < 0 ? horaTimezone24h + 24 : horaTimezone24h;
-    let horaTimezoneFormat = JSON.stringify(horaTimezone24h).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
-    return dataHojeFormatada + ' ' + horaTimezoneFormat;
-}
 async function init(json) {
     let data = JSON.parse(json);
 
@@ -257,7 +164,6 @@ async function init(json) {
                     statusPost = statusPost.concat('\n');
 
                     //*para cada linha do array de post, verifica se existe registro no grid destino
-                    let countFor = 0;
                     for (let y in arrPost) {
                         let objPost = arrPost[y];
                         objPost.onergyteam_equipe = objPost.equipe;
@@ -273,7 +179,17 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: categorias sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'categorias', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'categorias',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:departamento
@@ -315,7 +231,17 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: municipio sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'municipio', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'municipio',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:compania_atc
@@ -342,7 +268,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: forma_pago sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'formas_de_pagamentos', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'formas_de_pagamentos',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:lecturas
@@ -355,7 +291,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: lecturas sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'LCT_ferramentas', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'LCT_ferramentas',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:portafolio_atc
@@ -368,7 +314,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: portafolio_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipo_portifolio', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'tipo_portifolio',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:regional_atc
@@ -407,7 +363,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: estado_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'status_conta', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'status_conta',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:estado_sitio
@@ -446,7 +412,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_cobro sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipos_cobrancas', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'tipos_cobrancas',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:tipo_tercero
@@ -459,7 +435,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_tercero sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipo_de_terceiro', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'tipo_de_terceiro',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:tipo_acceso
@@ -472,7 +458,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_acceso sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'tipo_de_acesso', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'tipo_de_acesso',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:tipo_cuenta
@@ -485,7 +481,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: tipo_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'TC_tipo_de_conta', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'TC_tipo_de_conta',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:proveedores
@@ -590,7 +596,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: proveedores sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'nit_provedor', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'nit_provedor',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:estrato
@@ -603,7 +619,17 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: estrato sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'LST_estrato', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'LST_estrato',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:nivel_tension
@@ -616,7 +642,17 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: nivel_tension sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'NVT_nivel', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'NVT_nivel',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:clasificacion_passthru
@@ -638,7 +674,17 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: clasificacion_passthru sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'classificacao_passthru', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'classificacao_passthru',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:sitios
@@ -780,7 +826,17 @@ async function init(json) {
 
                             //!node:test (unhide.log and hide sendItem)
                             // onergy.log(`JFS: sitios sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'asset_number',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:informacion_cuenta
@@ -846,9 +902,11 @@ async function init(json) {
 
                             let isIdlcTipoCuenta = getTabExcel.filter((j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == objPost.tipo_cuenta);
                             if (!isIdlcTipoCuenta || data.em_caso_de_duplicidade == '1') {
-                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.TCprcs__tipo_de_conta_id = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
-                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.prcs__tipo_de_conta_cache = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
                                 delete objPost.tipo_cuenta;
                             }
@@ -969,14 +1027,19 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isIdlcSujetoPasivo = getTabExcel.filter((j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo);
+                            let isIdlcSujetoPasivo = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo
+                            );
                             if (!isIdlcSujetoPasivo || data.em_caso_de_duplicidade == '1') {
-                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
+                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico =
+                                    isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
                                 objPost.suj_pa_prcs__sujeito_passivo_alumbrado_publico_id = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].ID : '';
                                 delete objPost.sujeto_pasivo;
                             }
 
-                            let isAcuerdoResolucion = getTabExcel.filter((j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion);
+                            let isAcuerdoResolucion = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion
+                            );
                             if (!isAcuerdoResolucion || data.em_caso_de_duplicidade == '1') {
                                 objPost.prcs__acuerdo_resolucion_alumbrado_publico = objPost.acuerdo_resolucion;
                                 delete objPost.acuerdo_resolucion;
@@ -996,7 +1059,8 @@ async function init(json) {
 
                             let isIdlcTipoCobro = getTabExcel.filter((j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca == objPost.tipo_cobro);
                             if (!isIdlcTipoCobro || data.em_caso_de_duplicidade == '1') {
-                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca = isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
+                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca =
+                                    isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
                                 objPost.tipo_cobr_tipo_de_cobranca_id = isTipoCobro.length > 0 ? isTipoCobro[0].ID : '';
                                 delete objPost.tipo_cobro;
                             }
@@ -1025,9 +1089,12 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isIdlcFrecuenciaPago = getTabExcel.filter((j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago);
+                            let isIdlcFrecuenciaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago
+                            );
                             if (!isIdlcFrecuenciaPago || data.em_caso_de_duplicidade == '1') {
-                                objPost.fre_pag_frequencia__frequencia_de_pagamento = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
+                                objPost.fre_pag_frequencia__frequencia_de_pagamento =
+                                    isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
                                 objPost.fre_pag_frequencia_de_pagamento_id = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].ID : '';
                                 delete objPost.frecuencia_pago;
                             }
@@ -1044,17 +1111,27 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isIdlcFormaPago = getTabExcel.filter((j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago);
+                            let isIdlcFormaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago
+                            );
                             if (!isIdlcFormaPago || data.em_caso_de_duplicidade == '1') {
-                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento = isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
+                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento =
+                                    isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
                                 objPost.for_pag_forma_de_pagamento_id = isFormaPago.length > 0 ? isFormaPago[0].ID : '';
                                 delete objPost.forma_pago;
                             }
 
                             //*pesq.ref:clasificacion_passthru
                             let idClasificacionPassthru = 'ad62c737-2abc-4c71-a572-e11933114ed8';
-                            let getClasificacionPassthru = await getOnergyItem(idClasificacionPassthru, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                            let isClasificacionPassthru = getClasificacionPassthru.filter((j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru);
+                            let getClasificacionPassthru = await getOnergyItem(
+                                idClasificacionPassthru,
+                                data.onergy_js_ctx.assid,
+                                data.onergy_js_ctx.usrid,
+                                null
+                            );
+                            let isClasificacionPassthru = getClasificacionPassthru.filter(
+                                (j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru
+                            );
                             if (!isClasificacionPassthru) {
                                 status_desc = `ERROR: no hay "${objPost.clasificacion_passthru}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
@@ -1063,7 +1140,9 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isIdlcClasificacionPassthru = getTabExcel.filter((j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru);
+                            let isIdlcClasificacionPassthru = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru
+                            );
                             if (!isIdlcClasificacionPassthru || data.em_caso_de_duplicidade == '1') {
                                 objPost.CPTclassificacao_passthru__prcs__clasificacion_passthru =
                                     isClasificacionPassthru.length > 0 ? isClasificacionPassthru[0].UrlJsonContext.classificacao_passthru : '';
@@ -1074,7 +1153,9 @@ async function init(json) {
                             //*pesq.ref:estado_captura_cuenta
                             let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
                             let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                            let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter((j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta);
+                            let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter(
+                                (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta
+                            );
                             if (!isEstadoCapturaCuenta) {
                                 status_desc = `ERROR: no hay "${objPost.estado_captura_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
@@ -1083,7 +1164,9 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter((j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta);
+                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta
+                            );
                             if (!isIdlcEstadoCapturaCuenta || data.em_caso_de_duplicidade == '1') {
                                 objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
                                     isEstadoCapturaCuenta.length > 0 ? isEstadoCapturaCuenta[0].UrlJsonContext.ECCU_estado_da_captura_da_conta : '';
@@ -1105,7 +1188,17 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: informacion_cuenta sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number_IDC', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'asset_number_IDC',
+                                true,
+                                false,
+                                false
+                            );
                         }
 
                         //*aba:informacion_tecnica
@@ -1230,46 +1323,46 @@ async function init(json) {
                             }
 
                             //*btn.check:motogenerador
-                            objPost.motogenerador = objPost.motogenerador == 'SI' ? '1' : '';
+                            objPost.motogenerador = objPost.motogenerador == 'SI' ? 'sim' : '';
                             let arr00 = [];
                             arr00.push(objPost.motogenerador);
                             let isMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.gerador == arr00);
                             if (!isMotogenerador || data.em_caso_de_duplicidade == '1') {
                                 objPost.gerador = arr00;
-                                objPost.gerador_desc = objPost.motogenerador == '1' ? 'Sim' : 'Não';
+                                objPost.gerador_desc = objPost.motogenerador == 'sim' ? 'Sim' : 'Não';
                                 delete objPost.motogenerador;
                             }
 
                             //*btn.check:tablero_independiente
-                            objPost.tablero_independiente = objPost.tablero_independiente == 'SI' ? '1' : '';
+                            objPost.tablero_independiente = objPost.tablero_independiente == 'SI' ? 'sim' : '';
                             let arr01 = [];
                             arr01.push(objPost.tablero_independiente);
                             let isTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.diretoria_independente == arr01);
                             if (!isTableroIndependiente || data.em_caso_de_duplicidade == '1') {
                                 objPost.diretoria_independente = arr01;
-                                objPost.diretoria_independente_desc = objPost.tablero_independiente == '1' ? 'Sim' : 'Não';
+                                objPost.diretoria_independente_desc = objPost.tablero_independiente == 'sim' ? 'Sim' : 'Não';
                                 delete objPost.tablero_independiente;
                             }
 
                             //*btn.check:barter
-                            objPost.barter = objPost.barter == 'SI' ? '1' : '';
+                            objPost.barter = objPost.barter == 'SI' ? 'sim' : '';
                             let arr02 = [];
                             arr02.push(objPost.barter);
                             let isBarter = getTabExcel.filter((j) => j.UrlJsonContext.escambo == arr02);
                             if (!isBarter || data.em_caso_de_duplicidade == '1') {
                                 objPost.escambo = arr02;
-                                objPost.escambo_desc = objPost.barter == '1' ? 'Sim' : 'Não';
+                                objPost.escambo_desc = objPost.barter == 'sim' ? 'Sim' : 'Não';
                                 delete objPost.barter;
                             }
 
                             //*btn.check:provisional
-                            objPost.provisional = objPost.provisional == 'SI' ? '1' : '';
+                            objPost.provisional = objPost.provisional == 'SI' ? 'sim' : '';
                             let arr03 = [];
                             arr03.push(objPost.provisional);
                             let isProvisional = getTabExcel.filter((j) => j.UrlJsonContext.provisorio == arr03);
                             if (!isProvisional || data.em_caso_de_duplicidade == '1') {
                                 objPost.provisorio = arr03;
-                                objPost.provisorio_desc = objPost.provisional == '1' ? 'Sim' : 'Não';
+                                objPost.provisorio_desc = objPost.provisional == 'sim' ? 'Sim' : 'Não';
                                 delete objPost.provisional;
                             }
 
@@ -1281,7 +1374,36 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: informacion_tecnica sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number', true, false, false);
+                            debugger;
+                            //TODO: getOnergyItem no asset-number
+                            //TODO: se encontrar, updatemany no registro
+                            //TODO: ukField bugado
+                            if (paiRegistro) {
+                                let result = await onergy_updatemany({
+                                    fdtid: idTabExcel,
+                                    assid: data.onergy_js_ctx.assid,
+                                    usrid: data.onergy_js_ctx.usrid,
+                                    id: fatura.UrlJsonContext.one_copied_from,
+                                    data: JSON.stringify({
+                                        UrlJsonContext: {
+                                            ESTLlegalizacao_do_status_id: '598756cb-de3a-fbdf-7e1d-4b84b4effff3',
+                                            ESTLstatus__legalizacao_do_status: 'ENVIADO',
+                                        },
+                                    }),
+                                });
+                            }
+                            var result = await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'asset_number',
+                                true,
+                                false,
+                                false
+                            );
+                            debugger;
                         }
 
                         //*aba:clientes_sitio
@@ -1315,7 +1437,9 @@ async function init(json) {
                                 delete objPost.codigo_cliente;
                             }
 
-                            let isCodigoSitioCliente = getTabExcel.filter((j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente);
+                            let isCodigoSitioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente
+                            );
                             if (!isCodigoSitioCliente || data.em_caso_de_duplicidade == '1') {
                                 objPost.clsit__codigo_do_sitio_do_cliente = objPost.codigo_sitio_cliente;
                                 delete objPost.codigo_sitio_cliente;
@@ -1333,9 +1457,12 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isNombreRegional = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional);
+                            let isNombreRegional = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional
+                            );
                             if (!isNombreRegional || data.em_caso_de_duplicidade == '1') {
-                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                                 objPost.RCSclsit__regional_do_cliente_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
                                 delete objPost.nombre_regional;
                             }
@@ -1352,9 +1479,12 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isPcsPortafolioCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente);
+                            let isPcsPortafolioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente
+                            );
                             if (!isPcsPortafolioCliente || data.em_caso_de_duplicidade == '1') {
-                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
+                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente =
+                                    isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
                                 objPost.PCSclsit__portifolio_cliente_id = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].ID : '';
                                 delete objPost.portafolio_cliente;
                             }
@@ -1407,10 +1537,18 @@ async function init(json) {
 
                             //!node:test (unhide log and hide sendItem)
                             // onergy.log(`JFS: clientes_sitio sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'asset_number', true, false, false);
+                            await sendItemToOnergy(
+                                idTabExcel,
+                                data.onergy_js_ctx.usrid,
+                                data.onergy_js_ctx.assid,
+                                objPost,
+                                '',
+                                'asset_number',
+                                true,
+                                false,
+                                false
+                            );
                         }
-                        countFor++;
-                        onergy.log(`JFS: countFor: ${countFor}`);
                     }
                 } else {
                     dataHoje = new Date();
@@ -1476,33 +1614,127 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
     };
     return obj;
 }
+async function getOnergyItem(fdtid, assid, usrid, filtro, fedid) {
+    let keepSearching = true;
+    let skip = 0;
+    let take = 500;
+    let result = [];
+    while (keepSearching) {
+        let onergyGetObj = {
+            fdtid: fdtid,
+            assid: assid,
+            usrid: usrid,
+            filter: filtro,
+            skip: skip,
+            take: take,
+        };
+        if (fedid) {
+            onergyGetObj.fedid = fedid;
+        }
+        let strPageResp = await onergy_get(onergyGetObj);
+        skip += take;
+        let pageResp = JSON.parse(strPageResp);
+        if (pageResp != null && pageResp.length > 0) {
+            keepSearching = pageResp.length == take;
+            result = result.concat(pageResp);
+        } else {
+            keepSearching = false;
+        }
+    }
+    return result;
+}
+async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
+    let onergySaveData = {
+        fdtid: templateid,
+        assid: assid,
+        usrid: usrid,
+        data: JSON.stringify(data),
+        //executeAction: false
+    };
+    if (!execAction) {
+        onergySaveData.executeAction = false;
+    }
+    if (fedid != undefined && fedid != '') {
+        onergySaveData.id = fedid;
+    }
+    if (ukField != undefined && ukField != '') {
+        onergySaveData.ukField = ukField;
+        onergySaveData.blockDuplicate = true;
+    }
+    if (checkTemplateDuplicate != undefined && checkTemplateDuplicate != '') {
+        onergySaveData.checkTemplateDuplicate = checkTemplateDuplicate;
+    }
+    if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
+        onergySaveData.addCfgViewGroup = addCfgViewGroup;
+    }
+    return await onergy_save(onergySaveData);
+}
+async function postStatus(status_desc, statusPost, data) {
+    let postInfo = {
+        processamento: status_desc,
+        horas: data.time,
+        processo: statusPost,
+    };
+
+    //*consulta id do status e envia update para card de carga
+    let idCargaGeral = '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f';
+    let getCargaGeral = await getOnergyItem(idCargaGeral, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, '', data.id_upload_planilha);
+
+    //!node:test (unhide log + return)
+    // onergy.log(`JFS: postStatus sendItem=>postInfo: ${JSON.stringify(postInfo)}`);
+    // return true;
+    await sendItemToOnergy(idCargaGeral, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, postInfo, data.id_upload_planilha, '', true, false, false);
+}
+function gerarFiltro(fielNameP, valueP) {
+    return JSON.stringify([
+        {
+            FielName: fielNameP,
+            Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
+            FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
+            Value1: valueP,
+        },
+    ]);
+}
+function gerarDataHora(dataHoje, utc) {
+    let dataHojeFormat = dataHoje.getFullYear() + '-' + (dataHoje.getMonth() + 1) + '-' + dataHoje.getDate();
+    let arrayData = dataHojeFormat.split('-');
+    let dataHojeFormatada = arrayData[2].padStart(2, '0') + '/' + arrayData[1].padStart(2, '0') + '/' + arrayData[0];
+    let horaFormat = dataHoje.getHours() + ':' + dataHoje.getMinutes() + ':' + dataHoje.getSeconds();
+    let arrayHora = horaFormat.split(':');
+    let horaTimezone = parseInt(arrayHora[0]) + utc;
+    let horaTimezone24h = horaTimezone > 24 ? horaTimezone - 24 : horaTimezone;
+    horaTimezone24h = horaTimezone24h < 0 ? horaTimezone24h + 24 : horaTimezone24h;
+    let horaTimezoneFormat = JSON.stringify(horaTimezone24h).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
+    return dataHojeFormatada + ' ' + horaTimezoneFormat;
+}
 /**STD_METHODS**
  */
 let json = {
     processo: '',
     horas: '',
-    dataDate: '2022-11-03T16:21:37Z',
-    data: '2022-11-03 13:21:37',
+    dataDate: '2022-11-07T13:19:50Z',
+    data: '2022-11-07 10:19:50',
     load_index_equipe: 'COL',
-    load_index_id_do_card: 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4',
+    load_index_id_equipe: '',
+    load_index_id_do_card: '5ea06f19-d11a-4d61-b4ff-c74610e933cd',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v4.xlsxaa27942e-a807-4547-8376-37f9dd1590c8.xlsx?sv=2018-03-28&sr=b&sig=mIuWXpR%2F9Jcjgf50oClFkKg%2F8KH4ZnMK6ZlbSgJcrxE%3D&se=2023-05-22T16%3A21%3A20Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v4.xlsx778a63da-d0e1-4035-bb5c-81fb9e2836ff.xlsx?sv=2018-03-28&sr=b&sig=kzsiYb0VZ8yMEl3PQtNqnXgb1LM703A%2FN19kuw6JG3g%3D&se=2023-05-26T13%3A19%3A37Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v4.xlsxaa27942e-a807-4547-8376-37f9dd1590c8.xlsx?sv=2018-03-28&sr=b&sig=mIuWXpR%2F9Jcjgf50oClFkKg%2F8KH4ZnMK6ZlbSgJcrxE%3D&se=2023-05-22T16%3A21%3A20Z&sp=r',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v4.xlsx778a63da-d0e1-4035-bb5c-81fb9e2836ff.xlsx?sv=2018-03-28&sr=b&sig=kzsiYb0VZ8yMEl3PQtNqnXgb1LM703A%2FN19kuw6JG3g%3D&se=2023-05-26T13%3A19%3A37Z&sp=r',
             Name: 'tablas_maestras_v4.xlsx',
         },
     ],
-    load_index_tab_excel: 'sitios',
-    load_index_id: 'ea2c764b-d958-4905-af1e-669239bce62e',
+    load_index_tab_excel: 'informacion_tecnica',
+    load_index_id: '2a0be55c-005b-7ba3-4295-b835e3548741',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de sitios iniciada',
-    time: '13:21',
+    processamento: 'Carga de informacion_tecnica iniciada',
+    time: '10:19',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: '',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: '35feaa8a-e157-41b6-83a9-0aa2d8708385',
+    fedid: '895ef84a-0f58-4919-aa24-84d216a3487a',
     fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
     email: 'admin-colombia@atc.com.co',
@@ -1510,22 +1742,23 @@ let json = {
     timezone: null,
     onergy_js_ctx: {
         assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: '35feaa8a-e157-41b6-83a9-0aa2d8708385',
+        fedid: '895ef84a-0f58-4919-aa24-84d216a3487a',
         fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
         usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-11-03T16:21:32.646Z',
-        updateDt: '2022-11-03T16:21:32.646Z',
+        insertDt: '2022-11-07T13:19:52.673Z',
+        updateDt: '2022-11-07T13:19:52.673Z',
         cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
         email: 'admin-colombia@atc.com.co',
         user_name: 'Administrador Colômbia',
         onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: '271375f3-86c8-4ca2-a775-cd2581b9177f',
-        pcvid: '7e93e307-2ae0-4376-a428-e07a2dfa578d',
+        praid: '5507b222-18f1-4781-bf9c-862b53beae64',
+        pcvid: '13206131-11a1-434a-af3b-5a6c0de1c24e',
         prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
         timezone: null,
         timezone_value: '-03:00',
         pubNubHook: null,
     },
-    id_upload_planilha: '0e005c69-4915-cb97-89af-54ad61654ddc',
+    id_upload_planilha: 'ea58764f-10ef-9781-7133-c9d4feeb8df1',
 };
+
 init(JSON.stringify(json));
