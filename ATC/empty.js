@@ -73,43 +73,29 @@ function successCallback(result) {
 async function init(json) {
     let data = JSON.parse(json);
 
-    let idPortafolioATC = '18615527-c678-4f1c-87e0-d7a9735d0c6e';
-    let getPortafolioATC = await getOnergyItem(idPortafolioATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-    let isPortafolioATC = getPortafolioATC.filter((item) => item.UrlJsonContext.tipo_portifolio == 'ATC');
-    let this_idPortfolio = isPortafolioATC[0].ID;
-    let this_portfolio = isPortafolioATC[0].UrlJsonContext.tipo_portifolio;
-    onergy.log(`this-portfolio: ${this_portfolio}, this-id: ${this_idPortfolio}`);
+    let idClienteSitio = 'a727ac73-7e04-46a3-adb1-1fb06cdfbb34';
+    let getClienteSitio = await getOnergyItem(idClienteSitio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
 
-    let idSitios = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
-    let getSitios = await getOnergyItem(idSitios, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+    for (item of getClienteSitio) {
+        let postInfoDelet = {
+            UrlJsonContext: {
+                id_user_resp_delet: data.usrid,
+            },
+            BlockCount: 1,
+        };
 
-    for (item of getSitios) {
-        let old_portfolio = item.UrlJsonContext.tppf_tipo_portifolio;
-        let old_portfolio2 = item.UrlJsonContext.tppf_tipo_portifolio__portfolio;
-        let old_idTipoPortifolio = item.UrlJsonContext.tppf_portfolio_id;
+        await onergy_updatemany({
+            fdtid: idClienteSitio,
+            assid: data.onergy_js_ctx.assid,
+            usrid: data.onergy_js_ctx.usrid,
+            id: item.ID,
+            data: JSON.stringify(postInfoDelet),
+            isMultiUpdate: true,
+        });
 
-        if (old_portfolio.length == 0) {
-            onergy.log(`old-portfolio: ${old_portfolio}, old-portfolio2: ${old_portfolio2}, old-idTipoPortifolio: ${old_idTipoPortifolio}`);
-
-            let new_portfolio = this_portfolio;
-            let new_portfolio2 = this_portfolio;
-            let new_idTipoPortifolio = this_idPortfolio;
-            onergy.log(`new-portfolio: ${new_portfolio}, new-portfolio2: ${new_portfolio2}, new-idTipoPortifolio: ${new_idTipoPortifolio}`);
-
-            await onergy_updatemany({
-                fdtid: idSitios,
-                assid: data.onergy_js_ctx.assid,
-                usrid: data.onergy_js_ctx.usrid,
-                id: item.ID,
-                data: JSON.stringify({
-                    UrlJsonContext: {
-                        tppf_tipo_portifolio: new_portfolio,
-                        tppf_tipo_portifolio__portfolio: new_portfolio2,
-                        tppf_portfolio_id: new_idTipoPortifolio,
-                    },
-                }),
-            });
-        }
+        onergy.log(`item: ${item.ID} deletado`);
+        onergy.log(`getClienteSitio: ${getClienteSitio.length}`);
+        debugger;
     }
 
     return true;
