@@ -1458,12 +1458,12 @@ async function init(json) {
                             let isIdlcServicios = getTabExcel.filter((j) => j.UrlJsonContext.SERVservicos__servico == objPost.servicios);
                             if (!isIdlcServicios || data.em_caso_de_duplicidade == '1') {
                                 let arr00 = [];
-                                objPost.SERVservicos__servico = isServicios.length > 0 ? isServicios[0].UrlJsonContext.servicos : '';
-                                arr00.push(objPost.SERVservicos__servico);
+                                let objArr00 = isServicios.length > 0 ? isServicios[0].UrlJsonContext.servicos : '';
+                                arr00.push(objArr00);
                                 objPost.SERVservicos__servico = arr00;
                                 let arr01 = [];
-                                objPost.SERVservico_id = isServicios.length > 0 ? isServicios[0].ID : '';
-                                arr01.push(objPost.SERVservico_id);
+                                let objArr01 = isServicios.length > 0 ? isServicios[0].ID : '';
+                                arr01.push(objArr01);
                                 objPost.SERVservico_id = arr01;
                                 delete objPost.servicios;
                             }
@@ -2177,7 +2177,7 @@ async function init(json) {
                             let strFiltro = gerarFiltro('COLC_codigo_cliente', objPost.codigo_cliente.toString());
                             let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
 
-                            let isCodigoliente = getTabExcel.filter((j) => j.UrlJsonContext.CCS_codigo_cliente == objPost.codigo_cliente);
+                            let isCodigoCliente = getTabExcel.filter((j) => j.UrlJsonContext.CCS_codigo_cliente == objPost.codigo_cliente);
                             if (!isCodigoCliente || data.em_caso_de_duplicidade == '1') {
                                 objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
                                 objPost.CCS_codigo_cliente = objPost.codigo_cliente.toString();
@@ -2214,19 +2214,19 @@ async function init(json) {
 
                             let isTelefonoCelular = getTabExcel.filter((j) => j.UrlJsonContext.CCS_telefono_celular == objPost.telefono_celular);
                             if (!isTelefonoCelular || data.em_caso_de_duplicidade == '1') {
-                                objPost.CCS_telefono_celular = objPost.telefono_celular;
+                                objPost.CCS_telefono_celular = objPost.telefono_celular.toString();
                                 delete objPost.telefono_celular;
                             }
 
                             let isTelefonoFijo = getTabExcel.filter((j) => j.UrlJsonContext.CCS_telefono_fijo == objPost.telefono_fijo);
                             if (!isTelefonoFijo || data.em_caso_de_duplicidade == '1') {
-                                objPost.CCS_telefono_fijo = objPost.telefono_fijo;
+                                objPost.CCS_telefono_fijo = objPost.telefono_fijo.toString();
                                 delete objPost.telefono_fijo;
                             }
 
                             let isCorreoElectronico = getTabExcel.filter((j) => j.UrlJsonContext.CCS_correo_eletronico == objPost.correo_electronico);
                             if (!isCorreoElectronico || data.em_caso_de_duplicidade == '1') {
-                                objPost.CCS_correo_eletronico = objPost.correo_electronico;
+                                objPost.CCS_correo_eletronico = objPost.correo_electronico.toString();
                                 delete objPost.correo_electronico;
                             }
 
