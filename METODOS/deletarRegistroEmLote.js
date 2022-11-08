@@ -70,8 +70,8 @@ function successCallback(result) {
 async function init(strData) {
     var data = JSON.parse(strData);
 
-    let idInformacionTecnica = '5ea06f19-d11a-4d61-b4ff-c74610e933cd';
-    let strInfo = await getOnergyItem(idInformacionTecnica, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+    let idInformacionCuenta = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
+    let strInfo = await getOnergyItem(idInformacionCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
 
     if (strInfo.length > 0) {
         for (let i in strInfo) {
