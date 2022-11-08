@@ -245,14 +245,76 @@ async function init(json) {
                         if (tabExcel == 'compania_atc') {
                             let isCompaniaATC = getTabExcel.filter((j) => j.UrlJsonContext.site == objPost.compania_atc);
                             if (!isCompaniaATC || data.em_caso_de_duplicidade == '1') {
-                                //TODO: carga não preenche item (ATC)
                                 objPost.site = objPost.compania_atc;
                                 delete objPost.compania_atc;
                             }
 
-                            //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: compania_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(idTabExcel, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, objPost, '', 'site', true, false, false);
+                            //!node:test
+                            // onergy.log(`JFS: compania_atc objPost: ${JSON.stringify(objPost)}`);
+                            //!node:test
+
+                            let filItem = gerarFiltro('site', objPost.site);
+                            let getItem = await getOnergyItem(idTabExcel, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filItem);
+
+                            if (getItem.length > 0) {
+                                //*se houver registro, atualizar
+                                let postInfo = {
+                                    UrlJsonContext: objPost,
+                                };
+                                let result = await onergy_updatemany({
+                                    fdtid: idTabExcel,
+                                    assid: data.onergy_js_ctx.assid,
+                                    usrid: data.onergy_js_ctx.usrid,
+                                    id: getItem[0].ID,
+                                    data: JSON.stringify(postInfo),
+                                });
+                            } else {
+                                //*se não houver registro, criar
+                                let result = await onergy_save({
+                                    fdtid: idTabExcel,
+                                    usrid: data.onergy_js_ctx.usrid,
+                                    assid: data.onergy_js_ctx.assid,
+                                    data: JSON.stringify(objPost),
+                                });
+                            }
+                        }
+
+                        //*aba:suscriptor
+                        if (tabExcel == 'suscriptor') {
+                            let isSuscriptor = getTabExcel.filter((j) => j.UrlJsonContext.sus__suscriptor == objPost.suscriptor);
+                            if (!isSuscriptor || data.em_caso_de_duplicidade == '1') {
+                                objPost.sus__suscriptor = objPost.suscriptor;
+                                delete objPost.suscriptor;
+                            }
+
+                            //!node:test
+                            // onergy.log(`JFS: suscriptor objPost: ${JSON.stringify(objPost)}`);
+                            //!node:test
+
+                            let filItem = gerarFiltro('suscriptor', objPost.sus__suscriptor);
+                            let getItem = await getOnergyItem(idTabExcel, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filItem);
+
+                            if (getItem.length > 0) {
+                                //*se houver registro, atualizar
+                                let postInfo = {
+                                    UrlJsonContext: objPost,
+                                };
+                                let result = await onergy_updatemany({
+                                    fdtid: idTabExcel,
+                                    assid: data.onergy_js_ctx.assid,
+                                    usrid: data.onergy_js_ctx.usrid,
+                                    id: getItem[0].ID,
+                                    data: JSON.stringify(postInfo),
+                                });
+                            } else {
+                                //*se não houver registro, criar
+                                let result = await onergy_save({
+                                    fdtid: idTabExcel,
+                                    usrid: data.onergy_js_ctx.usrid,
+                                    assid: data.onergy_js_ctx.assid,
+                                    data: JSON.stringify(objPost),
+                                });
+                            }
                         }
 
                         //*aba:forma_pago
@@ -305,23 +367,39 @@ async function init(json) {
                         if (tabExcel == 'portafolio_atc') {
                             let isPortafolioATC = getTabExcel.filter((j) => j.UrlJsonContext.tipo_portifolio == objPost.portafolio_atc);
                             if (!isPortafolioATC || data.em_caso_de_duplicidade == '1') {
+                                //TODO: não preenche ATC
                                 objPost.tipo_portifolio = objPost.portafolio_atc;
                                 delete objPost.portafolio_atc;
                             }
 
-                            //!node:test (unhide.log and hide sendItem)
-                            // onergy.log(`JFS: portafolio_atc sendItem=>objPost: ${JSON.stringify(objPost)}`);
-                            await sendItemToOnergy(
-                                idTabExcel,
-                                data.onergy_js_ctx.usrid,
-                                data.onergy_js_ctx.assid,
-                                objPost,
-                                '',
-                                'tipo_portifolio',
-                                true,
-                                false,
-                                false
-                            );
+                            //!node:test
+                            // onergy.log(`JFS: portafolio_atc objPost: ${JSON.stringify(objPost)}`);
+                            //!node:test
+
+                            let filItem = gerarFiltro('tipo_portifolio', objPost.tipo_portifolio);
+                            let getItem = await getOnergyItem(idTabExcel, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filItem);
+
+                            if (getItem.length > 0) {
+                                //*se houver registro, atualizar
+                                let postInfo = {
+                                    UrlJsonContext: objPost,
+                                };
+                                let result = await onergy_updatemany({
+                                    fdtid: idTabExcel,
+                                    assid: data.onergy_js_ctx.assid,
+                                    usrid: data.onergy_js_ctx.usrid,
+                                    id: getItem[0].ID,
+                                    data: JSON.stringify(postInfo),
+                                });
+                            } else {
+                                //*se não houver registro, criar
+                                let result = await onergy_save({
+                                    fdtid: idTabExcel,
+                                    usrid: data.onergy_js_ctx.usrid,
+                                    assid: data.onergy_js_ctx.assid,
+                                    data: JSON.stringify(objPost),
+                                });
+                            }
                         }
 
                         //*aba:regional_atc
@@ -945,9 +1023,9 @@ async function init(json) {
                             }
 
                             //*pesq.ref:suscriptor
-                            let idCompaniaATC = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
-                            let getCompaniaATC = await getOnergyItem(idCompaniaATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                            let isSuscriptor = getCompaniaATC.filter((j) => j.UrlJsonContext.site == objPost.suscriptor);
+                            let idSuscriptor = '51a217b1-1d0a-47c7-b31c-46880c1ca5ad';
+                            let getSuscriptor = await getOnergyItem(idSuscriptor, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                            let isSuscriptor = getSuscriptor.filter((j) => j.UrlJsonContext.sus__suscriptor == objPost.suscriptor);
                             if (!isSuscriptor) {
                                 status_desc = `ERROR: no hay "${objPost.suscriptor}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
@@ -956,10 +1034,11 @@ async function init(json) {
                                 return false;
                             }
 
-                            let isIdlcSuscriptor = getTabExcel.filter((j) => j.UrlJsonContext.emp_atc_site__prcs__assinante_atc == objPost.suscriptor);
+                            let isIdlcSuscriptor = getTabExcel.filter((j) => j.UrlJsonContext.sus_sus__suscriptor__prcs__assinante_atc == objPost.suscriptor);
                             if (!isIdlcSuscriptor || data.em_caso_de_duplicidade == '1') {
-                                objPost.emp_atc_site__prcs__assinante_atc = isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.site : '';
-                                objPost.emp_atc_prcs__assinante_atc_id = isSuscriptor.length > 0 ? isSuscriptor[0].ID : '';
+                                objPost.sus_sus__suscriptor__prcs__assinante_atc =
+                                    isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.sus__suscriptor : '';
+                                objPost.sus_prcs__assinante_atc_id = isSuscriptor.length > 0 ? isSuscriptor[0].ID : '';
                                 delete objPost.suscriptor;
                             }
 
@@ -1373,7 +1452,7 @@ async function init(json) {
                             let isMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.gerador == arr00);
                             if (!isMotogenerador || data.em_caso_de_duplicidade == '1') {
                                 objPost.gerador = arr00;
-                                objPost.gerador_desc = objPost.motogenerador == 'si' ? 'Si' : 'No';
+                                objPost.gerador_desc = objPost.motogenerador == 'si' ? 'Si' : '';
                                 delete objPost.motogenerador;
                             }
 
@@ -1384,7 +1463,7 @@ async function init(json) {
                             let isTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.diretoria_independente == arr01);
                             if (!isTableroIndependiente || data.em_caso_de_duplicidade == '1') {
                                 objPost.diretoria_independente = arr01;
-                                objPost.diretoria_independente_desc = objPost.tablero_independiente == 'si' ? 'Si' : 'No';
+                                objPost.diretoria_independente_desc = objPost.tablero_independiente == 'si' ? 'Si' : '';
                                 delete objPost.tablero_independiente;
                             }
 
@@ -1395,7 +1474,7 @@ async function init(json) {
                             let isBarter = getTabExcel.filter((j) => j.UrlJsonContext.escambo == arr02);
                             if (!isBarter || data.em_caso_de_duplicidade == '1') {
                                 objPost.escambo = arr02;
-                                objPost.escambo_desc = objPost.barter == 'si' ? 'Si' : 'No';
+                                objPost.escambo_desc = objPost.barter == 'si' ? 'Si' : '';
                                 delete objPost.barter;
                             }
 
@@ -1406,7 +1485,7 @@ async function init(json) {
                             let isProvisional = getTabExcel.filter((j) => j.UrlJsonContext.provisorio == arr03);
                             if (!isProvisional || data.em_caso_de_duplicidade == '1') {
                                 objPost.provisorio = arr03;
-                                objPost.provisorio_desc = objPost.provisional == 'si' ? 'Si' : 'No';
+                                objPost.provisorio_desc = objPost.provisional == 'si' ? 'Si' : '';
                                 delete objPost.provisional;
                             }
 
