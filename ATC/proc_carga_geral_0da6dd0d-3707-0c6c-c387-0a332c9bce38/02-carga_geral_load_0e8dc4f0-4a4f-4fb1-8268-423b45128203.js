@@ -2069,7 +2069,7 @@ async function init(json) {
 
                             //*pesq.ref:municipio
                             let idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
-                            let getMunicipio = await getOnergyItem(idMunicipio, data.assid, data.usrid, null);
+                            let getMunicipio = await getOnergyItem(idMunicipio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isMunicipio = getMunicipio.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
                             if (!isMunicipio) {
                                 status_desc = `ERROR: no hay "${objPost.municipio}" registrado para ${tabExcel} de "${objPost.codigo_cliente}"`;
@@ -2123,7 +2123,7 @@ async function init(json) {
                             //*id_one_ref:clientes
                             let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
                             let strFiltro = gerarFiltro('COLC_codigo_cliente', objPost.codigo_cliente.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             let isCodigoCliente = getTabExcel.filter((j) => j.UrlJsonContext.RCS_codigo_cliente == objPost.codigo_cliente);
                             if (!isCodigoCliente || data.em_caso_de_duplicidade == '1') {
@@ -2175,7 +2175,7 @@ async function init(json) {
                             //*id_one_ref:clientes
                             let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
                             let strFiltro = gerarFiltro('COLC_codigo_cliente', objPost.codigo_cliente.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             let isCodigoCliente = getTabExcel.filter((j) => j.UrlJsonContext.CCS_codigo_cliente == objPost.codigo_cliente);
                             if (!isCodigoCliente || data.em_caso_de_duplicidade == '1') {
@@ -2186,7 +2186,7 @@ async function init(json) {
 
                             //*pesq.ref:regional_clientes
                             let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
-                            let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.assid, data.usrid, null);
+                            let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
                             let isRegionalClientes = getRegionalClientes.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
                             if (!isRegionalClientes) {
                                 status_desc = `ERROR: no hay "${objPost.nombre_regional}" registrado para ${tabExcel} de "${objPost.codigo_cliente}"`;
@@ -2267,7 +2267,7 @@ async function init(json) {
                             //*id_one_ref:clientes
                             let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
                             let strFiltro = gerarFiltro('COLC_codigo_cliente', objPost.codigo_cliente.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.assid, data.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             let isCodigoCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCS_codigo_cliente == objPost.codigo_cliente);
                             if (!isCodigoCliente || data.em_caso_de_duplicidade == '1') {
