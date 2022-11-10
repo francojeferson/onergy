@@ -69,10 +69,10 @@ function successCallback(result) {
  */
 async function init(strData) {
     var data = JSON.parse(strData);
-
-    let idInformacionCuenta = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
-    let strInfo = await getOnergyItem(idInformacionCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-
+    //*inserir fdtid de onde o registro se encontra
+    let idGridRegistro = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
+    let strInfo = await getOnergyItem(idGridRegistro, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+    //*função para deletar os registros em lote
     if (strInfo.length > 0) {
         for (let i in strInfo) {
             await DeletarRegistro(strInfo[i], data.onergy_js_ctx.usrid, strInfo[i].ID);
@@ -92,19 +92,15 @@ function SetObjectResponse(cond, json, WaitingWebHook, UsrID, GrpID) {
         json: JSON.stringify(json),
         WaitingWebHook: WaitingWebHook,
     };
-
     if (WaitingWebHook === undefined) {
         WaitingWebHook = false;
     }
-
     if (UsrID != null && UsrID.length > 0) {
         obj.UsrID = UsrID;
     }
-
     if (GrpID != null && GrpID.length > 0) {
         obj.GrpID = GrpID;
     }
-
     return obj;
 }
 async function getOnergyItem(fdtid, assid, usrid, filtro) {
@@ -132,31 +128,8 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
     }
     return result;
 }
-async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup) {
-    let onergySaveData = {
-        fdtid: templateid,
-        assid: assid,
-        usrid: usrid,
-        data: JSON.stringify(data),
-        //executeAction: false
-    };
-    if (fedid != undefined && fedid != '') {
-        onergySaveData.id = fedid;
-    }
-    if (ukField != undefined && ukField != '') {
-        onergySaveData.ukField = ukField;
-        onergySaveData.blockDuplicate = true;
-    }
-    if (checkTemplateDuplicate != undefined && checkTemplateDuplicate != '') {
-        onergySaveData.checkTemplateDuplicate = true;
-    }
-    if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
-        onergySaveData.addCfgViewGroup = addCfgViewGroup;
-    }
-
-    await onergy_save(onergySaveData);
-}
 async function DeletarRegistro(data, usrid, fedid) {
+    //*browser, f12, console, cabeçalho(header), pegar o valor do "ocp-apim-subscription-key" em algum "GetMongo" gerado
     const Ocp_Apim_Subscription_Key = '1ae92442465648cf8607540e41376936'; //Excluir registro, feedView, ocp-apim-subscription-key
 
     await axios({
