@@ -103,13 +103,13 @@ async function init(json) {
 
             //*se não existir conteúdo na planilha, gera erro
             if (ctxExcel.length > 0) {
-                //*status:inicio
-                dataHoje = new Date();
-                time = gerarDataHora(dataHoje, -5); //?Bogota
-                status_desc = `Cargando ${ctxExcel.length} registros de ${tabExcel}`;
-                statusPost.push(`${time}, ${status_desc}`);
-                await postStatus(status_desc, statusPost, data);
-                statusPost = statusPost.concat('\n');
+                // //*status:inicio
+                // dataHoje = new Date();
+                // time = gerarDataHora(dataHoje, -5); //?Bogota
+                // status_desc = `Cargando ${ctxExcel.length} registros de ${tabExcel}`;
+                // statusPost.push(`${time}, ${status_desc}`);
+                // await postStatus(status_desc, statusPost, data);
+                // statusPost = statusPost.concat('\n');
 
                 //*para cada linha da planilha (exceto cabeçalho) gera objeto
                 for (let x in ctxExcel) {
@@ -276,6 +276,56 @@ async function init(json) {
                             }
 
                             let result = await gravarRegistro('LCT_ferramentas', objPost.LCT_ferramentas, idTabExcel, objPost, data);
+                        }
+
+                        //*aba:motogenerador
+                        if (tabExcel == 'motogenerador') {
+                            //*item:motogenerador
+                            let isMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.ger_gerador == objPost.motogenerador);
+                            if (isMotogenerador.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.ger_gerador = objPost.motogenerador;
+                                delete objPost.motogenerador;
+                            }
+
+                            let result = await gravarRegistro('ger_gerador', objPost.ger_gerador, idTabExcel, objPost, data);
+                        }
+
+                        //*aba:tablero_independiente
+                        if (tabExcel == 'tablero_independiente') {
+                            //*item:tablero_independiente
+                            let isTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                            );
+                            if (isTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.dir_diretoria_independente = objPost.tablero_independiente;
+                                delete objPost.tablero_independiente;
+                            }
+
+                            let result = await gravarRegistro('dir_diretoria_independente', objPost.dir_diretoria_independente, idTabExcel, objPost, data);
+                        }
+
+                        //*aba:barter
+                        if (tabExcel == 'barter') {
+                            //*item:barter
+                            let isBarter = getTabExcel.filter((j) => j.UrlJsonContext.esc_escambo == objPost.barter);
+                            if (isBarter.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.esc_escambo = objPost.barter;
+                                delete objPost.barter;
+                            }
+
+                            let result = await gravarRegistro('esc_escambo', objPost.esc_escambo, idTabExcel, objPost, data);
+                        }
+
+                        //*aba:provisional
+                        if (tabExcel == 'provisional') {
+                            //*item:provisional
+                            let isProvisional = getTabExcel.filter((j) => j.UrlJsonContext.pro_provisorio == objPost.provisional);
+                            if (isProvisional.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.pro_provisorio = objPost.provisional;
+                                delete objPost.provisional;
+                            }
+
+                            let result = await gravarRegistro('pro_provisorio', objPost.pro_provisorio, idTabExcel, objPost, data);
                         }
 
                         //*aba:portafolio_atc
@@ -679,7 +729,6 @@ async function init(json) {
 
                         //*aba:informacion_cuenta
                         if (tabExcel == 'informacion_cuenta') {
-                            debugger;
                             //*id_one_ref:sitios
                             let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
@@ -1134,44 +1183,81 @@ async function init(json) {
                                 objPost.emp_atc_site = objPost.compania_atc;
                                 delete objPost.compania_atc;
                             }
-                            //*btn.check:motogenerador
-                            objPost.motogenerador = objPost.motogenerador == 'SI' ? 'si' : '';
-                            let arr00 = [];
-                            arr00.push(objPost.motogenerador);
-                            let isMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.gerador == arr00);
-                            if (isMotogenerador.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.gerador = arr00;
-                                objPost.gerador_desc = objPost.motogenerador == 'si' ? 'Si' : '';
+                            //*pesq.ref:motogenerador
+                            let idMotogenerador = '066e2afa-0169-4e5f-a7fb-79131aafe8c7';
+                            let getMotogenerador = await getOnergyItem(idMotogenerador, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                            let isMotogenerador = getMotogenerador.filter((j) => j.UrlJsonContext.ger_gerador == objPost.motogenerador);
+                            if (isMotogenerador.length == 0) {
+                                status_desc = `ERROR: no hay "${objPost.motogenerador}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
+                                statusPost.push(`${time}, ${status_desc}`);
+                                await postStatus(status_desc, statusPost, data);
+                                statusPost = statusPost.concat('\n');
+                                return false;
+                            }
+                            //*item:motogenerador
+                            let isItdsMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.gerger_gerador__gerador == objPost.motogenerador);
+                            if (isItdsMotogenerador.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.gerger_gerador__gerador = isMotogenerador.length > 0 ? isMotogenerador[0].UrlJsonContext.ger_gerador : '';
+                                objPost.gergerador_id = isMotogenerador.length > 0 ? isMotogenerador[0].ID : '';
                                 delete objPost.motogenerador;
                             }
-                            //*btn.check:tablero_independiente
-                            objPost.tablero_independiente = objPost.tablero_independiente == 'SI' ? 'si' : '';
-                            let arr01 = [];
-                            arr01.push(objPost.tablero_independiente);
-                            let isTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.diretoria_independente == arr01);
-                            if (isTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.diretoria_independente = arr01;
-                                objPost.diretoria_independente_desc = objPost.tablero_independiente == 'si' ? 'Si' : '';
+                            //*pesq.ref:tablero_independiente
+                            let idTableroIndependiente = 'dbaf278d-8fed-4611-be82-ecd9b69806c0';
+                            let getTableroIndependiente = await getOnergyItem(idTableroIndependiente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                            let isTableroIndependiente = getTableroIndependiente.filter(
+                                (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                            );
+                            if (isTableroIndependiente.length == 0) {
+                                status_desc = `ERROR: no hay "${objPost.tablero_independiente}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
+                                statusPost.push(`${time}, ${status_desc}`);
+                                await postStatus(status_desc, statusPost, data);
+                                statusPost = statusPost.concat('\n');
+                                return false;
+                            }
+                            //*item:tablero_independiente
+                            let isItdsTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dirdir_diretoria_independente__diretoria_independente == objPost.tablero_independiente
+                            );
+                            if (isItdsTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.dirdir_diretoria_independente__diretoria_independente =
+                                    isTableroIndependiente.length > 0 ? isTableroIndependiente[0].UrlJsonContext.dir_diretoria_independente : '';
+                                objPost.dirdiretoria_independente_id = isTableroIndependiente.length > 0 ? isTableroIndependiente[0].ID : '';
                                 delete objPost.tablero_independiente;
                             }
-                            //*btn.check:barter
-                            objPost.barter = objPost.barter == 'SI' ? 'si' : '';
-                            let arr02 = [];
-                            arr02.push(objPost.barter);
-                            let isBarter = getTabExcel.filter((j) => j.UrlJsonContext.escambo == arr02);
-                            if (isBarter.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.escambo = arr02;
-                                objPost.escambo_desc = objPost.barter == 'si' ? 'Si' : '';
+                            //*pesq.ref:barter
+                            let idBarter = '13dad727-2325-4e9d-85a3-c8ff09e053c7';
+                            let getBarter = await getOnergyItem(idBarter, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                            let isBarter = getBarter.filter((j) => j.UrlJsonContext.esc_escambo == objPost.barter);
+                            if (isBarter.length == 0) {
+                                status_desc = `ERROR: no hay "${objPost.barter}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
+                                statusPost.push(`${time}, ${status_desc}`);
+                                await postStatus(status_desc, statusPost, data);
+                                statusPost = statusPost.concat('\n');
+                                return false;
+                            }
+                            //*item:barter
+                            let isItdsBarter = getTabExcel.filter((j) => j.UrlJsonContext.escesc_escambo__escambo == objPost.barter);
+                            if (isItdsBarter.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.escesc_escambo__escambo = isBarter.length > 0 ? isBarter[0].UrlJsonContext.esc_escambo : '';
+                                objPost.escescambo_id = isBarter.length > 0 ? isBarter[0].ID : '';
                                 delete objPost.barter;
                             }
-                            //*btn.check:provisional
-                            objPost.provisional = objPost.provisional == 'SI' ? 'si' : '';
-                            let arr03 = [];
-                            arr03.push(objPost.provisional);
-                            let isProvisional = getTabExcel.filter((j) => j.UrlJsonContext.provisorio == arr03);
-                            if (isProvisional.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.provisorio = arr03;
-                                objPost.provisorio_desc = objPost.provisional == 'si' ? 'Si' : '';
+                            //*pesq.ref:provisional
+                            let idProvisional = 'fb6543b9-28a4-4e49-8f4b-2af6557a7cd8';
+                            let getProvisional = await getOnergyItem(idProvisional, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                            let isProvisional = getProvisional.filter((j) => j.UrlJsonContext.pro_provisorio == objPost.provisional);
+                            if (isProvisional.length == 0) {
+                                status_desc = `ERROR: no hay "${objPost.provisional}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
+                                statusPost.push(`${time}, ${status_desc}`);
+                                await postStatus(status_desc, statusPost, data);
+                                statusPost = statusPost.concat('\n');
+                                return false;
+                            }
+                            //*item:provisional
+                            let isItdsProvisional = getTabExcel.filter((j) => j.UrlJsonContext.propro_provisorio__provisorio == objPost.provisional);
+                            if (isItdsProvisional.length == 0 || data.em_caso_de_duplicidade == '1') {
+                                objPost.propro_provisorio__provisorio = isProvisional.length > 0 ? isProvisional[0].UrlJsonContext.pro_provisorio : '';
+                                objPost.proprovisorio_id = isProvisional.length > 0 ? isProvisional[0].ID : '';
                                 delete objPost.provisional;
                             }
                             //*item:cantidad_provisionales
