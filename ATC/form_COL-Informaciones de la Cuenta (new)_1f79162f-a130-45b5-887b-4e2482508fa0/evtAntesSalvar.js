@@ -45,19 +45,23 @@ let limiteDiaPago = async () => {
 
 let validarNic = async () => {
     let informacoesContaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
+    let tipoContaValue = mtdOnergy.JsEvtGetItemValue('TCTC_tipo_de_conta__TC_tipo_de_conta_valor');
     let nic = mtdOnergy.JsEvtGetItemValue('conta_interna_nic');
     let objNic = await mtdOnergy.JsEvtGetFeedData({
         fdtID: informacoesContaID,
         filter: gerarFiltro('conta_interna_nic', nic),
     });
 
-    if (objNic.length > 0 && nic == objNic[0].urlJsonContext.conta_interna_nic) {
-        if (onergyCtx.fedid != objNic[0].id) {
-            mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) ya informada');
-            mtdOnergy.JsEvtShowHideLoading(false);
-            return false;
+    if (tipoContaValue != 'HH') {
+        if (objNic.length > 0 && nic == objNic[0].urlJsonContext.conta_interna_nic) {
+            if (onergyCtx.fedid != objNic[0].id) {
+                mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) ya informada');
+                mtdOnergy.JsEvtShowHideLoading(false);
+                return false;
+            }
         }
     }
+
     return true;
 };
 
