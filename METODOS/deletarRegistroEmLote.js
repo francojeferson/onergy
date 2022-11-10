@@ -70,7 +70,7 @@ function successCallback(result) {
 async function init(strData) {
     var data = JSON.parse(strData);
     //*inserir fdtid de onde o registro se encontra
-    let idGridRegistro = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
+    let idGridRegistro = '5ea06f19-d11a-4d61-b4ff-c74610e933cd';
     let strInfo = await getOnergyItem(idGridRegistro, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
     //*função para deletar os registros em lote
     if (strInfo.length > 0) {
