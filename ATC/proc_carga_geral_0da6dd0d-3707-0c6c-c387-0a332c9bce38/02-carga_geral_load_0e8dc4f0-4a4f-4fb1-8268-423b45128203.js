@@ -1287,17 +1287,15 @@ async function init(json) {
                                 statusPost = statusPost.concat('\n');
                                 return false;
                             }
-                            //*item:nit_cliente, nombre_cliente, codigo_cliente
+                            //*item:nit_cliente, nombre_cliente
                             let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.COLCCOLC_nit_cliente == objPost.nit_cliente);
                             if (isNITCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.ID_ONE_REF = paiRegistro.length > 0 ? paiRegistro[0].ID : '';
                                 objPost.COLCCOLC_nit_cliente = isClientes.length > 0 ? isClientes[0].UrlJsonContext.COLC_nit_cliente : '';
                                 objPost.COLCclsit__nit_cliente_id = isClientes.length > 0 ? isClientes[0].ID : '';
                                 objPost.COLCCOLC_nome_cliente__clsit__nit_cliente = isClientes.length > 0 ? isClientes[0].UrlJsonContext.COLC_nome_cliente : '';
-                                objPost.COLCCOLC_codigo_cliente = isClientes.length > 0 ? isClientes[0].UrlJsonContext.COLC_codigo_cliente : '';
                                 delete objPost.nombre_cliente;
                                 delete objPost.nit_cliente;
-                                delete objPost.codigo_cliente;
                             }
                             //*item:codigo_sitio_cliente
                             let isCodigoSitioCliente = getTabExcel.filter(
