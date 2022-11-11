@@ -14,8 +14,8 @@ let validarAssetNumber = async () => {
         let tipoContaValue = mtdOnergy.JsEvtGetItemValue('TCTC_tipo_de_conta__TC_tipo_de_conta_valor');
         mtdOnergy.JsEvtSetItemValue('prcs__tipo_de_conta_cache', tipoConta, null, null, true);
 
-        //*se tipo_cuenta for P (Padre) ou PH (Padre Hibrida) ou HH (Hija Hibrida), limpar asset_number, caso contrário, determinar valor de cache em asset_number
-        if (tipoContaValue == 'P' || tipoContaValue == 'PH' || tipoContaValue == 'HH') {
+        //*se tipo_cuenta for P (Padre) ou PH (Padre Hibrida), limpar asset_number, caso contrário, determinar valor de cache em asset_number
+        if (tipoContaValue == 'P' || tipoContaValue == 'PH') {
             mtdOnergy.JsEvtSetItemValue('asset_number_IDC', '');
         } else {
             let assetNumber = mtdOnergy.JsEvtGetItemValue('asset_number');
@@ -50,7 +50,7 @@ let validarContaPai = async () => {
                 mtdOnergy.JsEvtShowHideLoading(false);
                 return false;
             }
-            if (!contaPai) {
+            if (contaPai.length == 0) {
                 mtdOnergy.JsEvtSetItemValue('prcs__conta_pai', '');
             }
         }
