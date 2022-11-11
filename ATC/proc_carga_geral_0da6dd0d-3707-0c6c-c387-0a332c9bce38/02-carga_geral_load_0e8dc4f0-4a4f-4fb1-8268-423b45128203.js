@@ -587,6 +587,8 @@ async function init(json) {
                         if (tabExcel == 'sitios') {
                             objPost.modificado_por = data.email;
                             objPost.modificado_em = data.data;
+                            objPost.registro_salvo = 'sim';
+
                             //*item:asset_number
                             let isAssetNumber = getTabExcel.filter((j) => j.UrlJsonContext.asset_number == objPost.asset_number);
                             if (isAssetNumber.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -719,6 +721,8 @@ async function init(json) {
 
                         //*aba:informacion_cuenta
                         if (tabExcel == 'informacion_cuenta') {
+                            objPost.registro_salvo_ = 'sim';
+
                             //*id_one_ref:sitios
                             let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
@@ -1026,7 +1030,7 @@ async function init(json) {
                                 delete objPost.proximo_pago_oportuno;
                             }
 
-                            let result = await gravarRegistro('asset_number', objPost.asset_number, idTabExcel, objPost, data);
+                            let result = await gravarRegistro('conta_interna_nic', objPost.conta_interna_nic, idTabExcel, objPost, data);
                         }
 
                         //*aba:informacion_tecnica
