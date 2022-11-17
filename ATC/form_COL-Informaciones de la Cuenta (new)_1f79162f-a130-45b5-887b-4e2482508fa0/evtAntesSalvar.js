@@ -47,17 +47,40 @@ let validarNic = async () => {
     let informacoesContaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
     let tipoContaValue = mtdOnergy.JsEvtGetItemValue('TCTC_tipo_de_conta__TC_tipo_de_conta_valor');
     let nic = mtdOnergy.JsEvtGetItemValue('conta_interna_nic');
+    let asset_number = mtdOnergy.JsEvtGetItemValue('asset_number');
     let objNic = await mtdOnergy.JsEvtGetFeedData({
         fdtID: informacoesContaID,
         filter: gerarFiltro('conta_interna_nic', nic),
     });
 
-    if (tipoContaValue != 'HH') {
-        if (objNic.length > 0 && nic == objNic[0].urlJsonContext.conta_interna_nic) {
-            if (onergyCtx.fedid != objNic[0].id) {
-                mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) ya informada');
-                mtdOnergy.JsEvtShowHideLoading(false);
-                return false;
+    for (let item in objNic) {
+        if (tipoContaValue == 'P' || tipoContaValue == 'H' || tipoContaValue == 'I') {
+            if (objNic.length > 0 && nic == objNic[item].urlJsonContext.conta_interna_nic) {
+                if (onergyCtx.fedid != objNic[item].id) {
+                    mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) ya informada');
+                    mtdOnergy.JsEvtShowHideLoading(false);
+                    return false;
+                }
+            }
+        } else if (tipoContaValue == 'PH') {
+            // tipoContaValue == 'PH' no puede repitir el NIC de otro PH
+            // tipoContaValue == 'PH' puede repitir el NIC de otra HH
+            if (objNic.length > 0 && nic == objNic[item].urlJsonContext.conta_interna_nic && objNic[item].urlJsonContext.TCTC_tipo_de_conta__TC_tipo_de_conta_valor == 'PH') {
+                if (onergyCtx.fedid != objNic[item].id) {
+                    mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) ya informada para otro PH');
+                    mtdOnergy.JsEvtShowHideLoading(false);
+                    return false;
+                }
+            }
+        } else if (tipoContaValue == 'HH') {
+            // tipoContaValue == 'HH' no puede repitir el NIC de otra HH
+            // tipoContaValue == 'HH' puede repitir el NIC de otro PH
+            if (objNic.length > 0 && nic == objNic[item].urlJsonContext.conta_interna_nic && objNic[item].urlJsonContext.TCTC_tipo_de_conta__TC_tipo_de_conta_valor == 'HH') {
+                if (onergyCtx.fedid != objNic[item].id) {
+                    mtdOnergy.JsEvtShowMessage('error', 'Cuenta Interna (NIC) ya informada para otra HH');
+                    mtdOnergy.JsEvtShowHideLoading(false);
+                    return false;
+                }
             }
         }
     }
