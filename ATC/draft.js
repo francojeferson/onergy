@@ -229,4 +229,7 @@ let json = {
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
 };
 
-init(JSON.stringify(json));
+// init(JSON.stringify(json));
+let b64txt = utils.GetTextFromBase64('dWcyOXM2YjhuamtoZGtjcmgydXp2YWdkOm5uUk5CclRuMzI=');
+const encode = Buffer.from(b64txt).toString('base64');
+debugger;
