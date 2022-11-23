@@ -1,29 +1,21 @@
-//!NODE_ENV ===
-const { date } = require('assert-plus');
-const { formatDate } = require('tough-cookie');
-const { log } = require('console');
-const { memory } = require('console');
-const { resolve } = require('path');
-const { type } = require('os');
-const axios = require('axios');
-const fs = require('fs');
-const jsuser = require('../../onergy/onergy-utils');
-const onergy = require('../../onergy/onergy-client');
-const utils = require('../../onergy/onergy-utils');
-replaceAll = function (content, needle, replacement) {
-    return content.split(needle).join(replacement);
-};
+/**ENV_NODE** =====================================================================================
+ */
+let { date } = require('assert-plus');
+let { formatDate } = require('tough-cookie');
+let { log, debug } = require('console');
+let { memory } = require('console');
+let { resolve } = require('path');
+let { type } = require('os');
+let axios = require('axios');
+let fs = require('fs');
+let jsuser = require('../../onergy/onergy-utils');
+let onergy = require('../../onergy/onergy-client');
+let utils = require('../../onergy/onergy-utils');
 async function ajax(args) {
     return await onergy.ajax(args);
 }
 async function ajaxPost(args) {
     return await onergy.ajaxPost(args);
-}
-function failureCallback(error) {
-    console.log('It failed with ' + error);
-}
-function get_usr_tmz_dt_now(data) {
-    return data;
 }
 async function hashMd5(args) {
     return await onergy.hashMd5(args);
@@ -35,7 +27,7 @@ async function onergy_countdocs(args) {
     return await onergy.onergy_countdocs(args);
 }
 async function onergy_get(args) {
-    const r = await onergy.onergy_get(args);
+    let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
 async function onergy_save(args) {
@@ -51,71 +43,47 @@ async function sendmail(args) {
     return await onergy.sendmail(args);
 }
 async function onergy_sendto(args) {
-    const r = await onergy.onergy_sendto(args);
+    let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
 }
 async function onergy_updatemany(args) {
     return await onergy.onergy_save(args);
 }
+function failureCallback(error) {
+    console.log('It failed with ' + error);
+}
+function get_usr_tmz_dt_now(data) {
+    return data;
+}
+function replaceAll(content, needle, replacement) {
+    return content.split(needle).join(replacement);
+}
 function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
-
-//!SCRIPT ===
-async function getOnergyItem(fdtid, assid, usrid, filtro) {
-    let keepSearching = true;
-    let skip = 0;
-    let take = 500;
-    let result = [];
-    while (keepSearching) {
-        let strPageResp = await onergy_get({
-            fdtid: fdtid,
-            assid: assid,
-            usrid: usrid,
-            filter: filtro,
-            skip: skip,
-            take: take,
-        });
-        skip += take;
-        let pageResp = JSON.parse(strPageResp);
-        if (pageResp !== null && pageResp.length > 0) {
-            keepSearching = pageResp.length === take;
-            result = result.concat(pageResp);
-        } else {
-            keepSearching = false;
-        }
-    }
-    return result;
-}
-
-async function sendToOnergy(oldFdt, newFdt, assid, usrid, fedid) {
-    let param = {
-        assid: assid,
-        usrid: usrid,
-        fdtid: oldFdt,
-        newfdtid: newFdt,
-        resetFdtData: true,
-        fedid: fedid,
-        resetPrc: true,
-    };
-    await onergy_sendto(param);
-}
-
-const fdtCompartliharDoctosParaValidacaoDeDuplicados = '8a7b4e11-0afb-4d61-9baf-a10f01cc1606';
-const fdtConsDet_Nfse = '9253cd1f-f178-4129-a0e0-a7585d7f51c5';
-const fdtConfSis_ConfigurarValidacoes = '33e92d6e-8d4b-4c85-bb0e-c332c9948b97';
-const fedConfVal_Nfse = 'dadfb076-f5ed-90e0-450b-1784846ca5b1';
-const fdtConfSis_RegrasValidacoes = 'd5482e8e-a646-4a35-a36c-3037a8e2b401';
-const fdtMonitDoc_Nfse = '254907b2-d9fe-4c4c-bc5e-6c4aec3d5bed';
-const fdtMonitAp_Nfse = 'f87511fa-1a34-436b-b62a-83f4a978f19e';
-const fedRegValid_ValorInss = '504db105-265d-29af-9a79-2430b072df40';
-const fedRegValid_ValorPisPasep = '85db7c95-1afb-0606-e1cb-692868fe43ab';
-const fedRegValid_ValorIrrf = 'f6528194-15b6-6e28-c697-2be89473324d';
-const fedRegValid_ValorCsll = 'ce9ef27d-9908-0f16-5b66-083545eb3c4c';
-const fedRegValid_ValorCofins = '34eb0a72-f1ec-fe97-66a1-8f068da61417';
+/**CLI_SCRIPT** ===================================================================================
+ * Executar automático quando em processo: Sim
+ * Atividade de longa duração: Não
+ * Esconder Menu: Sim
+ * Condicional: nenhum
+ * Aprovação: nenhum
+ */
 async function init(json) {
-    const data = JSON.parse(json);
-    // onergy.log('JFS: initProcRetencao_ValidarRetencao');
+    let data = JSON.parse(json);
+    onergy.log(`JFS ~ validar_retencao ~ init: ${JSON.stringify(data)}`);
+
+    let fdtCompartliharDoctosParaValidacaoDeDuplicados = '8a7b4e11-0afb-4d61-9baf-a10f01cc1606';
+    let fdtConsDet_Nfse = '9253cd1f-f178-4129-a0e0-a7585d7f51c5';
+    let fdtConfSis_ConfigurarValidacoes = '33e92d6e-8d4b-4c85-bb0e-c332c9948b97';
+    let fedConfVal_Nfse = 'dadfb076-f5ed-90e0-450b-1784846ca5b1';
+    let fdtConfSis_RegrasValidacoes = 'd5482e8e-a646-4a35-a36c-3037a8e2b401';
+    let fdtMonitDoc_Nfse = '254907b2-d9fe-4c4c-bc5e-6c4aec3d5bed';
+    let fdtMonitAp_Nfse = 'f87511fa-1a34-436b-b62a-83f4a978f19e';
+    let fedRegValid_ValorInss = '504db105-265d-29af-9a79-2430b072df40';
+    let fedRegValid_ValorPisPasep = '85db7c95-1afb-0606-e1cb-692868fe43ab';
+    let fedRegValid_ValorIrrf = 'f6528194-15b6-6e28-c697-2be89473324d';
+    let fedRegValid_ValorCsll = 'ce9ef27d-9908-0f16-5b66-083545eb3c4c';
+    let fedRegValid_ValorCofins = '34eb0a72-f1ec-fe97-66a1-8f068da61417';
 
     //* ConsultaDetalhada_Nfse
     //* busca getConsDet_Nfse filtrando fedid em idfk
@@ -127,7 +95,6 @@ async function init(json) {
         filtConsDet_Nfse
     );
     let objNfse = typeof getConsDet_Nfse !== 'object' ? JSON.parse(getConsDet_Nfse) : getConsDet_Nfse;
-    // onergy.log('JFS: getOnergyItem: fdtConsDet_Nfse: objNfse: ' + JSON.stringify(objNfse[0].UrlJsonContext));
 
     //* CadastroGeral_ConfiguracoesSistemicas_ConfigurarValidacoes
     //* busca getConfVal_Nfse filtrando _id em fedConfVal_Nfse
@@ -138,7 +105,6 @@ async function init(json) {
         data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
         filtConfVal_Nfse
     );
-    // onergy.log('JFS: getOnergyItem: fdtConfSis_ConfigurarValidacoes: getConfigValidNFSe: ' + JSON.stringify(getConfVal_Nfse[0].UrlJsonContext));
 
     let radValidacaoComercial = getConfVal_Nfse[0].UrlJsonContext.habilitar_validacao_comercial_desc;
     //* se validacao comercial habilitado, segue
@@ -157,7 +123,6 @@ async function init(json) {
             data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
             filtRegValid_ValorInss
         );
-        // onergy.log('JFS: getOnergyItem: fdtConfSis_RegrasValidacoes: getRegValid_ValorInss: ' + JSON.stringify(getRegValid_ValorInss[0].UrlJsonContext));
 
         //* se ValorInss encontrado, segue
         if (getRegValid_ValorInss[0].UrlJsonContext.LVC_validacao === 'Valor INSS') {
@@ -183,9 +148,6 @@ async function init(json) {
             data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
             filtRegValid_ValorPisPasep
         );
-        // onergy.log(
-        //     'JFS: getOnergyItem: fdtConfSis_RegrasValidacoes: getRegValid_ValorPisPasep: ' + JSON.stringify(getRegValid_ValorPisPasep[0].UrlJsonContext)
-        // );
 
         //* se ValorPisPasep encontrado, segue
         if (getRegValid_ValorPisPasep[0].UrlJsonContext.LVC_validacao) {
@@ -211,7 +173,6 @@ async function init(json) {
             data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
             filtRegValid_ValorIrrf
         );
-        // onergy.log('JFS: getOnergyItem: fdtConfSis_RegrasValidacoes: getRegValid_ValorIrrf: ' + JSON.stringify(getRegValid_ValorIrrf[0].UrlJsonContext));
 
         //* se ValorIrrf encontrado, segue
         if (getRegValid_ValorIrrf[0].UrlJsonContext.LVC_validacao) {
@@ -237,7 +198,6 @@ async function init(json) {
             data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
             filtRegValid_ValorCsll
         );
-        // onergy.log('JFS: getOnergyItem: fdtConfSis_RegrasValidacoes: getRegValid_ValorCsll: ' + JSON.stringify(getRegValid_ValorCsll[0].UrlJsonContext));
 
         //* se ValorIrrf encontrado, segue
         if (getRegValid_ValorCsll[0].UrlJsonContext.LVC_validacao) {
@@ -263,7 +223,6 @@ async function init(json) {
             data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
             filtRegValid_ValorCofins
         );
-        // onergy.log('JFS: getOnergyItem: fdtConfSis_RegrasValidacoes: getRegValid_ValorCofins: ' + JSON.stringify(getRegValid_ValorCofins[0].UrlJsonContext));
 
         //* se ValorCofins encontrado, segue
         if (getRegValid_ValorCofins[0].UrlJsonContext.LVC_validacao) {
@@ -292,8 +251,7 @@ async function init(json) {
             //* fdtCompartliharDoctosParaValidacaoDeDuplicados
             //* isMultiUpdate: true - atualiza todos os registros
             //* contendo doc_original: MonitDoc + ConsDet
-            // onergy.log('JFS: onergy_updatemany: fdtCompartliharDoctosParaValidacaoDeDuplicados: postInfo: ' + JSON.stringify(postInfo[0].UrlJsonContext));
-            await onergy_updatemany({
+            let result = await onergy_updatemany({
                 fdtid: fdtCompartliharDoctosParaValidacaoDeDuplicados,
                 assid: data.onergy_js_ctx.assid ? data.onergy_js_ctx.assid : data.assid,
                 usrid: data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
@@ -304,21 +262,13 @@ async function init(json) {
         } else {
             //* se nao houver erros, move Nfse
             //* de MonitorDocumentos para MonitorAprovacao
-            await sendToOnergy(
-                fdtMonitDoc_Nfse,
-                fdtMonitAp_Nfse,
-                data.onergy_js_ctx.assid ? data.onergy_js_ctx.assid : data.assid,
-                data.onergy_js_ctx.usrid ? data.onergy_js_ctx.usrid : data.usrid,
-                data.onergy_js_ctx.fedid ? data.onergy_js_ctx.fedid : data.fedid
-            );
+            let result = await sendToOnergy(fdtMonitDoc_Nfse, fdtMonitAp_Nfse, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, data.onergy_js_ctx.fedid);
         }
     }
 
-    // onergy.log('JFS: endinitProcRetencao_ValidarRetencao');
     // return true;
     return SetObjectResponse(true, data, true);
 }
-
 function initBefore(json) {
     //return true;
 }
@@ -334,9 +284,46 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
     };
     return obj;
 }
-
-//!METODOS PADRAO ===
-const json = {
+async function getOnergyItem(fdtid, assid, usrid, filtro) {
+    let keepSearching = true;
+    let skip = 0;
+    let take = 500;
+    let result = [];
+    while (keepSearching) {
+        let strPageResp = await onergy_get({
+            fdtid: fdtid,
+            assid: assid,
+            usrid: usrid,
+            filter: filtro,
+            skip: skip,
+            take: take,
+        });
+        skip += take;
+        let pageResp = JSON.parse(strPageResp);
+        if (pageResp !== null && pageResp.length > 0) {
+            keepSearching = pageResp.length === take;
+            result = result.concat(pageResp);
+        } else {
+            keepSearching = false;
+        }
+    }
+    return result;
+}
+async function sendToOnergy(oldFdt, newFdt, assid, usrid, fedid) {
+    let param = {
+        assid: assid,
+        usrid: usrid,
+        fdtid: oldFdt,
+        newfdtid: newFdt,
+        resetFdtData: true,
+        fedid: fedid,
+        resetPrc: true,
+    };
+    await onergy_sendto(param);
+}
+/**MET_PADRAO =====================================================================================
+ */
+let json = {
     doc_original: '9b99963f-3e5f-4a20-86fc-67d4e43acb63',
     idfk: '09d6b71e-4755-4116-98d4-2d3f96d92158',
     cnpj: '06990590000123',
