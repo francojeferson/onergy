@@ -1,7 +1,4 @@
-/**ENV_NODE**
- * node:test (find and replace)
- * async /**
- * await /**
+/**ENV_NODE** =====================================================================================
  */
 const { date } = require('assert-plus');
 const { formatDate } = require('tough-cookie');
@@ -64,13 +61,81 @@ function replaceAll(content, needle, replacement) {
 function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
-/**CLI_SCRIPT**
+/**CLI_SCRIPT** ===================================================================================
  * Executar automático quando em processo: Não
  * Atividade de longa duração: Não
  * Esconder Menu: Sim
  * Condicional: nenhum
  * Aprovação: nenhum
  */
+async function init(json) {
+    let data = JSON.parse(json);
+    onergy.log(`JFS ~ asignar_actividad_por_lotes ~ init: ${JSON.stringify(data)}`);
+
+    let idAsignarActividadporLotes = '8a46f1a6-e2ae-48a2-9480-352493d9cb17';
+    let getAsignarActividadporLotes = await getOnergyItem(idAsignarActividadporLotes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+
+    let idSeleccionDeCarga = 'ec2d14aa-a0c9-4e33-8856-4e16d703f0b8';
+    let getSeleccionDeCarga = await getOnergyItem(
+        idSeleccionDeCarga,
+        data.onergy_js_ctx.assid,
+        data.onergy_js_ctx.usrid,
+        gerarFiltro('ID_ONE_REF', data.onergy_js_ctx.fedid)
+    );
+
+    for (let fatura of getSeleccionDeCarga) {
+        let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
+        let actualizarEstadoLegalizacionID = fatura.UrlJsonContext.ESTLlegalizacao_do_status_id;
+        let actualizarEstadoLegalizacion = fatura.UrlJsonContext.ESTLstatus__legalizacao_do_status;
+        let actualizarEstadoPago = fatura.UrlJsonContext.ESTPstatus__status_pagamento;
+        let actualizarEstadoPagoID = fatura.UrlJsonContext.ESTPstatus_pagamento_id;
+
+        if (data.CDE__atualizar_status_legalizacao == '1') {
+            actualizarEstadoLegalizacionID = '598756cb-de3a-fbdf-7e1d-4b84b4effff3';
+            actualizarEstadoLegalizacion = 'ENVIADO';
+        }
+
+        if (data.CDE__atualizar_status_pagamento == '1') {
+            actualizarEstadoPago = fatura.UrlJsonContext.CDE__valor_a_pagar_parcial ? 'ENVIADO PARCIAL' : 'ENVIADO TOTAL';
+            actualizarEstadoPagoID = fatura.UrlJsonContext.CDE__valor_a_pagar_parcial
+                ? 'a318f2ec-770f-aa2a-759b-f760850de465'
+                : '9a5e2aa8-27b4-93bc-5772-b456f1bbffa2';
+        }
+
+        let result = await onergy_updatemany({
+            fdtid: idFaturaHijaIndividual,
+            assid: data.onergy_js_ctx.assid,
+            usrid: data.onergy_js_ctx.usrid,
+            id: fatura.UrlJsonContext.one_copied_from,
+            data: JSON.stringify({
+                UrlJsonContext: {
+                    ESTLlegalizacao_do_status_id: actualizarEstadoLegalizacionID,
+                    ESTLstatus__legalizacao_do_status: actualizarEstadoLegalizacion,
+                    ESTPstatus__status_pagamento: actualizarEstadoPago,
+                    ESTPstatus_pagamento_id: actualizarEstadoPagoID,
+                },
+            }),
+        });
+    }
+
+    return false;
+}
+function initBefore(json) {
+    //return true;
+}
+function initDelete(json) {
+    //return true;
+}
+function SetObjectResponse(cond, json, WaitingWebHook) {
+    if (WaitingWebHook === undefined) WaitingWebHook = false;
+
+    let obj = {
+        cond: cond,
+        json: JSON.stringify(json),
+        WaitingWebHook: WaitingWebHook,
+    };
+    return obj;
+}
 async function getOnergyItem(fdtid, assid, usrid, filtro) {
     let keepSearching = true;
     let skip = 0;
@@ -96,6 +161,15 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
     }
     return result;
 }
+async function gerarNumeroLote(data) {
+    let key = await increment({
+        assid: data.assid,
+        key_name: 'OCE',
+    });
+    let keyNumber = key.toString().padStart(4, '0');
+    keyNumber = 'LOT' + keyNumber;
+    return keyNumber;
+}
 function gerarFiltro(fielNameP, valueP) {
     return JSON.stringify([
         {
@@ -106,82 +180,13 @@ function gerarFiltro(fielNameP, valueP) {
         },
     ]);
 }
-async function init(json) {
-    let data = JSON.parse(json);
-
-    let idSeleccionDeCarga = 'ec2d14aa-a0c9-4e33-8856-4e16d703f0b8';
-    let getSeleccionDeCarga = await getOnergyItem(idSeleccionDeCarga, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('ID_ONE_REF', data.onergy_js_ctx.fedid));
-
-    for (let fatura of getSeleccionDeCarga) {
-        //TODO: Verificar se a fatura precisa ser salva em Facturas Padre
-        let idFaturaPadre = '822245f3-b0de-4f74-830b-90c8c8efee15';
-        let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
-
-        if (data.CDE__atualizar_status_legalizacao == '1') {
-            await onergy_updatemany({
-                fdtid: idFaturaHijaIndividual,
-                assid: data.onergy_js_ctx.assid,
-                usrid: data.onergy_js_ctx.usrid,
-                id: fatura.UrlJsonContext.one_copied_from,
-                data: JSON.stringify({
-                    UrlJsonContext: {
-                        ESTLlegalizacao_do_status_id: '598756cb-de3a-fbdf-7e1d-4b84b4effff3',
-                        ESTLstatus__legalizacao_do_status: 'ENVIADO',
-                    },
-                }),
-            });
-        }
-        if (data.CDE__atualizar_status_pagamento == '1') {
-            await onergy_updatemany({
-                fdtid: idFaturaHijaIndividual,
-                assid: data.onergy_js_ctx.assid,
-                usrid: data.onergy_js_ctx.usrid,
-                id: fatura.UrlJsonContext.one_copied_from,
-                data: JSON.stringify({
-                    UrlJsonContext: {
-                        ESTPstatus__status_pagamento: fatura.UrlJsonContext.CDE__valor_a_pagar_parcial ? 'ENVIADO PARCIAL' : 'ENVIADO TOTAL',
-                        ESTPstatus_pagamento_id: fatura.UrlJsonContext.CDE__valor_a_pagar_parcial ? 'a318f2ec-770f-aa2a-759b-f760850de465' : '9a5e2aa8-27b4-93bc-5772-b456f1bbffa2',
-                    },
-                }),
-            });
-        }
-    }
-
-    return false;
-}
-function initBefore(json) {
-    //return true;
-}
-function initDelete(json) {
-    //return true;
-}
-function SetObjectResponse(cond, json, WaitingWebHook) {
-    if (WaitingWebHook === undefined) WaitingWebHook = false;
-
-    let obj = {
-        cond: cond,
-        json: JSON.stringify(json),
-        WaitingWebHook: WaitingWebHook,
-    };
-    return obj;
-}
-/**STD_METHODS**
+/**MET_PADRAO =====================================================================================
  */
 let json = {
     planilla_legalizacion_y_pago: null,
     seleccion_de_carga: null,
     CDE__atualizar_status_legalizacao: '0',
     CDE__atualizar_status_pagamento: '0',
-    CDE__mes_processo: 'nov',
-    forma_de_pagamento: null,
-    ESTLlegalizacao_do_status_id: ['2fca9ef9-6b49-6f7a-ce52-3ad1a426244a'],
-    ESTLstatus__legalizacao_do_status: ['PARA ANALISIS'],
-    ESTPstatus_pagamento_id: ['70aa7e30-a2b8-90ef-ae4f-0b5ab5148cb1'],
-    ESTPstatus__status_pagamento: ['PENDIENTE'],
-    data_inicio_pagamento: null,
-    data_fim_pagamento: null,
-    CDE__ultima_captura: null,
-    tipo_de_conta: null,
     cargar_excel: ' ',
     registro_salvo: 'sim',
     CDE__atualizar_status_legalizacao_desc: 'Não',
@@ -189,7 +194,7 @@ let json = {
     oneTemplateTitle: '',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: '7780abfc-3e0f-4183-5cfe-fdc71da022d9',
+    fedid: 'dcc3884c-4d50-e0d7-fae7-bf940393d159',
     fdtid: '8a46f1a6-e2ae-48a2-9480-352493d9cb17',
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
     email: 'admin-colombia@atc.com.co',
@@ -197,17 +202,17 @@ let json = {
     timezone: null,
     onergy_js_ctx: {
         assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: '7780abfc-3e0f-4183-5cfe-fdc71da022d9',
+        fedid: 'dcc3884c-4d50-e0d7-fae7-bf940393d159',
         fdtid: '8a46f1a6-e2ae-48a2-9480-352493d9cb17',
         usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-11-02T16:42:26.506Z',
-        updateDt: '2022-11-02T16:42:26.506Z',
+        insertDt: '2022-11-22T16:57:33.735Z',
+        updateDt: '2022-11-22T16:57:33.735Z',
         cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
         email: 'admin-colombia@atc.com.co',
         user_name: 'Administrador Colômbia',
         onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: 'd8e84497-2700-441f-9994-264368e48893',
-        pcvid: '544541f8-0c5f-45e2-8cd4-e950bb8b490c',
+        praid: '59910694-7660-4d0e-82d4-a554f3e46625',
+        pcvid: '9d68648b-b3e7-4e88-a185-24f33a61ca86',
         prcid: '2c136341-fc64-c751-5cf4-0b92500c7a1e',
         timezone: null,
         timezone_value: '-03:00',
