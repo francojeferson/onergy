@@ -285,7 +285,9 @@ async function init(json) {
                         //*aba:tablero_independiente
                         if (tabExcel == 'tablero_independiente') {
                             //*item:tablero_independiente
-                            let isTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente);
+                            let isTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                            );
                             if (isTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.dir_diretoria_independente = objPost.tablero_independiente;
                                 delete objPost.tablero_independiente;
@@ -783,9 +785,11 @@ async function init(json) {
                             //*item:tipo_cuenta
                             let isIdlcTipoCuenta = getTabExcel.filter((j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == objPost.tipo_cuenta);
                             if (isIdlcTipoCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.TCprcs__tipo_de_conta_id = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
-                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.prcs__tipo_de_conta_cache = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
                                 delete objPost.tipo_cuenta;
                             }
@@ -809,7 +813,8 @@ async function init(json) {
                             //*item:suscriptor
                             let isIdlcSuscriptor = getTabExcel.filter((j) => j.UrlJsonContext.sus_sus__suscriptor__prcs__assinante_atc == objPost.suscriptor);
                             if (isIdlcSuscriptor.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.sus_sus__suscriptor__prcs__assinante_atc = isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.sus__suscriptor : '';
+                                objPost.sus_sus__suscriptor__prcs__assinante_atc =
+                                    isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.sus__suscriptor : '';
                                 objPost.sus_prcs__assinante_atc_id = isSuscriptor.length > 0 ? isSuscriptor[0].ID : '';
                                 delete objPost.suscriptor;
                             }
@@ -901,14 +906,19 @@ async function init(json) {
                                 return false;
                             }
                             //*item:sujeto_pasivo
-                            let isIdlcSujetoPasivo = getTabExcel.filter((j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo);
+                            let isIdlcSujetoPasivo = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo
+                            );
                             if (isIdlcSujetoPasivo.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
+                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico =
+                                    isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
                                 objPost.suj_pa_prcs__sujeito_passivo_alumbrado_publico_id = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].ID : '';
                                 delete objPost.sujeto_pasivo;
                             }
                             //*item:acuerdo_resolucion
-                            let isAcuerdoResolucion = getTabExcel.filter((j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion);
+                            let isAcuerdoResolucion = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion
+                            );
                             if (isAcuerdoResolucion.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.prcs__acuerdo_resolucion_alumbrado_publico = objPost.acuerdo_resolucion;
                                 delete objPost.acuerdo_resolucion;
@@ -927,7 +937,8 @@ async function init(json) {
                             //*item:tipo_cobro
                             let isIdlcTipoCobro = getTabExcel.filter((j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca == objPost.tipo_cobro);
                             if (isIdlcTipoCobro.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca = isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
+                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca =
+                                    isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
                                 objPost.tipo_cobr_tipo_de_cobranca_id = isTipoCobro.length > 0 ? isTipoCobro[0].ID : '';
                                 delete objPost.tipo_cobro;
                             }
@@ -955,9 +966,12 @@ async function init(json) {
                                 return false;
                             }
                             //*item:frecuencia_pago
-                            let isIdlcFrecuenciaPago = getTabExcel.filter((j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago);
+                            let isIdlcFrecuenciaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago
+                            );
                             if (isIdlcFrecuenciaPago.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.fre_pag_frequencia__frequencia_de_pagamento = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
+                                objPost.fre_pag_frequencia__frequencia_de_pagamento =
+                                    isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
                                 objPost.fre_pag_frequencia_de_pagamento_id = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].ID : '';
                                 delete objPost.frecuencia_pago;
                             }
@@ -973,16 +987,26 @@ async function init(json) {
                                 return false;
                             }
                             //*item:forma_pago
-                            let isIdlcFormaPago = getTabExcel.filter((j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago);
+                            let isIdlcFormaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago
+                            );
                             if (isIdlcFormaPago.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento = isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
+                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento =
+                                    isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
                                 objPost.for_pag_forma_de_pagamento_id = isFormaPago.length > 0 ? isFormaPago[0].ID : '';
                                 delete objPost.forma_pago;
                             }
                             //*pesq.ref:clasificacion_passthru
                             let idClasificacionPassthru = 'ad62c737-2abc-4c71-a572-e11933114ed8';
-                            let getClasificacionPassthru = await getOnergyItem(idClasificacionPassthru, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                            let isClasificacionPassthru = getClasificacionPassthru.filter((j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru);
+                            let getClasificacionPassthru = await getOnergyItem(
+                                idClasificacionPassthru,
+                                data.onergy_js_ctx.assid,
+                                data.onergy_js_ctx.usrid,
+                                null
+                            );
+                            let isClasificacionPassthru = getClasificacionPassthru.filter(
+                                (j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru
+                            );
                             if (isClasificacionPassthru.length == 0) {
                                 status_desc = `ERROR: no hay "${objPost.clasificacion_passthru}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
@@ -991,7 +1015,9 @@ async function init(json) {
                                 return false;
                             }
                             //*item:clasificacion_passthru
-                            let isIdlcClasificacionPassthru = getTabExcel.filter((j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru);
+                            let isIdlcClasificacionPassthru = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru
+                            );
                             if (isIdlcClasificacionPassthru.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.CPTclassificacao_passthru__prcs__clasificacion_passthru =
                                     isClasificacionPassthru.length > 0 ? isClasificacionPassthru[0].UrlJsonContext.classificacao_passthru : '';
@@ -1001,7 +1027,9 @@ async function init(json) {
                             //*pesq.ref:estado_captura_cuenta
                             let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
                             let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                            let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter((j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta);
+                            let isEstadoCapturaCuenta = getEstadoCapturaCuenta.filter(
+                                (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta
+                            );
                             if (isEstadoCapturaCuenta.length == 0) {
                                 status_desc = `ERROR: no hay "${objPost.estado_captura_cuenta}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
@@ -1010,7 +1038,9 @@ async function init(json) {
                                 return false;
                             }
                             //*item:estado_captura_cuenta
-                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter((j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta);
+                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta
+                            );
                             if (isIdlcEstadoCapturaCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
                                     isEstadoCapturaCuenta.length > 0 ? isEstadoCapturaCuenta[0].UrlJsonContext.ECCU_estado_da_captura_da_conta : '';
@@ -1018,15 +1048,17 @@ async function init(json) {
                                 delete objPost.estado_captura_cuenta;
                             }
                             //*item:proxima_captura
-                            let isProximaCaptura = getTabExcel.filter((j) => j.UrlJsonContext.prcs__proxima_captura == objPost.proxima_captura);
+                            let dataProximaCaptura = objPost.proxima_captura.split('T')[0];
+                            let isProximaCaptura = getTabExcel.filter((j) => j.UrlJsonContext.prcs__proxima_captura == dataProximaCaptura);
                             if (isProximaCaptura.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.prcs__proxima_captura = objPost.proxima_captura;
+                                objPost.prcs__proxima_captura = dataProximaCaptura;
                                 delete objPost.proxima_captura;
                             }
                             //*item:proximo_pago_oportuno
-                            let isProximoPagoOportuno = getTabExcel.filter((j) => j.UrlJsonContext.prcs__proximo_pagamento == objPost.proximo_pago_oportuno);
+                            let dataProximoPagoOportuno = objPost.proximo_pago_oportuno.split('T')[0];
+                            let isProximoPagoOportuno = getTabExcel.filter((j) => j.UrlJsonContext.prcs__proximo_pagamento == dataProximoPagoOportuno);
                             if (isProximoPagoOportuno.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.prcs__proximo_pagamento = objPost.proximo_pago_oportuno;
+                                objPost.prcs__proximo_pagamento = dataProximoPagoOportuno;
                                 delete objPost.proximo_pago_oportuno;
                             }
 
@@ -1170,7 +1202,9 @@ async function init(json) {
                             //*pesq.ref:tablero_independiente
                             let idTableroIndependiente = 'dbaf278d-8fed-4611-be82-ecd9b69806c0';
                             let getTableroIndependiente = await getOnergyItem(idTableroIndependiente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                            let isTableroIndependiente = getTableroIndependiente.filter((j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente);
+                            let isTableroIndependiente = getTableroIndependiente.filter(
+                                (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                            );
                             if (isTableroIndependiente.length == 0) {
                                 status_desc = `ERROR: no hay "${objPost.tablero_independiente}" registrado para ${tabExcel} de "${objPost.asset_number}"`;
                                 statusPost.push(`${time}, ${status_desc}`);
@@ -1179,7 +1213,9 @@ async function init(json) {
                                 return false;
                             }
                             //*item:tablero_independiente
-                            let isItdsTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.dirdir_diretoria_independente__diretoria_independente == objPost.tablero_independiente);
+                            let isItdsTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dirdir_diretoria_independente__diretoria_independente == objPost.tablero_independiente
+                            );
                             if (isItdsTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.dirdir_diretoria_independente__diretoria_independente =
                                     isTableroIndependiente.length > 0 ? isTableroIndependiente[0].UrlJsonContext.dir_diretoria_independente : '';
@@ -1260,7 +1296,9 @@ async function init(json) {
                                 delete objPost.nit_cliente;
                             }
                             //*item:codigo_sitio_cliente
-                            let isCodigoSitioCliente = getTabExcel.filter((j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente);
+                            let isCodigoSitioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente
+                            );
                             if (isCodigoSitioCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.clsit__codigo_do_sitio_do_cliente = objPost.codigo_sitio_cliente;
                                 delete objPost.codigo_sitio_cliente;
@@ -1277,9 +1315,12 @@ async function init(json) {
                                 return false;
                             }
                             //*item:nombre_regional
-                            let isNombreRegional = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional);
+                            let isNombreRegional = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional
+                            );
                             if (isNombreRegional.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                                 objPost.RCSclsit__regional_do_cliente_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
                                 delete objPost.nombre_regional;
                             }
@@ -1295,9 +1336,12 @@ async function init(json) {
                                 return false;
                             }
                             //*item:portafolio_cliente
-                            let isPcsPortafolioCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente);
+                            let isPcsPortafolioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente
+                            );
                             if (isPcsPortafolioCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
+                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente =
+                                    isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
                                 objPost.PCSclsit__portifolio_cliente_id = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].ID : '';
                                 delete objPost.portafolio_cliente;
                             }
@@ -1449,9 +1493,12 @@ async function init(json) {
                                 return false;
                             }
                             //*item:nombre_regional
-                            let isRcsRegionalClientes = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional);
+                            let isRcsRegionalClientes = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional
+                            );
                             if (isRcsRegionalClientes.length == 0 || data.em_caso_de_duplicidade == '1') {
-                                objPost.RCSRCS_nome_regional__CCS_nombre_regional = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSRCS_nome_regional__CCS_nombre_regional =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                                 objPost.RCSCCS_nombre_regional_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
                                 delete objPost.nombre_regional;
                             }
@@ -1480,7 +1527,13 @@ async function init(json) {
                                 delete objPost.correo_electronico;
                             }
 
-                            let result = await gravarRegistro('RCSRCS_nome_regional__CCS_nombre_regional', objPost.RCSRCS_nome_regional__CCS_nombre_regional, idTabExcel, objPost, data);
+                            let result = await gravarRegistro(
+                                'RCSRCS_nome_regional__CCS_nombre_regional',
+                                objPost.RCSRCS_nome_regional__CCS_nombre_regional,
+                                idTabExcel,
+                                objPost,
+                                data
+                            );
                         }
 
                         //*aba:portafolio_clientes
@@ -1639,7 +1692,17 @@ async function postStatus(status_desc, statusPost, data) {
     let idCargaGeral = '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f';
     let getCargaGeral = await getOnergyItem(idCargaGeral, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, '', data.id_upload_planilha);
     //*envia update para registro de carga
-    let result = await sendItemToOnergy(idCargaGeral, data.onergy_js_ctx.usrid, data.onergy_js_ctx.assid, postInfo, data.id_upload_planilha, '', true, false, false);
+    let result = await sendItemToOnergy(
+        idCargaGeral,
+        data.onergy_js_ctx.usrid,
+        data.onergy_js_ctx.assid,
+        postInfo,
+        data.id_upload_planilha,
+        '',
+        true,
+        false,
+        false
+    );
     return result;
 }
 async function gravarRegistro(fielNameQ, valueQ, idTabExcel, objPost, data) {
@@ -1697,28 +1760,29 @@ function gerarDataHora(dataHoje, utc) {
 let json = {
     processo: '',
     horas: '',
-    dataDate: '2022-11-10T10:34:57Z',
-    data: '2022-11-10 07:34:57',
+    dataDate: '2022-11-28T11:29:33Z',
+    data: '2022-11-28 08:29:33',
     load_index_equipe: 'COL',
-    load_index_id_do_card: '30da777d-952c-4a5a-9c18-128b69e55893',
+    load_index_id_equipe: '',
+    load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v6.xlsx92f6d855-afd0-4dbc-9413-9c1cfda8c5ff.xlsx?sv=2018-03-28&sr=b&sig=9%2B6eOCeyNBw88MwWetZRcGzEf9xs1ZCATtVKuMw3a%2BM%3D&se=2023-05-29T10%3A34%3A37Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v8.xlsxb90eb061-f39f-4b49-aec5-2f7031af69ac.xlsx?sv=2018-03-28&sr=b&sig=x%2BMt94PW1FG%2BEB1ugsrACkZ2mLvMxW7IUPQjlbNH3lI%3D&se=2023-06-16T11%3A29%3A23Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v6.xlsx92f6d855-afd0-4dbc-9413-9c1cfda8c5ff.xlsx?sv=2018-03-28&sr=b&sig=9%2B6eOCeyNBw88MwWetZRcGzEf9xs1ZCATtVKuMw3a%2BM%3D&se=2023-05-29T10%3A34%3A37Z&sp=r',
-            Name: 'tablas_maestras_v6.xlsx',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v8.xlsxb90eb061-f39f-4b49-aec5-2f7031af69ac.xlsx?sv=2018-03-28&sr=b&sig=x%2BMt94PW1FG%2BEB1ugsrACkZ2mLvMxW7IUPQjlbNH3lI%3D&se=2023-06-16T11%3A29%3A23Z&sp=r',
+            Name: 'tablas_maestras_v8.xlsx',
         },
     ],
-    load_index_tab_excel: 'clientes_sitio',
-    load_index_id: '123c4ee9-0863-1048-279e-88cb72b1ef89',
+    load_index_tab_excel: 'informacion_cuenta',
+    load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de clientes_sitio iniciada',
-    time: '7:34',
+    processamento: 'Carga de informacion_cuenta iniciada',
+    time: '8:29',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: '',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: '623fb1e6-56bd-46ca-ae58-e9006f1f8421',
+    fedid: 'cf7b8be0-4128-4a43-9ea5-d09e48fe6592',
     fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
     email: 'admin-colombia@atc.com.co',
@@ -1726,23 +1790,23 @@ let json = {
     timezone: null,
     onergy_js_ctx: {
         assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: '623fb1e6-56bd-46ca-ae58-e9006f1f8421',
+        fedid: 'cf7b8be0-4128-4a43-9ea5-d09e48fe6592',
         fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
         usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-11-10T10:34:53.104Z',
-        updateDt: '2022-11-10T10:34:53.104Z',
+        insertDt: '2022-11-28T11:43:20.661Z',
+        updateDt: '2022-11-28T11:43:20.661Z',
         cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
         email: 'admin-colombia@atc.com.co',
         user_name: 'Administrador Colômbia',
         onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: '0b62573d-25d6-4f83-94fb-ab0a55d47275',
-        pcvid: '5d786371-cf5c-4ac4-85b9-d0294d5c1d64',
+        praid: '589447f1-ab72-450e-99d4-5ac93c118c4d',
+        pcvid: '3400a3ac-ad55-4444-ba17-515a80aae369',
         prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
         timezone: null,
         timezone_value: '-03:00',
         pubNubHook: null,
     },
-    id_upload_planilha: '303e6e0e-73f4-058f-0555-5ca106170e3e',
+    id_upload_planilha: '0ee74b19-302a-df25-71bd-18d7c4145a65',
 };
 
 init(JSON.stringify(json));
