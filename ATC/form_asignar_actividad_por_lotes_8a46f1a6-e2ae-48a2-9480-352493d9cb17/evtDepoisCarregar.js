@@ -6,6 +6,11 @@ let mainMethod = async () => {
 
 let aplicarNumeroLote = async () => {
     await mtdOnergy.JsEvtGetParentRefID();
+    mtdOnergy.JsEvtSetItemValue('CDE__status_lote', 'Procesado');
+    // let hoje = new Date();
+    // let hojeFormat = hoje.getFullYear() + '-' + (hoje.getMonth() + 1) + '-' + hoje.getDate();
+    // mtdOnergy.JsEvtSetItemValue('CDE__data_lote', hojeFormat);
+
     let idAsignarActividadporLotes = '8a46f1a6-e2ae-48a2-9480-352493d9cb17';
     let getNumeroLote = await mtdOnergy.JsEvtGetFeedData({
         fdtID: idAsignarActividadporLotes,
@@ -29,17 +34,6 @@ let aplicarNumeroLote = async () => {
             }
         }
     }
-};
-
-const gerarFiltro = (fielNameP, valueP) => {
-    return JSON.stringify([
-        {
-            FielName: fielNameP,
-            Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`,
-            Value1: valueP,
-        },
-    ]);
 };
 
 mainMethod();
