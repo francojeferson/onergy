@@ -1,15 +1,27 @@
 let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 
 let mainMethod = async () => {
+    await aplicarDataLote();
     await aplicarNumeroLote();
+};
+
+let aplicarDataLote = async () => {
+    await mtdOnergy.JsEvtGetParentRefID();
+    let dataLote = mtdOnergy.JsEvtGetItemValue('data_lote');
+    if (dataLote == undefined || dataLote == '') {
+        let date = new Date();
+        let dt_obj = {
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            day: date.getDate(),
+        };
+        mtdOnergy.JsEvtSetItemValue('data_lote', dt_obj);
+    }
 };
 
 let aplicarNumeroLote = async () => {
     await mtdOnergy.JsEvtGetParentRefID();
     mtdOnergy.JsEvtSetItemValue('CDE__status_lote', 'Procesado');
-    // let hoje = new Date();
-    // let hojeFormat = hoje.getFullYear() + '-' + (hoje.getMonth() + 1) + '-' + hoje.getDate();
-    // mtdOnergy.JsEvtSetItemValue('CDE__data_lote', hojeFormat);
 
     let idAsignarActividadporLotes = '8a46f1a6-e2ae-48a2-9480-352493d9cb17';
     let getNumeroLote = await mtdOnergy.JsEvtGetFeedData({
