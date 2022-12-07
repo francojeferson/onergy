@@ -91,14 +91,24 @@ async function init(json) {
         (j) => j.UrlJsonContext.sta_cont_status_conta == isEstadoCuenta[(0, 1, 2)].UrlJsonContext.status_conta
     );
 
+    let cache = [];
     if (isInformacionCuenta.length > 0) {
         for (let i in isInformacionCuenta) {
             let objPost = isInformacionCuenta[i].UrlJsonContext;
 
             //*pesq.ref:tipo_cuenta
-            let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
-            let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-            let isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta);
+            let isTipoCuenta = '';
+            if (cache.length > 0) {
+                let isCache = cache.filter((j) => j.asset_number == objPost.asset_number);
+                if (isCache.length > 0) {
+                    isTipoCuenta = isCache[0].isTipoCuenta;
+                }
+            } else {
+                let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
+                let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                isTipoCuenta = getTipoCuenta.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta);
+                cache.push({ asset_number: objPost.asset_number, tipo_cuenta: objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta, isTipoCuenta: isTipoCuenta });
+            }
 
             //*tipo_cuenta == P || PH || I, calcula ProximoPago e ProximaCaptura
             //*else, copia ProximoPago e ProximaCaptura de P para H || HH
@@ -134,7 +144,7 @@ async function init(json) {
                         let setDiaDePago = new Date(newDiaDePago + ' 00:00:00');
 
                         //*ProximoPago
-                        let isProximoPago = objPost.prcs__proximo_pagamento;
+                        let isProximoPago = objPost.data_proximo_pagamento;
                         let defProximoPago = isProximoPago == null ? hoje : isProximoPago;
                         let strProximoPago = JSON.stringify(defProximoPago);
                         strProximoPago.includes(' 00:00:00') == true ? strProximoPago : strProximoPago + ' 00:00:00';
@@ -162,7 +172,7 @@ async function init(json) {
                             newEstadoCapturaCuenta = 'EN ESPERA';
 
                             //*envia resultado
-                            objPost.prcs__proximo_pagamento = gerarData(ajustProximoPago);
+                            objPost.data_proximo_pagamento = gerarData(ajustProximoPago);
                             objPost.prcs__proxima_captura = gerarData(newProximaCaptura);
                             objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
 
@@ -247,7 +257,7 @@ async function init(json) {
 
                 if (strInformacionCuenta.length > 0) {
                     //*envia resultado
-                    objPost.prcs__proximo_pagamento = strInformacionCuenta[0].UrlJsonContext.prcs__proximo_pagamento;
+                    objPost.data_proximo_pagamento = strInformacionCuenta[0].UrlJsonContext.data_proximo_pagamento;
                     objPost.prcs__proxima_captura = strInformacionCuenta[0].UrlJsonContext.prcs__proxima_captura;
                     objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
                         strInformacionCuenta[0].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
@@ -391,10 +401,11 @@ function gerarData(dataHoje) {
 /**MET_PADRAO =====================================================================================
  */
 let json = {
+    a: 1,
     oneTemplateTitle: '',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: 'c5f08095-3196-4eda-a10b-14cda1178d5a',
+    fedid: '62e956e5-f2eb-4643-bcfb-f73dd7eb955c',
     fdtid: '51f0ba7e-35cc-4167-8e4e-da9f52972822',
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
     email: 'admin-colombia@atc.com.co',
@@ -402,17 +413,17 @@ let json = {
     timezone: null,
     onergy_js_ctx: {
         assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: 'c5f08095-3196-4eda-a10b-14cda1178d5a',
+        fedid: '62e956e5-f2eb-4643-bcfb-f73dd7eb955c',
         fdtid: '51f0ba7e-35cc-4167-8e4e-da9f52972822',
         usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-11-11T13:26:49.193Z',
-        updateDt: '2022-11-11T13:26:49.193Z',
+        insertDt: '2022-12-06T12:54:27.035Z',
+        updateDt: '2022-12-06T12:54:27.035Z',
         cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
         email: 'admin-colombia@atc.com.co',
         user_name: 'Administrador Colômbia',
         onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: 'e44dd44d-9d1f-4a56-9f67-c62f5e0da3ee',
-        pcvid: '7d352fcf-dc37-43f2-8164-b4fb8afd6ce5',
+        praid: '25dd5bdb-2c5c-4df0-9810-f8eb8d244b87',
+        pcvid: '388b1790-14b8-4312-a249-ec36040e298b',
         prcid: '0a17be9c-1247-2f1e-b91c-15740976f2c5',
         timezone: null,
         timezone_value: '-03:00',
