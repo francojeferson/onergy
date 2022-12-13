@@ -75,9 +75,9 @@ async function init(json) {
     //*pesq.ref:constantes
     let idConstantes = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
     let getConstantes = await getOnergyItem(idConstantes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-    let isConstAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura');
-    let isConstBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura');
-    let isConstDiaCorte = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dia_corte');
+    let isConstAlertaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_alerta_captura'); // 5
+    let isConstBuscaCaptura = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dias_antes_captura'); // 15
+    let isConstDiaCorte = getConstantes.filter((j) => j.UrlJsonContext.nome_interno == 'dia_corte'); // 25
 
     //*pesq.ref:estado_cuenta
     let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
@@ -176,17 +176,7 @@ async function init(json) {
                             objPost.prcs__proxima_captura = gerarData(newProximaCaptura);
                             objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
 
-                            let resultPost = await sendItemToOnergy(
-                                idInformacionCuenta,
-                                data.onergy_js_ctx.usrid,
-                                data.onergy_js_ctx.assid,
-                                objPost,
-                                '',
-                                'asset_number',
-                                true,
-                                false,
-                                false
-                            );
+                            let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
                         } else if (objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == 'CAPTURADA') {
                             //*else if, estado_captura_cuenta == CAPTURADA
                             continue;
@@ -205,17 +195,7 @@ async function init(json) {
                                 //*envia resultado
                                 objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
 
-                                let resultPost = await sendItemToOnergy(
-                                    idInformacionCuenta,
-                                    data.onergy_js_ctx.usrid,
-                                    data.onergy_js_ctx.assid,
-                                    objPost,
-                                    '',
-                                    'asset_number',
-                                    true,
-                                    false,
-                                    false
-                                );
+                                let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
 
                                 //*check hoje >= (ProximoPago - constAlerta)
                                 let valConstAlerta = JSON.parse(isConstAlertaCaptura[0].UrlJsonContext.valor);
@@ -231,17 +211,7 @@ async function init(json) {
                                     //*envia resultado
                                     objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
 
-                                    let resultPost = await sendItemToOnergy(
-                                        idInformacionCuenta,
-                                        data.onergy_js_ctx.usrid,
-                                        data.onergy_js_ctx.assid,
-                                        objPost,
-                                        '',
-                                        'asset_number',
-                                        true,
-                                        false,
-                                        false
-                                    );
+                                    let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
                                 }
                             }
                         }
@@ -262,17 +232,7 @@ async function init(json) {
                     objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
                         strInformacionCuenta[0].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
 
-                    let resultPost = await sendItemToOnergy(
-                        idInformacionCuenta,
-                        data.onergy_js_ctx.usrid,
-                        data.onergy_js_ctx.assid,
-                        objPost,
-                        '',
-                        'asset_number',
-                        true,
-                        false,
-                        false
-                    );
+                    let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
                 } else {
                     onergy.log(`JFS ~ verifica_captura ~ Cuenta Padre no encontrada para Asset Number ${objPost.asset_number}`);
                 }
@@ -327,32 +287,6 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
         }
     }
     return result;
-}
-async function sendItemToOnergy(templateid, usrid, assid, data, fedid, ukField, checkTemplateDuplicate, addCfgViewGroup, execAction) {
-    let onergySaveData = {
-        fdtid: templateid,
-        assid: assid,
-        usrid: usrid,
-        data: JSON.stringify(data),
-        //executeAction: false
-    };
-    if (!execAction) {
-        onergySaveData.executeAction = false;
-    }
-    if (fedid != undefined && fedid != '') {
-        onergySaveData.id = fedid;
-    }
-    if (ukField != undefined && ukField != '') {
-        onergySaveData.ukField = ukField;
-        onergySaveData.blockDuplicate = true;
-    }
-    if (checkTemplateDuplicate != undefined && checkTemplateDuplicate != '') {
-        onergySaveData.checkTemplateDuplicate = true;
-    }
-    if (addCfgViewGroup != undefined && addCfgViewGroup.length > 0) {
-        onergySaveData.addCfgViewGroup = addCfgViewGroup;
-    }
-    return await onergy_save(onergySaveData);
 }
 async function gravarRegistro(fielNameQ, valueQ, idTabExcel, objPost, data) {
     //*consulta registro
