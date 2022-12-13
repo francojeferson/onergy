@@ -154,7 +154,7 @@ async function init(json) {
                 data_programadaDate: LINHA['Due Date'] ? LINHA['Due Date'] : '',
             };
 
-            if (LINHA['Check Status'] == 'ANULADO') {
+            if (LINHA['Check Status'] == 'AVOIDED') {
                 faturaPostInfo.ESTPstatus__status_pagamento = 'ERROR PAGO';
                 faturaPostInfo.ESTPstatus_pagamento_id = '5ba8e811-9e5b-b6fe-725d-d17b1e43275d';
                 await atualizaRegistros(data, [`${FATURA.templateid}/${FATURA.ID}`], faturaPostInfo);
@@ -294,7 +294,7 @@ const validarValores = (index, linha) => {
     }
 
     let estadoPago = linha['Check Status'];
-    if (!estadoPago || (estadoPago != 'NEGOTIABLE' && estadoPago != 'ANULADO')) {
+    if (!estadoPago || (estadoPago != 'NEGOTIABLE' && estadoPago != 'AVOIDED')) {
         result.push('    Estado Pago inválido.');
     }
 
