@@ -87,11 +87,10 @@ async function init(json) {
     //*aba:informacion_cuenta(pai:sitios)
     let idInformacionCuenta = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
     let getInformacionCuenta = await getOnergyItem(idInformacionCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-    let isInformacionCuenta = getInformacionCuenta.filter(
-        (j) => j.UrlJsonContext.sta_cont_status_conta == isEstadoCuenta[(0, 1, 2)].UrlJsonContext.status_conta
-    );
+    let isInformacionCuenta = getInformacionCuenta.filter((j) => j.UrlJsonContext.sta_cont_status_conta == isEstadoCuenta[(0, 1, 2)].UrlJsonContext.status_conta);
 
     let cache = [];
+    let logStatus = [];
     if (isInformacionCuenta.length > 0) {
         for (let i in isInformacionCuenta) {
             let objPost = isInformacionCuenta[i].UrlJsonContext;
@@ -114,9 +113,7 @@ async function init(json) {
             //*else, copia ProximoPago e ProximaCaptura de P para H || HH
             if (
                 isTipoCuenta.length > 0 &&
-                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' ||
-                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' ||
-                    objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
+                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'P' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'PH' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'I')
             ) {
                 //*pesq.ref:frecuencia_pago
                 let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
@@ -217,10 +214,7 @@ async function init(json) {
                         }
                     }
                 }
-            } else if (
-                isTipoCuenta.length > 0 &&
-                (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'H' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'HH')
-            ) {
+            } else if (isTipoCuenta.length > 0 && (objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'H' || objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta == 'HH')) {
                 //*else, copia ProximoPago e ProximaCaptura de P para H || HH
                 let isCuentaPadre = objPost.prcs__conta_pai;
                 let strInformacionCuenta = isInformacionCuenta.filter((j) => j.UrlJsonContext.conta_interna_nic == isCuentaPadre);
@@ -229,21 +223,21 @@ async function init(json) {
                     //*envia resultado
                     objPost.data_proximo_pagamento = strInformacionCuenta[0].UrlJsonContext.data_proximo_pagamento;
                     objPost.prcs__proxima_captura = strInformacionCuenta[0].UrlJsonContext.prcs__proxima_captura;
-                    objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
-                        strInformacionCuenta[0].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+                    objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = strInformacionCuenta[0].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
 
                     let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
                 } else {
-                    onergy.log(`JFS ~ verifica_captura ~ Cuenta Padre no encontrada para Asset Number ${objPost.asset_number}`);
+                    logStatus.push(`JFS ~ verifica_captura ~ Cuenta Padre no encontrada para Asset Number ${objPost.asset_number}\n`);
                 }
             } else {
-                onergy.log(`JFS ~ verifica_captura ~ Tipo de Cuenta no encontrada para Asset Number ${objPost.asset_number}`);
+                logStatus.push(`JFS ~ verifica_captura ~ Tipo de Cuenta no encontrada para Asset Number ${objPost.asset_number}\n`);
             }
         }
     } else {
-        onergy.log(`JFS ~ verifica_captura ~ Estado de Cuenta ${strEstadoCuenta} no encontrado para Información de la Cuenta ${data.asset_number}`);
+        logStatus.push(`JFS ~ verifica_captura ~ Estado de Cuenta ${strEstadoCuenta} no encontrado para Información de la Cuenta ${data.asset_number}\n`);
     }
 
+    onergy.log(logStatus.join(''));
     //return true;
     return SetObjectResponse(true, data, true);
 }
