@@ -1,4 +1,6 @@
 let mainMethod = async () => {
+    await limparDocsiaStatus();
+
     let resultFrequenciaPagto = await validarFrequenciaPagto();
     let resultDiaPagto = await validarDiaPagto();
 
@@ -7,6 +9,13 @@ let mainMethod = async () => {
     } else {
         mtdOnergy.JsEvtSetItemValue('prcs__ocultar_campo', 'sim');
     }
+};
+
+// Limpa campos Docsia Status
+let limparDocsiaStatus = async () => {
+    mtdOnergy.JsEvtSetItemValue('status_docsia', '');
+    mtdOnergy.JsEvtSetItemValue('status_docsia_Desc', '');
+    mtdOnergy.JsEvtSetItemValue('status_docsia_msg', '');
 };
 
 let validarFrequenciaPagto = async () => {
