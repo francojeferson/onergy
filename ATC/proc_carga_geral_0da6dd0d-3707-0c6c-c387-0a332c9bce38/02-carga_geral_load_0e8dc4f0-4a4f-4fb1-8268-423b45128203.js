@@ -311,7 +311,9 @@ async function init(json) {
                         //*aba:tablero_independiente
                         if (tabExcel == 'tablero_independiente') {
                             //*item:tablero_independiente
-                            let isTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente);
+                            let isTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                            );
                             if (isTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*obj:tablero_independiente
                                 objPost.dir_diretoria_independente = objPost.tablero_independiente;
@@ -943,9 +945,11 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:tipo_cuenta
-                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.TCprcs__tipo_de_conta_id = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
-                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.prcs__tipo_de_conta_cache = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
                                 delete objPost.tipo_cuenta;
                             }
@@ -978,7 +982,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:suscriptor
-                                objPost.sus_sus__suscriptor__prcs__assinante_atc = isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.sus__suscriptor : '';
+                                objPost.sus_sus__suscriptor__prcs__assinante_atc =
+                                    isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.sus__suscriptor : '';
                                 objPost.sus_prcs__assinante_atc_id = isSuscriptor.length > 0 ? isSuscriptor[0].ID : '';
                                 delete objPost.suscriptor;
                             }
@@ -1037,6 +1042,9 @@ async function init(json) {
                                 objPost.prvd_beneficiario = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.beneficiario : '';
                                 objPost.prvd_apelido_provedor = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.apelido_provedor : '';
                                 objPost.prvd_link_web = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.link_web : '';
+                                objPost.tp_acces_tipo_de_acesso__tp_acces_tipo_de_acesso =
+                                    isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.tp_acces_tipo_de_acesso : '';
+                                objPost.tp_acces_tp_acces_tipo_de_acesso_id = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.tp_acces_id : '';
                                 objPost.prvd_usuario = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.usuario : '';
                                 objPost.prvd_senha = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.senha : '';
                                 delete objPost.nombre_proveedor;
@@ -1081,7 +1089,9 @@ async function init(json) {
                             }
 
                             //*item:sujeto_pasivo
-                            let isIdlcSujetoPasivo = getTabExcel.filter((j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo);
+                            let isIdlcSujetoPasivo = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo
+                            );
                             if (isIdlcSujetoPasivo.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:sujeto_pasivo
                                 let idSujetoPasivo = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
@@ -1100,13 +1110,16 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:sujeto_pasivo
-                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
+                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico =
+                                    isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
                                 objPost.suj_pa_prcs__sujeito_passivo_alumbrado_publico_id = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].ID : '';
                                 delete objPost.sujeto_pasivo;
                             }
 
                             //*item:acuerdo_resolucion
-                            let isAcuerdoResolucion = getTabExcel.filter((j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion);
+                            let isAcuerdoResolucion = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion
+                            );
                             if (isAcuerdoResolucion.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*obj:acuerdo_resolucion
                                 objPost.prcs__acuerdo_resolucion_alumbrado_publico = objPost.acuerdo_resolucion;
@@ -1133,7 +1146,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:tipo_cobro
-                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca = isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
+                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca =
+                                    isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
                                 objPost.tipo_cobr_tipo_de_cobranca_id = isTipoCobro.length > 0 ? isTipoCobro[0].ID : '';
                                 delete objPost.tipo_cobro;
                             }
@@ -1152,7 +1166,9 @@ async function init(json) {
                             }
 
                             //*item:frecuencia_pago
-                            let isIdlcFrecuenciaPago = getTabExcel.filter((j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago);
+                            let isIdlcFrecuenciaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago
+                            );
                             if (isIdlcFrecuenciaPago.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:frecuencia_pago
                                 let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
@@ -1171,13 +1187,16 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:frecuencia_pago
-                                objPost.fre_pag_frequencia__frequencia_de_pagamento = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
+                                objPost.fre_pag_frequencia__frequencia_de_pagamento =
+                                    isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
                                 objPost.fre_pag_frequencia_de_pagamento_id = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].ID : '';
                                 delete objPost.frecuencia_pago;
                             }
 
                             //*item:forma_pago
-                            let isIdlcFormaPago = getTabExcel.filter((j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago);
+                            let isIdlcFormaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago
+                            );
                             if (isIdlcFormaPago.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:forma_pago
                                 let idFormaPago = '0e8a4463-28db-474f-926b-39fa1bd0c9bc';
@@ -1196,23 +1215,33 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:forma_pago
-                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento = isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
+                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento =
+                                    isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
                                 objPost.for_pag_forma_de_pagamento_id = isFormaPago.length > 0 ? isFormaPago[0].ID : '';
                                 delete objPost.forma_pago;
                             }
 
                             //*item:clasificacion_passthru
-                            let isIdlcClasificacionPassthru = getTabExcel.filter((j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru);
+                            let isIdlcClasificacionPassthru = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru
+                            );
                             if (isIdlcClasificacionPassthru.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:clasificacion_passthru
                                 let idClasificacionPassthru = 'ad62c737-2abc-4c71-a572-e11933114ed8';
                                 if (arrCache[idClasificacionPassthru] == undefined) {
                                     //*cache:clasificacion_passthru
-                                    let getClasificacionPassthru = await getOnergyItem(idClasificacionPassthru, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                                    let getClasificacionPassthru = await getOnergyItem(
+                                        idClasificacionPassthru,
+                                        data.onergy_js_ctx.assid,
+                                        data.onergy_js_ctx.usrid,
+                                        null
+                                    );
                                     arrCache.push({ id: idClasificacionPassthru, data: getClasificacionPassthru });
                                 }
                                 let cacheClasificacionPassthru = arrCache.filter((j) => j.id == idClasificacionPassthru);
-                                let isClasificacionPassthru = cacheClasificacionPassthru[0].data.filter((j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru);
+                                let isClasificacionPassthru = cacheClasificacionPassthru[0].data.filter(
+                                    (j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru
+                                );
                                 if (isClasificacionPassthru.length == 0) {
                                     //*err:clasificacion_passthru
                                     status_desc = `ERROR: no hay Clasificacion Passthru "${objPost.clasificacion_passthru}" registrado para ${tabExcel} en Asset Number "${objPost.asset_number}"`;
@@ -1228,17 +1257,26 @@ async function init(json) {
                             }
 
                             //*item:estado_captura_cuenta
-                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter((j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta);
+                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta
+                            );
                             if (isIdlcEstadoCapturaCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:estado_captura_cuenta
                                 let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
                                 if (arrCache[idEstadoCapturaCuenta] == undefined) {
                                     //*cache:estado_captura_cuenta
-                                    let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                                    let getEstadoCapturaCuenta = await getOnergyItem(
+                                        idEstadoCapturaCuenta,
+                                        data.onergy_js_ctx.assid,
+                                        data.onergy_js_ctx.usrid,
+                                        null
+                                    );
                                     arrCache.push({ id: idEstadoCapturaCuenta, data: getEstadoCapturaCuenta });
                                 }
                                 let cacheEstadoCapturaCuenta = arrCache.filter((j) => j.id == idEstadoCapturaCuenta);
-                                let isEstadoCapturaCuenta = cacheEstadoCapturaCuenta[0].data.filter((j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta);
+                                let isEstadoCapturaCuenta = cacheEstadoCapturaCuenta[0].data.filter(
+                                    (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta
+                                );
                                 if (isEstadoCapturaCuenta.length == 0) {
                                     //*err:estado_captura_cuenta
                                     status_desc = `ERROR: no hay Estado Captura Cuenta "${objPost.estado_captura_cuenta}" registrado para ${tabExcel} en Asset Number "${objPost.asset_number}"`;
@@ -1458,17 +1496,26 @@ async function init(json) {
                             }
 
                             //*item:tablero_independiente
-                            let isItdsTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.dirdir_diretoria_independente__diretoria_independente == objPost.tablero_independiente);
+                            let isItdsTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dirdir_diretoria_independente__diretoria_independente == objPost.tablero_independiente
+                            );
                             if (isItdsTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:tablero_independiente
                                 let idTableroIndependiente = 'dbaf278d-8fed-4611-be82-ecd9b69806c0';
                                 if (arrCache[idTableroIndependiente] == undefined) {
                                     //*cache:tablero_independiente
-                                    let getTableroIndependiente = await getOnergyItem(idTableroIndependiente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                                    let getTableroIndependiente = await getOnergyItem(
+                                        idTableroIndependiente,
+                                        data.onergy_js_ctx.assid,
+                                        data.onergy_js_ctx.usrid,
+                                        null
+                                    );
                                     arrCache.push({ id: idTableroIndependiente, data: getTableroIndependiente });
                                 }
                                 let cacheTableroIndependiente = arrCache.filter((j) => j.id == idTableroIndependiente);
-                                let isTableroIndependiente = cacheTableroIndependiente[0].data.filter((j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente);
+                                let isTableroIndependiente = cacheTableroIndependiente[0].data.filter(
+                                    (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                                );
                                 if (isTableroIndependiente.length == 0) {
                                     //*err:tablero_independiente
                                     status_desc = `ERROR: no hay Tablero Independiente "${objPost.tablero_independiente}" registrado para ${tabExcel} en Asset Number "${objPost.asset_number}"`;
@@ -1581,7 +1628,9 @@ async function init(json) {
                             }
 
                             //*item:codigo_sitio_cliente
-                            let isCodigoSitioCliente = getTabExcel.filter((j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente);
+                            let isCodigoSitioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente
+                            );
                             if (isCodigoSitioCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*obj:codigo_sitio_cliente
                                 objPost.clsit__codigo_do_sitio_do_cliente = objPost.codigo_sitio_cliente;
@@ -1589,7 +1638,9 @@ async function init(json) {
                             }
 
                             //*item:nombre_regional
-                            let isNombreRegional = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional);
+                            let isNombreRegional = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional
+                            );
                             if (isNombreRegional.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:nombre_regional
                                 let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
@@ -1599,7 +1650,9 @@ async function init(json) {
                                     arrCache.push({ id: idRegionalClientes, data: getRegionalClientes });
                                 }
                                 let cacheRegionalClientes = arrCache.filter((j) => j.id == idRegionalClientes);
-                                let isRegionalClientes = cacheRegionalClientes[0].data.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
+                                let isRegionalClientes = cacheRegionalClientes[0].data.filter(
+                                    (j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional
+                                );
                                 if (isRegionalClientes.length == 0) {
                                     //*err:nombre_regional
                                     status_desc = `ERROR: no hay Nombre Regional "${objPost.nombre_regional}" registrado para ${tabExcel} en NIT Cliente "${objPost.nit_cliente}"`;
@@ -1608,23 +1661,33 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:nombre_regional
-                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                                 objPost.RCSclsit__regional_do_cliente_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
                                 delete objPost.nombre_regional;
                             }
 
                             //*item:portafolio_cliente
-                            let isPcsPortafolioCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente);
+                            let isPcsPortafolioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente
+                            );
                             if (isPcsPortafolioCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:portafolio_cliente
                                 let idPortafolioCliente = 'b36cf260-c691-4d36-9339-137041e6fb63';
                                 if (arrCache[idPortafolioCliente] == undefined) {
                                     //*cache:portafolio_cliente
-                                    let getPortafolioCliente = await getOnergyItem(idPortafolioCliente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                                    let getPortafolioCliente = await getOnergyItem(
+                                        idPortafolioCliente,
+                                        data.onergy_js_ctx.assid,
+                                        data.onergy_js_ctx.usrid,
+                                        null
+                                    );
                                     arrCache.push({ id: idPortafolioCliente, data: getPortafolioCliente });
                                 }
                                 let cachePortafolioCliente = arrCache.filter((j) => j.id == idPortafolioCliente);
-                                let isPortafolioCliente = cachePortafolioCliente[0].data.filter((j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente);
+                                let isPortafolioCliente = cachePortafolioCliente[0].data.filter(
+                                    (j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente
+                                );
                                 if (isPortafolioCliente.length == 0) {
                                     //*err:portafolio_cliente
                                     status_desc = `ERROR: no hay Portafolio Cliente "${objPost.portafolio_cliente}" registrado para ${tabExcel} en NIT Cliente "${objPost.nit_cliente}"`;
@@ -1633,7 +1696,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:portafolio_cliente
-                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
+                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente =
+                                    isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
                                 objPost.PCSclsit__portifolio_cliente_id = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].ID : '';
                                 delete objPost.portafolio_cliente;
                             }
@@ -1814,7 +1878,9 @@ async function init(json) {
                             }
 
                             //*item:nombre_regional
-                            let isRcsRegionalClientes = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional);
+                            let isRcsRegionalClientes = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional
+                            );
                             if (isRcsRegionalClientes.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:regional_clientes
                                 let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
@@ -1824,7 +1890,9 @@ async function init(json) {
                                     arrCache.push({ id: idRegionalClientes, data: getRegionalClientes });
                                 }
                                 let cacheRegionalClientes = arrCache.filter((j) => j.id == idRegionalClientes);
-                                let isRegionalClientes = cacheRegionalClientes[0].data.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
+                                let isRegionalClientes = cacheRegionalClientes[0].data.filter(
+                                    (j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional
+                                );
                                 if (isRegionalClientes.length == 0) {
                                     //*err:regional_clientes
                                     status_desc = `ERROR: no hay Nombre Regional "${objPost.nombre_regional}" registrado para ${tabExcel} en NIT Cliente "${objPost.nit_cliente}"`;
@@ -1833,7 +1901,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:nombre_regional
-                                objPost.RCSRCS_nome_regional__CCS_nombre_regional = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSRCS_nome_regional__CCS_nombre_regional =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                                 objPost.RCSCCS_nombre_regional_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
                                 delete objPost.nombre_regional;
                             }
@@ -1871,7 +1940,13 @@ async function init(json) {
                             }
 
                             //*save:contactos_clientes
-                            let result = await gravarRegistro('RCSRCS_nome_regional__CCS_nombre_regional', objPost.RCSRCS_nome_regional__CCS_nombre_regional, idTabExcel, objPost, data);
+                            let result = await gravarRegistro(
+                                'RCSRCS_nome_regional__CCS_nombre_regional',
+                                objPost.RCSRCS_nome_regional__CCS_nombre_regional,
+                                idTabExcel,
+                                objPost,
+                                data
+                            );
                         }
 
                         //*aba:portafolio_clientes
@@ -2066,29 +2141,29 @@ function gerarDataHora(dataHoje, utc) {
 let json = {
     processo: '',
     horas: '',
-    dataDate: '2022-12-06T22:08:48Z',
-    data: '2022-12-06 19:08:48',
+    dataDate: '2022-12-17T19:23:27Z',
+    data: '2022-12-17 16:23:27',
     load_index_equipe: 'COL',
     load_index_id_equipe: '',
     load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v8_diadepago.xlsx09253251-495c-4630-9b2c-7888b3b27915.xlsx?sv=2018-03-28&sr=b&sig=QPDd1aM1A9bAiM2MklyKCZmeG9s%2BLZ5nUictPYxItDw%3D&se=2023-06-24T22%3A08%3A28Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/carga_maestra_v9.xlsxb4dd7541-4366-4717-9b0e-80526b49ee4e.xlsx?sv=2018-03-28&sr=b&sig=g1olQAKQd%2FVl26E5GaBTxFF8qaIDo7stwQ%2ByvI6AM0E%3D&se=2023-07-05T19%3A23%3A05Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_v8_diadepago.xlsx09253251-495c-4630-9b2c-7888b3b27915.xlsx?sv=2018-03-28&sr=b&sig=QPDd1aM1A9bAiM2MklyKCZmeG9s%2BLZ5nUictPYxItDw%3D&se=2023-06-24T22%3A08%3A28Z&sp=r',
-            Name: 'tablas_maestras_v8_diadepago.xlsx',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/carga_maestra_v9.xlsxb4dd7541-4366-4717-9b0e-80526b49ee4e.xlsx?sv=2018-03-28&sr=b&sig=g1olQAKQd%2FVl26E5GaBTxFF8qaIDo7stwQ%2ByvI6AM0E%3D&se=2023-07-05T19%3A23%3A05Z&sp=r',
+            Name: 'carga_maestra_v9.xlsx',
         },
     ],
     load_index_tab_excel: 'informacion_cuenta',
     load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
     em_caso_de_duplicidade: '1',
-    processamento: '',
-    time: '19:08',
+    processamento: 'Carga de informacion_cuenta iniciada',
+    time: '16:22',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: '',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: '0145fe42-9916-45e1-b5c3-204beb931868',
+    fedid: 'c7fc8a73-0a84-4390-af97-ee65f0bd51f4',
     fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
     email: 'admin-colombia@atc.com.co',
@@ -2096,23 +2171,23 @@ let json = {
     timezone: null,
     onergy_js_ctx: {
         assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: '0145fe42-9916-45e1-b5c3-204beb931868',
+        fedid: 'c7fc8a73-0a84-4390-af97-ee65f0bd51f4',
         fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
         usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-12-06T21:45:04.502Z',
-        updateDt: '2022-12-06T21:45:04.502Z',
+        insertDt: '2022-12-17T19:23:26.307Z',
+        updateDt: '2022-12-17T19:23:26.307Z',
         cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
         email: 'admin-colombia@atc.com.co',
         user_name: 'Administrador Colômbia',
         onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: 'cf5bbf80-e601-4442-8c40-1bedd304a46a',
-        pcvid: '054ab9f1-1873-49fb-9db9-7c78c8f54ee5',
+        praid: 'cffda0b7-a129-495b-a11e-9d6215844ec5',
+        pcvid: '8810eaa3-9b4c-427a-90ca-cdb8dab79667',
         prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
         timezone: null,
         timezone_value: '-03:00',
         pubNubHook: null,
     },
-    id_upload_planilha: '7d9164ad-e170-cc8f-210c-40430a78a8a9',
+    id_upload_planilha: 'a7cd9a27-e453-5b70-4488-781ab6c611db',
 };
 
 init(JSON.stringify(json));
