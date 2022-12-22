@@ -1,5 +1,13 @@
 let mainMethod = async () => {
+    await limparDocsiaStatus();
     await validarContaPai();
+};
+
+// Limpa campos Docsia Status
+let limparDocsiaStatus = async () => {
+    mtdOnergy.JsEvtSetItemValue('status_docsia', '');
+    mtdOnergy.JsEvtSetItemValue('status_docsia_Desc', '');
+    mtdOnergy.JsEvtSetItemValue('status_docsia_msg', '');
 };
 
 // Valida o tipo de conta e seta o valor do campo prcs__conta_pai
