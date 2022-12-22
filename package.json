@@ -22,5 +22,8 @@
     "bugs": {
         "url": "https://github.com/jeferson-franco/onergy/issues"
     },
-    "homepage": "https://github.com/jeferson-franco/onergy#readme"
+    "homepage": "https://github.com/jeferson-franco/onergy#readme",
+    "devDependencies": {
+        "eslint": "^8.30.0"
+    }
 }
