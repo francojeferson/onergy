@@ -1,66 +1,66 @@
 /**ENV_NODE** =====================================================================================
  */
-const { date } = require('assert-plus');
-const { formatDate } = require('tough-cookie');
-const { log } = require('console');
-const { memory } = require('console');
-const { resolve } = require('path');
-const { type } = require('os');
+// const { date } = require('assert-plus');
+// const { formatDate } = require('tough-cookie');
+// const { log } = require('console');
+// const { memory } = require('console');
+// const { resolve } = require('path');
+// const { type } = require('os');
 const axios = require('axios');
-const fs = require('fs');
-const jsuser = require('../onergy/onergy-utils');
+// const fs = require('fs');
+// const jsuser = require('../onergy/onergy-utils');
 const onergy = require('../onergy/onergy-client');
-const utils = require('../onergy/onergy-utils');
-async function ajax(args) {
-    return await onergy.ajax(args);
-}
-async function ajaxPost(args) {
-    return await onergy.ajaxPost(args);
-}
-async function hashMd5(args) {
-    return await onergy.hashMd5(args);
-}
-async function increment(args) {
-    return await onergy.increment(args);
-}
-async function onergy_countdocs(args) {
-    return await onergy.onergy_countdocs(args);
-}
+// const utils = require('../onergy/onergy-utils');
+// async function ajax(args) {
+//     return await onergy.ajax(args);
+// }
+// async function ajaxPost(args) {
+//     return await onergy.ajaxPost(args);
+// }
+// async function hashMd5(args) {
+//     return await onergy.hashMd5(args);
+// }
+// async function increment(args) {
+//     return await onergy.increment(args);
+// }
+// async function onergy_countdocs(args) {
+//     return await onergy.onergy_countdocs(args);
+// }
 async function onergy_get(args) {
     let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-async function onergy_save(args) {
-    return await onergy.onergy_save(args);
-}
-async function ReadExcelToJson(args) {
-    return await onergy.ReadExcelToJson(args);
-}
-async function ReadTextPdf(args) {
-    return await onergy.ReadTextPdf(args);
-}
-async function sendmail(args) {
-    return await onergy.sendmail(args);
-}
-async function onergy_sendto(args) {
-    let r = await onergy.onergy_sendto(args);
-    return JSON.stringify(r);
-}
-async function onergy_updatemany(args) {
-    return await onergy.onergy_save(args);
-}
-function failureCallback(error) {
-    console.log('It failed with ' + error);
-}
-function get_usr_tmz_dt_now(data) {
-    return data;
-}
-function replaceAll(content, needle, replacement) {
-    return content.split(needle).join(replacement);
-}
-function successCallback(result) {
-    console.log('It succeeded with ' + result);
-}
+// async function onergy_save(args) {
+//     return await onergy.onergy_save(args);
+// }
+// async function ReadExcelToJson(args) {
+//     return await onergy.ReadExcelToJson(args);
+// }
+// async function ReadTextPdf(args) {
+//     return await onergy.ReadTextPdf(args);
+// }
+// async function sendmail(args) {
+//     return await onergy.sendmail(args);
+// }
+// async function onergy_sendto(args) {
+//     let r = await onergy.onergy_sendto(args);
+//     return JSON.stringify(r);
+// }
+// async function onergy_updatemany(args) {
+//     return await onergy.onergy_save(args);
+// }
+// function failureCallback(error) {
+//     console.log('It failed with ' + error);
+// }
+// function get_usr_tmz_dt_now(data) {
+//     return data;
+// }
+// function replaceAll(content, needle, replacement) {
+//     return content.split(needle).join(replacement);
+// }
+// function successCallback(result) {
+//     console.log('It succeeded with ' + result);
+// }
 /**CLI_SCRIPT** ===================================================================================
  * @param {string} args
  * @returns {string}
@@ -70,7 +70,7 @@ function successCallback(result) {
 async function init(strData) {
     var data = JSON.parse(strData);
     //*inserir fdtid de onde o registro se encontra
-    let idGridRegistro = '21672360-869c-4c29-8cf8-2bafa8530923';
+    let idGridRegistro = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
     let strInfo = await getOnergyItem(idGridRegistro, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
     //*função para deletar os registros em lote
     if (strInfo.length > 0) {
@@ -80,33 +80,33 @@ async function init(strData) {
         }
     }
 }
-function initBefore(json) {
-    //return true;
-}
-function initDelete(json) {
-    //return true;
-}
-function SetObjectResponse(cond, json, WaitingWebHook, UsrID, GrpID) {
-    var obj = {
-        cond: cond,
-        json: JSON.stringify(json),
-        WaitingWebHook: WaitingWebHook,
-    };
-    if (WaitingWebHook === undefined) {
-        WaitingWebHook = false;
-    }
-    if (UsrID != null && UsrID.length > 0) {
-        obj.UsrID = UsrID;
-    }
-    if (GrpID != null && GrpID.length > 0) {
-        obj.GrpID = GrpID;
-    }
-    return obj;
-}
+// function initBefore(json) {
+//     //return true;
+// }
+// function initDelete(json) {
+//     //return true;
+// }
+// function SetObjectResponse(cond, json, WaitingWebHook, UsrID, GrpID) {
+//     var obj = {
+//         cond: cond,
+//         json: JSON.stringify(json),
+//         WaitingWebHook: WaitingWebHook,
+//     };
+//     if (WaitingWebHook === undefined) {
+//         WaitingWebHook = false;
+//     }
+//     if (UsrID != null && UsrID.length > 0) {
+//         obj.UsrID = UsrID;
+//     }
+//     if (GrpID != null && GrpID.length > 0) {
+//         obj.GrpID = GrpID;
+//     }
+//     return obj;
+// }
 async function getOnergyItem(fdtid, assid, usrid, filtro) {
     let keepSearching = true;
     let skip = 0;
-    take = 500;
+    let take = 500;
     let result = [];
     while (keepSearching) {
         let strPageResp = await onergy_get({
@@ -179,10 +179,12 @@ let obj = {
     COLCCOLC_codigo_cliente: '',
     oneTemplateTitle: '',
     onergy_js_ctx: {
-        assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+        // assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a', //HOMOLOG
+        assid: '88443605-74d6-4ea4-b426-a6c3e26aa615', //PROD
         fedid: '35feaa8a-e157-41b6-83a9-0aa2d8708385',
         fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
-        usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+        // usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5', //HOMOLOG
+        usrid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331', //PROD
         insertDt: '2022-11-03T16:21:32.646Z',
         updateDt: '2022-11-03T16:21:32.646Z',
         cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
