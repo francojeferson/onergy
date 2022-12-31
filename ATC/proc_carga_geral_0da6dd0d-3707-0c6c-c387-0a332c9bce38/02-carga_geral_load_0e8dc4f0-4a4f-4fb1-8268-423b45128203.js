@@ -86,8 +86,8 @@ async function init(json) {
     let dataExcel = JSON.parse(strArrExcel);
 
     //*pesq.ref:indice_carga
+    const idIndiceCarga = '9a6e262f-e463-4c5d-9d8b-0fd8343b2f02';
     let idTabExcel = data.load_index_id_do_card;
-    let idIndiceCarga = '9a6e262f-e463-4c5d-9d8b-0fd8343b2f02';
     let strFiltro = gerarFiltro('id_do_card', idTabExcel);
     let getTabExcel = await getOnergyItem(idIndiceCarga, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
@@ -100,6 +100,7 @@ async function init(json) {
         //*se não existir dados na planilha, gera erro
         if (dataExcel != null) {
             let ctxExcel = dataExcel[tabExcel];
+            ctxExcel = removeDuplicados(ctxExcel, tabExcel);
 
             //*se não existir conteúdo na planilha, gera erro
             if (ctxExcel.length > 0) {
@@ -147,7 +148,216 @@ async function init(json) {
 
                     //*para cada linha do array de post, verifica se existe registro no grid destino
                     //*update: grava pesquisa no array de cache para evitar repetição de pesquisa
+                    //*update: por motivos de performance, pesquisa em cache antes do for loop
                     let arrCache = [];
+
+                    const idDepartamento = '132b8394-2193-4d83-a399-08f4cde70873';
+                    if (tabExcel == 'municipio') {
+                        //*cache:departamento
+                        let getDepartamento = await getOnergyItem(idDepartamento, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idDepartamento, data: getDepartamento });
+                        onergy.log('JFS ~ cache:departamento');
+                    }
+
+                    const idTipoTercero = '70110b99-aa96-4e25-b1b2-177484668700';
+                    const idTipoAcceso = '62e9a129-73b5-4819-9c16-f1d4bdababde';
+                    if (tabExcel == 'proveedores') {
+                        //*cache:tipo_tercero
+                        let getTipoTercero = await getOnergyItem(idTipoTercero, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idTipoTercero, data: getTipoTercero });
+                        onergy.log('JFS ~ cache:tipo_tercero');
+
+                        //*cache:tipo_acceso
+                        let getTipoAcceso = await getOnergyItem(idTipoAcceso, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idTipoAcceso, data: getTipoAcceso });
+                        onergy.log('JFS ~ cache:tipo_acceso');
+                    }
+
+                    const idSitios = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
+                    const idCompaniaATC = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
+                    const idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
+                    const idEstadoSitio = 'f0ee1dd9-bb48-4aef-9f77-43e357870a31';
+                    const idPortafolioATC = '18615527-c678-4f1c-87e0-d7a9735d0c6e';
+                    const idRegionalATC = '74d8a818-46a7-4d56-8a18-2369bdd00589';
+                    if (tabExcel == 'sitios') {
+                        //*cache:compania_atc
+                        let getCompaniaATC = await getOnergyItem(idCompaniaATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idCompaniaATC, data: getCompaniaATC });
+                        onergy.log('JFS ~ cache:compania_atc');
+
+                        //*cache:municipio
+                        let getMunicipio = await getOnergyItem(idMunicipio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idMunicipio, data: getMunicipio });
+                        onergy.log('JFS ~ cache:municipio');
+
+                        //*cache:estado_sitio
+                        let getEstadoSitio = await getOnergyItem(idEstadoSitio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idEstadoSitio, data: getEstadoSitio });
+                        onergy.log('JFS ~ cache:estado_sitio');
+
+                        //*cache:portafolio_atc
+                        let getPortafolioATC = await getOnergyItem(idPortafolioATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idPortafolioATC, data: getPortafolioATC });
+                        onergy.log('JFS ~ cache:portafolio_atc');
+
+                        //*cache:regional_atc
+                        let getRegionalATC = await getOnergyItem(idRegionalATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idRegionalATC, data: getRegionalATC });
+                        onergy.log('JFS ~ cache:regional_atc');
+                    }
+
+                    const idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
+                    const idSuscriptor = '51a217b1-1d0a-47c7-b31c-46880c1ca5ad';
+                    const idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
+                    const idProveedores = '4783ca0b-357d-42ab-a5c8-3328ee315f86';
+                    const idServicios = '8e284e84-b8f9-45c1-abe2-991555441ea2';
+                    const idSujetoPasivo = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
+                    const idTipoCobro = '22538843-147f-4d41-9534-20a6d674f4b6';
+                    const idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
+                    const idFormaPago = '0e8a4463-28db-474f-926b-39fa1bd0c9bc';
+                    const idClasificacionPassthru = 'ad62c737-2abc-4c71-a572-e11933114ed8';
+                    const idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
+                    if (tabExcel == 'informacion_cuenta') {
+                        //*cache:tipo_cuenta
+                        let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idTipoCuenta, data: getTipoCuenta });
+                        onergy.log('JFS ~ cache:tipo_cuenta');
+
+                        //*cache:suscriptor
+                        let getSuscriptor = await getOnergyItem(idSuscriptor, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idSuscriptor, data: getSuscriptor });
+                        onergy.log('JFS ~ cache:suscriptor');
+
+                        //*cache:estado_cuenta
+                        let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idEstadoCuenta, data: getEstadoCuenta });
+                        onergy.log('JFS ~ cache:estado_cuenta');
+
+                        //*cache:proveedores
+                        let getProveedores = await getOnergyItem(idProveedores, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idProveedores, data: getProveedores });
+                        onergy.log('JFS ~ cache:proveedores');
+
+                        //*cache:servicios
+                        let getServicios = await getOnergyItem(idServicios, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idServicios, data: getServicios });
+                        onergy.log('JFS ~ cache:servicios');
+
+                        //*cache:sujeto_pasivo
+                        let getSujetoPasivo = await getOnergyItem(idSujetoPasivo, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idSujetoPasivo, data: getSujetoPasivo });
+                        onergy.log('JFS ~ cache:sujeto_pasivo');
+
+                        //*cache:tipo_cobro
+                        let getTipoCobro = await getOnergyItem(idTipoCobro, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idTipoCobro, data: getTipoCobro });
+                        onergy.log('JFS ~ cache:tipo_cobro');
+
+                        //*cache:frecuencia_pago
+                        let getFrecuenciaPago = await getOnergyItem(idFrecuenciaPago, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idFrecuenciaPago, data: getFrecuenciaPago });
+                        onergy.log('JFS ~ cache:frecuencia_pago');
+
+                        //*cache:forma_pago
+                        let getFormaPago = await getOnergyItem(idFormaPago, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idFormaPago, data: getFormaPago });
+                        onergy.log('JFS ~ cache:forma_pago');
+
+                        //*cache:clasificacion_passthru
+                        let getClasificacionPassthru = await getOnergyItem(idClasificacionPassthru, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idClasificacionPassthru, data: getClasificacionPassthru });
+                        onergy.log('JFS ~ cache:clasificacion_passthru');
+
+                        //*cache:estado_captura_cuenta
+                        let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idEstadoCapturaCuenta, data: getEstadoCapturaCuenta });
+                        onergy.log('JFS ~ cache:estado_captura_cuenta');
+                    }
+
+                    const idCategorias = '55ec978d-7dbe-4a6f-8cb4-536b53361d54';
+                    const idEstrato = '34f26407-6afe-41c8-8420-7dbcd4f1aed4';
+                    const idNivelTension = '4056b8c5-29c0-47ff-b5b1-cfc3c7f39018';
+                    const idLecturas = '0d3b6287-8f3a-4ad7-acdd-e1c60426f73f';
+                    const idMotogenerador = '066e2afa-0169-4e5f-a7fb-79131aafe8c7';
+                    const idTableroIndependiente = 'dbaf278d-8fed-4611-be82-ecd9b69806c0';
+                    const idBarter = '13dad727-2325-4e9d-85a3-c8ff09e053c7';
+                    const idProvisional = 'fb6543b9-28a4-4e49-8f4b-2af6557a7cd8';
+                    if (tabExcel == 'informacion_tecnica') {
+                        //*cache:categorias
+                        let getCategorias = await getOnergyItem(idCategorias, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idCategorias, data: getCategorias });
+                        onergy.log('JFS ~ cache:categorias');
+
+                        //*cache:estrato
+                        let getEstrato = await getOnergyItem(idEstrato, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idEstrato, data: getEstrato });
+                        onergy.log('JFS ~ cache:estrato');
+
+                        //*cache:nivel_tension
+                        let getNivelTension = await getOnergyItem(idNivelTension, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idNivelTension, data: getNivelTension });
+                        onergy.log('JFS ~ cache:nivel_tension');
+
+                        //*cache:lecturas
+                        let getLecturas = await getOnergyItem(idLecturas, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idLecturas, data: getLecturas });
+                        onergy.log('JFS ~ cache:lecturas');
+
+                        //*cache:motogenerador
+                        let getMotogenerador = await getOnergyItem(idMotogenerador, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idMotogenerador, data: getMotogenerador });
+                        onergy.log('JFS ~ cache:motogenerador');
+
+                        //*cache:tablero_independiente
+                        let getTableroIndependiente = await getOnergyItem(idTableroIndependiente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idTableroIndependiente, data: getTableroIndependiente });
+                        onergy.log('JFS ~ cache:tablero_independiente');
+
+                        //*cache:barter
+                        let getBarter = await getOnergyItem(idBarter, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idBarter, data: getBarter });
+                        onergy.log('JFS ~ cache:barter');
+
+                        //*cache:provisional
+                        let getProvisional = await getOnergyItem(idProvisional, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idProvisional, data: getProvisional });
+                        onergy.log('JFS ~ cache:provisional');
+                    }
+
+                    const idClientes = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
+                    const idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
+                    const idPortafolioCliente = 'b36cf260-c691-4d36-9339-137041e6fb63';
+                    if (tabExcel == 'clientes_sitio') {
+                        //*cache:nit_cliente
+                        let getClientes = await getOnergyItem(idClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idClientes, data: getClientes });
+                        onergy.log('JFS ~ cache:nit_cliente');
+
+                        //*cache:nombre_regional
+                        let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idRegionalClientes, data: getRegionalClientes });
+                        onergy.log('JFS ~ cache:nombre_regional');
+
+                        //*cache:portafolio_cliente
+                        let getPortafolioCliente = await getOnergyItem(idPortafolioCliente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idPortafolioCliente, data: getPortafolioCliente });
+                        onergy.log('JFS ~ cache:portafolio_cliente');
+
+                        //*cache:municipio
+                        let getMunicipio = await getOnergyItem(idMunicipio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idMunicipio, data: getMunicipio });
+                        onergy.log('JFS ~ cache:municipio');
+                    }
+
+                    if (tabExcel == 'contactos_clientes') {
+                        //*cache:regional_clientes
+                        let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+                        arrCache.push({ id: idRegionalClientes, data: getRegionalClientes });
+                        onergy.log('JFS ~ cache:regional_clientes');
+                    }
+
+                    let fielNameQ = '';
+                    let valueQ = '';
                     for (let y in arrPost) {
                         let objPost = arrPost[y];
                         objPost.onergyteam_equipe = objPost.equipe;
@@ -156,19 +366,22 @@ async function init(json) {
 
                         //*aba:categorias
                         if (tabExcel == 'categorias') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.categorias;
+
                             //*item:categorias
                             let isCategorias = getTabExcel.filter((j) => j.UrlJsonContext.categorias == objPost.categorias);
                             if (isCategorias.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*obj:categorias
                                 objPost.categorias;
                             }
-
-                            //*save:categorias
-                            await gravarRegistro('categorias', objPost.categorias, idTabExcel, objPost, data);
                         }
 
                         //*aba:departamento
                         if (tabExcel == 'departamento') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.uf;
+
                             //*item:departamento
                             let isDepartamento = getTabExcel.filter((j) => j.UrlJsonContext.uf == objPost.departamento);
                             if (isDepartamento.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -178,23 +391,17 @@ async function init(json) {
                                 delete objPost.departamento_sigla;
                                 delete objPost.departamento;
                             }
-
-                            //*save:departamento
-                            await gravarRegistro('uf', objPost.uf, idTabExcel, objPost, data);
                         }
 
                         //*aba:municipio
                         if (tabExcel == 'municipio') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.municipio;
+
                             //*item:municipio
                             let isMunicipio = getTabExcel.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
                             if (isMunicipio.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:departamento
-                                let idDepartamento = '132b8394-2193-4d83-a399-08f4cde70873';
-                                if (arrCache[idDepartamento] == undefined) {
-                                    //*cache:departamento
-                                    let getDepartamento = await getOnergyItem(idDepartamento, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idDepartamento, data: getDepartamento });
-                                }
                                 let cacheDepartamento = arrCache.filter((j) => j.id == idDepartamento);
                                 let isDepartamento = cacheDepartamento[0].data.filter((j) => j.UrlJsonContext.uf == objPost.departamento);
                                 if (isDepartamento.length == 0) {
@@ -210,13 +417,13 @@ async function init(json) {
                                 objPost.municipio;
                                 delete objPost.departamento;
                             }
-
-                            //*save:municipio
-                            await gravarRegistro('municipio', objPost.municipio, idTabExcel, objPost, data);
                         }
 
                         //*aba:compania_atc
                         if (tabExcel == 'compania_atc') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.site;
+
                             //*item:compania_atc
                             let isCompaniaATC = getTabExcel.filter((j) => j.UrlJsonContext.site == objPost.compania_atc);
                             if (isCompaniaATC.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -224,13 +431,13 @@ async function init(json) {
                                 objPost.site = objPost.compania_atc;
                                 delete objPost.compania_atc;
                             }
-
-                            //*save:compania_atc
-                            await gravarRegistro('site', objPost.site, idTabExcel, objPost, data);
                         }
 
                         //*aba:suscriptor
                         if (tabExcel == 'suscriptor') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.sus__suscriptor;
+
                             //*item:suscriptor
                             let isSuscriptor = getTabExcel.filter((j) => j.UrlJsonContext.sus__suscriptor == objPost.suscriptor);
                             if (isSuscriptor.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -238,13 +445,13 @@ async function init(json) {
                                 objPost.sus__suscriptor = objPost.suscriptor;
                                 delete objPost.suscriptor;
                             }
-
-                            //*save:suscriptor
-                            await gravarRegistro('suscriptor', objPost.sus__suscriptor, idTabExcel, objPost, data);
                         }
 
                         //*aba:forma_pago
                         if (tabExcel == 'forma_pago') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.formas_de_pagamentos;
+
                             //*item:forma_pago
                             let isFormaPago = getTabExcel.filter((j) => j.UrlJsonContext.formas_de_pagamentos == objPost.forma_pago);
                             if (isFormaPago.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -252,13 +459,13 @@ async function init(json) {
                                 objPost.formas_de_pagamentos = objPost.forma_pago;
                                 delete objPost.forma_pago;
                             }
-
-                            //*save:forma_pago
-                            await gravarRegistro('formas_de_pagamentos', objPost.formas_de_pagamentos, idTabExcel, objPost, data);
                         }
 
                         //*aba:frecuencia_pago
                         if (tabExcel == 'frecuencia_pago') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.frequencia_em_meses;
+
                             //*item:frecuencia_pago
                             let isFrequencia = getTabExcel.filter((j) => j.UrlJsonContext.frequencia == objPost.frecuencia_pago);
                             if (isFrequencia.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -274,13 +481,13 @@ async function init(json) {
                                 objPost.frequencia_em_meses = objPost.frecuencia_meses;
                                 delete objPost.frecuencia_meses;
                             }
-
-                            //*save:frecuencia_pago
-                            await gravarRegistro('frequencia', objPost.frequencia_em_meses, idTabExcel, objPost, data);
                         }
 
                         //*aba:lecturas
                         if (tabExcel == 'lecturas') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.LCT_ferramentas;
+
                             //*item:herramientas
                             let isLecturas = getTabExcel.filter((j) => j.UrlJsonContext.LCT_ferramentas == objPost.herramientas);
                             if (isLecturas.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -288,13 +495,13 @@ async function init(json) {
                                 objPost.LCT_ferramentas = objPost.herramientas;
                                 delete objPost.herramientas;
                             }
-
-                            //*save:lecturas
-                            await gravarRegistro('LCT_ferramentas', objPost.LCT_ferramentas, idTabExcel, objPost, data);
                         }
 
                         //*aba:motogenerador
                         if (tabExcel == 'motogenerador') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.ger_gerador;
+
                             //*item:motogenerador
                             let isMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.ger_gerador == objPost.motogenerador);
                             if (isMotogenerador.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -302,27 +509,29 @@ async function init(json) {
                                 objPost.ger_gerador = objPost.motogenerador;
                                 delete objPost.motogenerador;
                             }
-
-                            //*save:motogenerador
-                            await gravarRegistro('ger_gerador', objPost.ger_gerador, idTabExcel, objPost, data);
                         }
 
                         //*aba:tablero_independiente
                         if (tabExcel == 'tablero_independiente') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.dir_diretoria_independente;
+
                             //*item:tablero_independiente
-                            let isTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente);
+                            let isTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                            );
                             if (isTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*obj:tablero_independiente
                                 objPost.dir_diretoria_independente = objPost.tablero_independiente;
                                 delete objPost.tablero_independiente;
                             }
-
-                            //*save:tablero_independiente
-                            await gravarRegistro('dir_diretoria_independente', objPost.dir_diretoria_independente, idTabExcel, objPost, data);
                         }
 
                         //*aba:barter
                         if (tabExcel == 'barter') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.esc_escambo;
+
                             //*item:barter
                             let isBarter = getTabExcel.filter((j) => j.UrlJsonContext.esc_escambo == objPost.barter);
                             if (isBarter.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -330,13 +539,13 @@ async function init(json) {
                                 objPost.esc_escambo = objPost.barter;
                                 delete objPost.barter;
                             }
-
-                            //*save:barter
-                            await gravarRegistro('esc_escambo', objPost.esc_escambo, idTabExcel, objPost, data);
                         }
 
                         //*aba:provisional
                         if (tabExcel == 'provisional') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.pro_provisorio;
+
                             //*item:provisional
                             let isProvisional = getTabExcel.filter((j) => j.UrlJsonContext.pro_provisorio == objPost.provisional);
                             if (isProvisional.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -344,13 +553,13 @@ async function init(json) {
                                 objPost.pro_provisorio = objPost.provisional;
                                 delete objPost.provisional;
                             }
-
-                            //*save:provisional
-                            await gravarRegistro('pro_provisorio', objPost.pro_provisorio, idTabExcel, objPost, data);
                         }
 
                         //*aba:portafolio_atc
                         if (tabExcel == 'portafolio_atc') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.tipo_portifolio;
+
                             //*item:portafolio_atc
                             let isPortafolioATC = getTabExcel.filter((j) => j.UrlJsonContext.tipo_portifolio == objPost.portafolio_atc);
                             if (isPortafolioATC.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -358,13 +567,13 @@ async function init(json) {
                                 objPost.tipo_portifolio = objPost.portafolio_atc;
                                 delete objPost.portafolio_atc;
                             }
-
-                            //*save:portafolio_atc
-                            await gravarRegistro('tipo_portifolio', objPost.tipo_portifolio, idTabExcel, objPost, data);
                         }
 
                         //*aba:regional_atc
                         if (tabExcel == 'regional_atc') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.regional;
+
                             //*item:regional_atc
                             let isRegionalATC = getTabExcel.filter((j) => j.UrlJsonContext.regional == objPost.regional_atc);
                             if (isRegionalATC.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -372,13 +581,13 @@ async function init(json) {
                                 objPost.regional = objPost.regional_atc;
                                 delete objPost.regional_atc;
                             }
-
-                            //*save:regional_atc
-                            await gravarRegistro('regional', objPost.regional, idTabExcel, objPost, data);
                         }
 
                         //*aba:servicios
                         if (tabExcel == 'servicios') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.servicos;
+
                             //*item:servicios
                             let isServicios = getTabExcel.filter((j) => j.UrlJsonContext.servicos == objPost.servicios);
                             if (isServicios.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -386,13 +595,13 @@ async function init(json) {
                                 objPost.servicos = objPost.servicios;
                                 delete objPost.servicios;
                             }
-
-                            //*save:servicios
-                            await gravarRegistro('servicos', objPost.servicos, idTabExcel, objPost, data);
                         }
 
                         //*aba:estado_cuenta
                         if (tabExcel == 'estado_cuenta') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.status_conta;
+
                             //*item:estado_cuenta
                             let isEstadoCuenta = getTabExcel.filter((j) => j.UrlJsonContext.status_conta == objPost.estado_cuenta);
                             if (isEstadoCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -400,13 +609,13 @@ async function init(json) {
                                 objPost.status_conta = objPost.estado_cuenta;
                                 delete objPost.estado_cuenta;
                             }
-
-                            //*save:estado_cuenta
-                            await gravarRegistro('status_conta', objPost.status_conta, idTabExcel, objPost, data);
                         }
 
                         //*aba:estado_sitio
                         if (tabExcel == 'estado_sitio') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.status;
+
                             //*item:estado_sitio
                             let isEstadoSitio = getTabExcel.filter((j) => j.UrlJsonContext.status == objPost.estado_sitio);
                             if (isEstadoSitio.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -414,13 +623,13 @@ async function init(json) {
                                 objPost.status = objPost.estado_sitio;
                                 delete objPost.estado_sitio;
                             }
-
-                            //*save:estado_sitio
-                            await gravarRegistro('status', objPost.status, idTabExcel, objPost, data);
                         }
 
                         //*aba:sujeto_pasivo
                         if (tabExcel == 'sujeto_pasivo') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.sujeito;
+
                             //*item:sujeto_pasivo
                             let isSujetoPasivo = getTabExcel.filter((j) => j.UrlJsonContext.sujeito == objPost.sujeto_pasivo);
                             if (isSujetoPasivo.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -428,13 +637,13 @@ async function init(json) {
                                 objPost.sujeito = objPost.sujeto_pasivo;
                                 delete objPost.sujeto_pasivo;
                             }
-
-                            //*save:sujeto_pasivo
-                            await gravarRegistro('sujeito', objPost.sujeito, idTabExcel, objPost, data);
                         }
 
                         //*aba:tipo_cobro
                         if (tabExcel == 'tipo_cobro') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.tipos_cobrancas;
+
                             //*item:tipo_cobro
                             let isTipoCobro = getTabExcel.filter((j) => j.UrlJsonContext.tipos_cobrancas == objPost.tipo_cobro);
                             if (isTipoCobro.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -442,13 +651,13 @@ async function init(json) {
                                 objPost.tipos_cobrancas = objPost.tipo_cobro;
                                 delete objPost.tipo_cobro;
                             }
-
-                            //*save:tipo_cobro
-                            await gravarRegistro('tipos_cobrancas', objPost.tipos_cobrancas, idTabExcel, objPost, data);
                         }
 
                         //*aba:tipo_tercero
                         if (tabExcel == 'tipo_tercero') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.tipo_de_terceiro;
+
                             //*item:tipo_tercero
                             let isTipoTercero = getTabExcel.filter((j) => j.UrlJsonContext.tipo_de_terceiro == objPost.tipo_tercero);
                             if (isTipoTercero.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -456,13 +665,13 @@ async function init(json) {
                                 objPost.tipo_de_terceiro = objPost.tipo_tercero;
                                 delete objPost.tipo_tercero;
                             }
-
-                            //*save:tipo_tercero
-                            await gravarRegistro('tipo_de_terceiro', objPost.tipo_de_terceiro, idTabExcel, objPost, data);
                         }
 
                         //*aba:tipo_acceso
                         if (tabExcel == 'tipo_acceso') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.tipo_de_acesso;
+
                             //*item:tipo_acceso
                             let isTipoAcesso = getTabExcel.filter((j) => j.UrlJsonContext.tipo_de_acesso == objPost.tipo_acceso);
                             if (isTipoAcesso.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -470,13 +679,13 @@ async function init(json) {
                                 objPost.tipo_de_acesso = objPost.tipo_acceso;
                                 delete objPost.tipo_acceso;
                             }
-
-                            //*save:tipo_acceso
-                            await gravarRegistro('tipo_de_acesso', objPost.tipo_de_acesso, idTabExcel, objPost, data);
                         }
 
                         //*aba:tipo_cuenta
                         if (tabExcel == 'tipo_cuenta') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.TC_tipo_de_conta;
+
                             //*item:tipo_cuenta
                             let isTipoCuenta = getTabExcel.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.tipo_cuenta);
                             if (isTipoCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -484,13 +693,13 @@ async function init(json) {
                                 objPost.TC_tipo_de_conta = objPost.tipo_cuenta;
                                 delete objPost.tipo_cuenta;
                             }
-
-                            //*save:tipo_cuenta
-                            await gravarRegistro('TC_tipo_de_conta', objPost.TC_tipo_de_conta, idTabExcel, objPost, data);
                         }
 
                         //*aba:estrato
                         if (tabExcel == 'estrato') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.LST_estrato;
+
                             //*item:estrato
                             let isEstrato = getTabExcel.filter((j) => j.UrlJsonContext.LST_estrato == objPost.estrato);
                             if (isEstrato.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -498,13 +707,13 @@ async function init(json) {
                                 objPost.LST_estrato = objPost.estrato;
                                 delete objPost.estrato;
                             }
-
-                            //*save:estrato
-                            await gravarRegistro('LST_estrato', objPost.LST_estrato, idTabExcel, objPost, data);
                         }
 
                         //*aba:nivel_tension
                         if (tabExcel == 'nivel_tension') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.NVT_nivel;
+
                             //*item:nivel_tension
                             let isNivelTension = getTabExcel.filter((j) => j.UrlJsonContext.NVT_nivel == objPost.nivel_tension);
                             if (isNivelTension.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -512,13 +721,13 @@ async function init(json) {
                                 objPost.NVT_nivel = objPost.nivel_tension;
                                 delete objPost.nivel_tension;
                             }
-
-                            //*save:nivel_tension
-                            await gravarRegistro('NVT_nivel', objPost.NVT_nivel, idTabExcel, objPost, data);
                         }
 
                         //*aba:clasificacion_passthru
                         if (tabExcel == 'clasificacion_passthru') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.CPT_tem_passthru;
+
                             //*item:clasificacion_passthru
                             let isClasificacionPassthru = getTabExcel.filter((j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru);
                             if (isClasificacionPassthru.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -536,13 +745,13 @@ async function init(json) {
                                 objPost.CPT_tem_passthru_desc = objPost.tiene_passthru == 'si' ? 'Si' : 'No';
                                 delete objPost.tiene_passthru;
                             }
-
-                            //*save:clasificacion_passthru
-                            await gravarRegistro('classificacao_passthru', objPost.CPT_tem_passthru, idTabExcel, objPost, data);
                         }
 
                         //*aba:proveedores
                         if (tabExcel == 'proveedores') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.nit_provedor;
+
                             //*item:nit_proveedor
                             let isNITProveedor = getTabExcel.filter((j) => j.UrlJsonContext.nit_provedor == objPost.nit_proveedor);
                             if (isNITProveedor.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -578,12 +787,6 @@ async function init(json) {
                             let isPrvdTipoTercero = getTabExcel.filter((j) => j.UrlJsonContext.tp3o_tipo_de_terceiro == objPost.tipo_tercero);
                             if (isPrvdTipoTercero.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:tipo_tercero
-                                let idTipoTercero = '70110b99-aa96-4e25-b1b2-177484668700';
-                                if (arrCache[idTipoTercero] == undefined) {
-                                    //*cache:tipo_tercero
-                                    let getTipoTercero = await getOnergyItem(idTipoTercero, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idTipoTercero, data: getTipoTercero });
-                                }
                                 let cacheTipoTercero = arrCache.filter((j) => j.id == idTipoTercero);
                                 let isTipoTercero = cacheTipoTercero[0].data.filter((j) => j.UrlJsonContext.tipo_de_terceiro == objPost.tipo_tercero);
                                 if (isTipoTercero.length == 0) {
@@ -621,12 +824,6 @@ async function init(json) {
                             let isPrvdTipoAcceso = getTabExcel.filter((j) => j.UrlJsonContext.tp_acces_tipo_de_acesso == objPost.tipo_acceso);
                             if (isPrvdTipoAcceso.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:tipo_acceso
-                                let idTipoAcceso = '62e9a129-73b5-4819-9c16-f1d4bdababde';
-                                if (arrCache[idTipoAcceso] == undefined) {
-                                    //*cache:tipo_acceso
-                                    let getTipoAcceso = await getOnergyItem(idTipoAcceso, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idTipoAcceso, data: getTipoAcceso });
-                                }
                                 let cacheTipoAcceso = arrCache.filter((j) => j.id == idTipoAcceso);
                                 let isTipoAcceso = cacheTipoAcceso[0].data.filter((j) => j.UrlJsonContext.tipo_de_acesso == objPost.tipo_acceso);
                                 if (isTipoAcceso.length == 0) {
@@ -671,13 +868,12 @@ async function init(json) {
                                 objPost.senha = objPost.contrasena;
                                 delete objPost.contrasena;
                             }
-
-                            //*save:proveedores
-                            await gravarRegistro('nit_provedor', objPost.nit_provedor, idTabExcel, objPost, data);
                         }
 
                         //*aba:sitios
                         if (tabExcel == 'sitios') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.asset_number;
                             objPost.modificado_por = data.email;
                             objPost.modificado_em = data.data;
                             objPost.registro_salvo = 'sim';
@@ -708,12 +904,6 @@ async function init(json) {
                             let isSitCompaniaATC = getTabExcel.filter((j) => j.UrlJsonContext.emp_atc_site__empresa_atc == objPost.compania_atc);
                             if (isSitCompaniaATC.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:compania_atc
-                                let idCompaniaATC = '8803f10a-9c32-4c4f-8bd6-8e959ed24277';
-                                if (arrCache[idCompaniaATC] == undefined) {
-                                    //*cache:compania_atc
-                                    let getCompaniaATC = await getOnergyItem(idCompaniaATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idCompaniaATC, data: getCompaniaATC });
-                                }
                                 let cacheCompaniaATC = arrCache.filter((j) => j.id == idCompaniaATC);
                                 let isCompaniaATC = cacheCompaniaATC[0].data.filter((j) => j.UrlJsonContext.site == objPost.compania_atc);
                                 if (isCompaniaATC.length == 0) {
@@ -734,12 +924,6 @@ async function init(json) {
                             let isSitMunicipio = getTabExcel.filter((j) => j.UrlJsonContext.loca_cida_municipio == objPost.municipio);
                             if (isSitMunicipio.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:municipio
-                                let idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
-                                if (arrCache[idMunicipio] == undefined) {
-                                    //*cache:municipio
-                                    let getMunicipio = await getOnergyItem(idMunicipio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idMunicipio, data: getMunicipio });
-                                }
                                 let cacheMunicipio = arrCache.filter((j) => j.id == idMunicipio);
                                 let isMunicipio = cacheMunicipio[0].data.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
                                 if (isMunicipio.length == 0) {
@@ -778,12 +962,6 @@ async function init(json) {
                             let isSitEstadoSitio = getTabExcel.filter((j) => j.UrlJsonContext.STAstatus__status_do_site == objPost.estado_sitio);
                             if (isSitEstadoSitio.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:estado_sitio
-                                let idEstadoSitio = 'f0ee1dd9-bb48-4aef-9f77-43e357870a31';
-                                if (arrCache[idEstadoSitio] == undefined) {
-                                    //*cache:estado_sitio
-                                    let getEstadoSitio = await getOnergyItem(idEstadoSitio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idEstadoSitio, data: getEstadoSitio });
-                                }
                                 let cacheEstadoSitio = arrCache.filter((j) => j.id == idEstadoSitio);
                                 let isEstadoSitio = cacheEstadoSitio[0].data.filter((j) => j.UrlJsonContext.status == objPost.estado_sitio);
                                 if (isEstadoSitio.length == 0) {
@@ -804,12 +982,6 @@ async function init(json) {
                             let isSitPortafolioATC = getTabExcel.filter((j) => j.UrlJsonContext.tppf_tipo_portifolio__portfolio == objPost.portafolio_atc);
                             if (isSitPortafolioATC.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:portafolio_atc
-                                let idPortafolioATC = '18615527-c678-4f1c-87e0-d7a9735d0c6e';
-                                if (arrCache[idPortafolioATC] == undefined) {
-                                    //*cache:portafolio_atc
-                                    let getPortafolioATC = await getOnergyItem(idPortafolioATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idPortafolioATC, data: getPortafolioATC });
-                                }
                                 let cachePortafolioATC = arrCache.filter((j) => j.id == idPortafolioATC);
                                 let isPortafolioATC = cachePortafolioATC[0].data.filter((j) => j.UrlJsonContext.tipo_portifolio == objPost.portafolio_atc);
                                 if (isPortafolioATC.length == 0) {
@@ -830,12 +1002,6 @@ async function init(json) {
                             let isSitRegionalATC = getTabExcel.filter((j) => j.UrlJsonContext.regio_regional__regiao_atc == objPost.regional_atc);
                             if (isSitRegionalATC.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:regional_atc
-                                let idRegionalATC = '74d8a818-46a7-4d56-8a18-2369bdd00589';
-                                if (arrCache[idRegionalATC] == undefined) {
-                                    //*cache:regional_atc
-                                    let getRegionalATC = await getOnergyItem(idRegionalATC, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idRegionalATC, data: getRegionalATC });
-                                }
                                 let cacheRegionalATC = arrCache.filter((j) => j.id == idRegionalATC);
                                 let isRegionalATC = cacheRegionalATC[0].data.filter((j) => j.UrlJsonContext.regional == objPost.regional_atc);
                                 if (isRegionalATC.length == 0) {
@@ -852,19 +1018,17 @@ async function init(json) {
                                 objPost.regio_regiao_atc_id = isRegionalATC.length > 0 ? isRegionalATC[0].ID : '';
                                 delete objPost.regional_atc;
                             }
-
-                            //*save:sitios
-                            await gravarRegistro('asset_number', objPost.asset_number, idTabExcel, objPost, data);
                         }
 
                         //*aba:informacion_cuenta
                         if (tabExcel == 'informacion_cuenta') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.conta_interna_nic;
                             objPost.registro_salvo_ = 'sim';
 
                             //*id_one_ref:sitios
-                            let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(idSitios, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*item:profit_cost_center
                             let isProfitCostCenter = getTabExcel.filter((j) => j.UrlJsonContext.profit_cost_center == objPost.profit_cost_center);
@@ -926,12 +1090,6 @@ async function init(json) {
                             let isIdlcTipoCuenta = getTabExcel.filter((j) => j.UrlJsonContext.TCTC_tipo_de_conta__prcs__tipo_de_conta == objPost.tipo_cuenta);
                             if (isIdlcTipoCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:tipo_cuenta
-                                let idTipoCuenta = '84ca5970-7a49-4192-a2c8-030031503a1a';
-                                if (arrCache[idTipoCuenta] == undefined) {
-                                    //*cache:tipo_cuenta
-                                    let getTipoCuenta = await getOnergyItem(idTipoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idTipoCuenta, data: getTipoCuenta });
-                                }
                                 let cacheTipoCuenta = arrCache.filter((j) => j.id == idTipoCuenta);
                                 let isTipoCuenta = cacheTipoCuenta[0].data.filter((j) => j.UrlJsonContext.TC_tipo_de_conta == objPost.tipo_cuenta);
                                 if (isTipoCuenta.length == 0) {
@@ -942,9 +1100,11 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:tipo_cuenta
-                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__prcs__tipo_de_conta =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.TCprcs__tipo_de_conta_id = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
-                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor = isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
+                                objPost.TCTC_tipo_de_conta__TC_tipo_de_conta_valor =
+                                    isTipoCuenta.length > 0 ? isTipoCuenta[0].UrlJsonContext.TC_tipo_de_conta : '';
                                 objPost.prcs__tipo_de_conta_cache = isTipoCuenta.length > 0 ? isTipoCuenta[0].ID : '';
                                 delete objPost.tipo_cuenta;
                             }
@@ -961,12 +1121,6 @@ async function init(json) {
                             let isIdlcSuscriptor = getTabExcel.filter((j) => j.UrlJsonContext.sus_sus__suscriptor__prcs__assinante_atc == objPost.suscriptor);
                             if (isIdlcSuscriptor.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:suscriptor
-                                let idSuscriptor = '51a217b1-1d0a-47c7-b31c-46880c1ca5ad';
-                                if (arrCache[idSuscriptor] == undefined) {
-                                    //*cache:suscriptor
-                                    let getSuscriptor = await getOnergyItem(idSuscriptor, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idSuscriptor, data: getSuscriptor });
-                                }
                                 let cacheSuscriptor = arrCache.filter((j) => j.id == idSuscriptor);
                                 let isSuscriptor = cacheSuscriptor[0].data.filter((j) => j.UrlJsonContext.sus__suscriptor == objPost.suscriptor);
                                 if (isSuscriptor.length == 0) {
@@ -977,7 +1131,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:suscriptor
-                                objPost.sus_sus__suscriptor__prcs__assinante_atc = isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.sus__suscriptor : '';
+                                objPost.sus_sus__suscriptor__prcs__assinante_atc =
+                                    isSuscriptor.length > 0 ? isSuscriptor[0].UrlJsonContext.sus__suscriptor : '';
                                 objPost.sus_prcs__assinante_atc_id = isSuscriptor.length > 0 ? isSuscriptor[0].ID : '';
                                 delete objPost.suscriptor;
                             }
@@ -986,12 +1141,6 @@ async function init(json) {
                             let isIdlcEstadoCuenta = getTabExcel.filter((j) => j.UrlJsonContext.sta_cont_status_conta == objPost.estado_cuenta);
                             if (isIdlcEstadoCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:estado_cuenta
-                                let idEstadoCuenta = '4963d2c6-2b94-4c37-bffb-87c0dc296587';
-                                if (arrCache[idEstadoCuenta] == undefined) {
-                                    //*cache:estado_cuenta
-                                    let getEstadoCuenta = await getOnergyItem(idEstadoCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idEstadoCuenta, data: getEstadoCuenta });
-                                }
                                 let cacheEstadoCuenta = arrCache.filter((j) => j.id == idEstadoCuenta);
                                 let isEstadoCuenta = cacheEstadoCuenta[0].data.filter((j) => j.UrlJsonContext.status_conta == objPost.estado_cuenta);
                                 if (isEstadoCuenta.length == 0) {
@@ -1011,12 +1160,6 @@ async function init(json) {
                             let isIdlcProveedores = getTabExcel.filter((j) => j.UrlJsonContext.prvd_nome_provedor == objPost.nombre_proveedor);
                             if (isIdlcProveedores.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:proveedores
-                                let idProveedores = '4783ca0b-357d-42ab-a5c8-3328ee315f86';
-                                if (arrCache[idProveedores] == undefined) {
-                                    //*cache:proveedores
-                                    let getProveedores = await getOnergyItem(idProveedores, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idProveedores, data: getProveedores });
-                                }
                                 let cacheProveedores = arrCache.filter((j) => j.id == idProveedores);
                                 let isProveedores = cacheProveedores[0].data.filter((j) => j.UrlJsonContext.nome_provedor == objPost.nombre_proveedor);
                                 if (isProveedores.length == 0) {
@@ -1036,7 +1179,8 @@ async function init(json) {
                                 objPost.prvd_beneficiario = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.beneficiario : '';
                                 objPost.prvd_apelido_provedor = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.apelido_provedor : '';
                                 objPost.prvd_link_web = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.link_web : '';
-                                objPost.tp_acces_tipo_de_acesso__tp_acces_tipo_de_acesso = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.tp_acces_tipo_de_acesso : '';
+                                objPost.tp_acces_tipo_de_acesso__tp_acces_tipo_de_acesso =
+                                    isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.tp_acces_tipo_de_acesso : '';
                                 objPost.tp_acces_tp_acces_tipo_de_acesso_id = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.tp_acces_id : '';
                                 objPost.prvd_usuario = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.usuario : '';
                                 objPost.prvd_senha = isProveedores.length > 0 ? isProveedores[0].UrlJsonContext.senha : '';
@@ -1054,12 +1198,6 @@ async function init(json) {
                             let isIdlcServicios = getTabExcel.filter((j) => j.UrlJsonContext.SERVservicos__servico == objPost.servicios);
                             if (isIdlcServicios.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:servicios
-                                let idServicios = '8e284e84-b8f9-45c1-abe2-991555441ea2';
-                                if (arrCache[idServicios] == undefined) {
-                                    //*cache:servicios
-                                    let getServicios = await getOnergyItem(idServicios, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idServicios, data: getServicios });
-                                }
                                 let cacheServicios = arrCache.filter((j) => j.id == idServicios);
                                 let isServicios = cacheServicios[0].data.filter((j) => j.UrlJsonContext.servicos == objPost.servicios);
                                 if (isServicios.length == 0) {
@@ -1082,15 +1220,11 @@ async function init(json) {
                             }
 
                             //*item:sujeto_pasivo
-                            let isIdlcSujetoPasivo = getTabExcel.filter((j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo);
+                            let isIdlcSujetoPasivo = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico == objPost.sujeto_pasivo
+                            );
                             if (isIdlcSujetoPasivo.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:sujeto_pasivo
-                                let idSujetoPasivo = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
-                                if (arrCache[idSujetoPasivo] == undefined) {
-                                    //*cache:sujeto_pasivo
-                                    let getSujetoPasivo = await getOnergyItem(idSujetoPasivo, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idSujetoPasivo, data: getSujetoPasivo });
-                                }
                                 let cacheSujetoPasivo = arrCache.filter((j) => j.id == idSujetoPasivo);
                                 let isSujetoPasivo = cacheSujetoPasivo[0].data.filter((j) => j.UrlJsonContext.sujeito == objPost.sujeto_pasivo);
                                 if (isSujetoPasivo.length == 0) {
@@ -1101,13 +1235,16 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:sujeto_pasivo
-                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
+                                objPost.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico =
+                                    isSujetoPasivo.length > 0 ? isSujetoPasivo[0].UrlJsonContext.sujeito : '';
                                 objPost.suj_pa_prcs__sujeito_passivo_alumbrado_publico_id = isSujetoPasivo.length > 0 ? isSujetoPasivo[0].ID : '';
                                 delete objPost.sujeto_pasivo;
                             }
 
                             //*item:acuerdo_resolucion
-                            let isAcuerdoResolucion = getTabExcel.filter((j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion);
+                            let isAcuerdoResolucion = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.prcs__acuerdo_resolucion_alumbrado_publico == objPost.acuerdo_resolucion
+                            );
                             if (isAcuerdoResolucion.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*obj:acuerdo_resolucion
                                 objPost.prcs__acuerdo_resolucion_alumbrado_publico = objPost.acuerdo_resolucion;
@@ -1118,12 +1255,6 @@ async function init(json) {
                             let isIdlcTipoCobro = getTabExcel.filter((j) => j.UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca == objPost.tipo_cobro);
                             if (isIdlcTipoCobro.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:tipo_cobro
-                                let idTipoCobro = '22538843-147f-4d41-9534-20a6d674f4b6';
-                                if (arrCache[idTipoCobro] == undefined) {
-                                    //*cache:tipo_cobro
-                                    let getTipoCobro = await getOnergyItem(idTipoCobro, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idTipoCobro, data: getTipoCobro });
-                                }
                                 let cacheTipoCobro = arrCache.filter((j) => j.id == idTipoCobro);
                                 let isTipoCobro = cacheTipoCobro[0].data.filter((j) => j.UrlJsonContext.tipos_cobrancas == objPost.tipo_cobro);
                                 if (isTipoCobro.length == 0) {
@@ -1134,7 +1265,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:tipo_cobro
-                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca = isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
+                                objPost.tipo_cobr_tipos_cobrancas__tipo_de_cobranca =
+                                    isTipoCobro.length > 0 ? isTipoCobro[0].UrlJsonContext.tipos_cobrancas : '';
                                 objPost.tipo_cobr_tipo_de_cobranca_id = isTipoCobro.length > 0 ? isTipoCobro[0].ID : '';
                                 delete objPost.tipo_cobro;
                             }
@@ -1144,24 +1276,14 @@ async function init(json) {
                             if (isDiaDePago.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 objPost.prcs__dia_de_pagamento = objPost.dia_de_pago > 0 ? objPost.dia_de_pago : '';
                                 delete objPost.dia_de_pago;
-                                delete objPost.fecha_pago_abril;
-                                delete objPost.fecha_pago_mayo;
-                                delete objPost.fecha_pago_junio;
-                                delete objPost.d1;
-                                delete objPost.d2;
-                                delete objPost.d3;
                             }
 
                             //*item:frecuencia_pago
-                            let isIdlcFrecuenciaPago = getTabExcel.filter((j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago);
+                            let isIdlcFrecuenciaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.fre_pag_frequencia__frequencia_de_pagamento == objPost.frecuencia_pago
+                            );
                             if (isIdlcFrecuenciaPago.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:frecuencia_pago
-                                let idFrecuenciaPago = '2d4edce3-7131-413a-98e5-35d328daef7f';
-                                if (arrCache[idFrecuenciaPago] == undefined) {
-                                    //*cache:frecuencia_pago
-                                    let getFrecuenciaPago = await getOnergyItem(idFrecuenciaPago, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idFrecuenciaPago, data: getFrecuenciaPago });
-                                }
                                 let cacheFrecuenciaPago = arrCache.filter((j) => j.id == idFrecuenciaPago);
                                 let isFrecuenciaPago = cacheFrecuenciaPago[0].data.filter((j) => j.UrlJsonContext.frequencia == objPost.frecuencia_pago);
                                 if (isFrecuenciaPago.length == 0) {
@@ -1172,21 +1294,18 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:frecuencia_pago
-                                objPost.fre_pag_frequencia__frequencia_de_pagamento = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
+                                objPost.fre_pag_frequencia__frequencia_de_pagamento =
+                                    isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].UrlJsonContext.frequencia : '';
                                 objPost.fre_pag_frequencia_de_pagamento_id = isFrecuenciaPago.length > 0 ? isFrecuenciaPago[0].ID : '';
                                 delete objPost.frecuencia_pago;
                             }
 
                             //*item:forma_pago
-                            let isIdlcFormaPago = getTabExcel.filter((j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago);
+                            let isIdlcFormaPago = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.for_pag_formas_de_pagamentos__forma_de_pagamento == objPost.forma_pago
+                            );
                             if (isIdlcFormaPago.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:forma_pago
-                                let idFormaPago = '0e8a4463-28db-474f-926b-39fa1bd0c9bc';
-                                if (arrCache[idFormaPago] == undefined) {
-                                    //*cache:forma_pago
-                                    let getFormaPago = await getOnergyItem(idFormaPago, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idFormaPago, data: getFormaPago });
-                                }
                                 let cacheFormaPago = arrCache.filter((j) => j.id == idFormaPago);
                                 let isFormaPago = cacheFormaPago[0].data.filter((j) => j.UrlJsonContext.formas_de_pagamentos == objPost.forma_pago);
                                 if (isFormaPago.length == 0) {
@@ -1197,23 +1316,22 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:forma_pago
-                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento = isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
+                                objPost.for_pag_formas_de_pagamentos__forma_de_pagamento =
+                                    isFormaPago.length > 0 ? isFormaPago[0].UrlJsonContext.formas_de_pagamentos : '';
                                 objPost.for_pag_forma_de_pagamento_id = isFormaPago.length > 0 ? isFormaPago[0].ID : '';
                                 delete objPost.forma_pago;
                             }
 
                             //*item:clasificacion_passthru
-                            let isIdlcClasificacionPassthru = getTabExcel.filter((j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru);
+                            let isIdlcClasificacionPassthru = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru == objPost.clasificacion_passthru
+                            );
                             if (isIdlcClasificacionPassthru.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:clasificacion_passthru
-                                let idClasificacionPassthru = 'ad62c737-2abc-4c71-a572-e11933114ed8';
-                                if (arrCache[idClasificacionPassthru] == undefined) {
-                                    //*cache:clasificacion_passthru
-                                    let getClasificacionPassthru = await getOnergyItem(idClasificacionPassthru, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idClasificacionPassthru, data: getClasificacionPassthru });
-                                }
                                 let cacheClasificacionPassthru = arrCache.filter((j) => j.id == idClasificacionPassthru);
-                                let isClasificacionPassthru = cacheClasificacionPassthru[0].data.filter((j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru);
+                                let isClasificacionPassthru = cacheClasificacionPassthru[0].data.filter(
+                                    (j) => j.UrlJsonContext.classificacao_passthru == objPost.clasificacion_passthru
+                                );
                                 if (isClasificacionPassthru.length == 0) {
                                     //*err:clasificacion_passthru
                                     status_desc = `ERROR: no hay Clasificacion Passthru "${objPost.clasificacion_passthru}" registrado para ${tabExcel} en Asset Number "${objPost.asset_number}"`;
@@ -1229,17 +1347,15 @@ async function init(json) {
                             }
 
                             //*item:estado_captura_cuenta
-                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter((j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta);
+                            let isIdlcEstadoCapturaCuenta = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == objPost.estado_captura_cuenta
+                            );
                             if (isIdlcEstadoCapturaCuenta.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:estado_captura_cuenta
-                                let idEstadoCapturaCuenta = '3c2d0727-6359-4c71-9409-465759462854';
-                                if (arrCache[idEstadoCapturaCuenta] == undefined) {
-                                    //*cache:estado_captura_cuenta
-                                    let getEstadoCapturaCuenta = await getOnergyItem(idEstadoCapturaCuenta, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idEstadoCapturaCuenta, data: getEstadoCapturaCuenta });
-                                }
                                 let cacheEstadoCapturaCuenta = arrCache.filter((j) => j.id == idEstadoCapturaCuenta);
-                                let isEstadoCapturaCuenta = cacheEstadoCapturaCuenta[0].data.filter((j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta);
+                                let isEstadoCapturaCuenta = cacheEstadoCapturaCuenta[0].data.filter(
+                                    (j) => j.UrlJsonContext.ECCU_estado_da_captura_da_conta == objPost.estado_captura_cuenta
+                                );
                                 if (isEstadoCapturaCuenta.length == 0) {
                                     //*err:estado_captura_cuenta
                                     status_desc = `ERROR: no hay Estado Captura Cuenta "${objPost.estado_captura_cuenta}" registrado para ${tabExcel} en Asset Number "${objPost.asset_number}"`;
@@ -1271,28 +1387,21 @@ async function init(json) {
                                 objPost.data_proximo_pagamento = dataProximoPagoOportuno;
                                 delete objPost.proximo_pago_oportuno;
                             }
-
-                            //*save:informacion_cuenta
-                            await gravarRegistro('conta_interna_nic', objPost.conta_interna_nic, idTabExcel, objPost, data);
                         }
 
                         //*aba:informacion_tecnica
                         if (tabExcel == 'informacion_tecnica') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.asset_number;
+
                             //*id_one_ref:sitios
-                            let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(idSitios, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*item:categorias
                             let isItdsCategorias = getTabExcel.filter((j) => j.UrlJsonContext.ctgr_categorias__categoria == objPost.categorias);
                             if (isItdsCategorias.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:categorias
-                                let idCategorias = '55ec978d-7dbe-4a6f-8cb4-536b53361d54';
-                                if (arrCache[idCategorias] == undefined) {
-                                    //*cache:categorias
-                                    let getCategorias = await getOnergyItem(idCategorias, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idCategorias, data: getCategorias });
-                                }
                                 let cacheCategorias = arrCache.filter((j) => j.id == idCategorias);
                                 let isCategorias = cacheCategorias[0].data.filter((j) => j.UrlJsonContext.categorias == objPost.categorias);
                                 if (isCategorias.length == 0) {
@@ -1312,12 +1421,6 @@ async function init(json) {
                             let isItdsEstrato = getTabExcel.filter((j) => j.UrlJsonContext.LSTLST_estrato__ITDS_estrato == objPost.estrato);
                             if (isItdsEstrato.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:estrato
-                                let idEstrato = '34f26407-6afe-41c8-8420-7dbcd4f1aed4';
-                                if (arrCache[idEstrato] == undefined) {
-                                    //*cache:estrato
-                                    let getEstrato = await getOnergyItem(idEstrato, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idEstrato, data: getEstrato });
-                                }
                                 let cacheEstrato = arrCache.filter((j) => j.id == idEstrato);
                                 let isEstrato = cacheEstrato[0].data.filter((j) => j.UrlJsonContext.LST_estrato == objPost.estrato);
                                 if (isEstrato.length == 0) {
@@ -1337,12 +1440,6 @@ async function init(json) {
                             let isItdsNivelTension = getTabExcel.filter((j) => j.UrlJsonContext.NVTNVT_nivel__ITDS_nivel_de_tensao == objPost.nivel_tension);
                             if (isItdsNivelTension.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:nivel_tension
-                                let idNivelTension = '4056b8c5-29c0-47ff-b5b1-cfc3c7f39018';
-                                if (arrCache[idNivelTension] == undefined) {
-                                    //*cache:nivel_tension
-                                    let getNivelTension = await getOnergyItem(idNivelTension, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idNivelTension, data: getNivelTension });
-                                }
                                 let cacheNivelTension = arrCache.filter((j) => j.id == idNivelTension);
                                 let isNivelTension = cacheNivelTension[0].data.filter((j) => j.UrlJsonContext.NVT_nivel == objPost.nivel_tension);
                                 if (isNivelTension.length == 0) {
@@ -1362,12 +1459,6 @@ async function init(json) {
                             let isItdsLecturas = getTabExcel.filter((j) => j.UrlJsonContext.LCTLCT_ferramentas__ITDS_lecturas == objPost.lectura_atc);
                             if (isItdsLecturas.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:lecturas
-                                let idLecturas = '0d3b6287-8f3a-4ad7-acdd-e1c60426f73f';
-                                if (arrCache[idLecturas] == undefined) {
-                                    //*cache:lecturas
-                                    let getLecturas = await getOnergyItem(idLecturas, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idLecturas, data: getLecturas });
-                                }
                                 let cacheLecturas = arrCache.filter((j) => j.id == idLecturas);
                                 let isLecturas = cacheLecturas[0].data.filter((j) => j.UrlJsonContext.LCT_ferramentas == objPost.lectura_atc);
                                 if (isLecturas.length == 0) {
@@ -1437,12 +1528,6 @@ async function init(json) {
                             let isItdsMotogenerador = getTabExcel.filter((j) => j.UrlJsonContext.gerger_gerador__gerador == objPost.motogenerador);
                             if (isItdsMotogenerador.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:motogenerador
-                                let idMotogenerador = '066e2afa-0169-4e5f-a7fb-79131aafe8c7';
-                                if (arrCache[idMotogenerador] == undefined) {
-                                    //*cache:motogenerador
-                                    let getMotogenerador = await getOnergyItem(idMotogenerador, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idMotogenerador, data: getMotogenerador });
-                                }
                                 let cacheMotogenerador = arrCache.filter((j) => j.id == idMotogenerador);
                                 let isMotogenerador = cacheMotogenerador[0].data.filter((j) => j.UrlJsonContext.ger_gerador == objPost.motogenerador);
                                 if (isMotogenerador.length == 0) {
@@ -1459,17 +1544,15 @@ async function init(json) {
                             }
 
                             //*item:tablero_independiente
-                            let isItdsTableroIndependiente = getTabExcel.filter((j) => j.UrlJsonContext.dirdir_diretoria_independente__diretoria_independente == objPost.tablero_independiente);
+                            let isItdsTableroIndependiente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.dirdir_diretoria_independente__diretoria_independente == objPost.tablero_independiente
+                            );
                             if (isItdsTableroIndependiente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:tablero_independiente
-                                let idTableroIndependiente = 'dbaf278d-8fed-4611-be82-ecd9b69806c0';
-                                if (arrCache[idTableroIndependiente] == undefined) {
-                                    //*cache:tablero_independiente
-                                    let getTableroIndependiente = await getOnergyItem(idTableroIndependiente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idTableroIndependiente, data: getTableroIndependiente });
-                                }
                                 let cacheTableroIndependiente = arrCache.filter((j) => j.id == idTableroIndependiente);
-                                let isTableroIndependiente = cacheTableroIndependiente[0].data.filter((j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente);
+                                let isTableroIndependiente = cacheTableroIndependiente[0].data.filter(
+                                    (j) => j.UrlJsonContext.dir_diretoria_independente == objPost.tablero_independiente
+                                );
                                 if (isTableroIndependiente.length == 0) {
                                     //*err:tablero_independiente
                                     status_desc = `ERROR: no hay Tablero Independiente "${objPost.tablero_independiente}" registrado para ${tabExcel} en Asset Number "${objPost.asset_number}"`;
@@ -1488,12 +1571,6 @@ async function init(json) {
                             let isItdsBarter = getTabExcel.filter((j) => j.UrlJsonContext.escesc_escambo__escambo == objPost.barter);
                             if (isItdsBarter.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:barter
-                                let idBarter = '13dad727-2325-4e9d-85a3-c8ff09e053c7';
-                                if (arrCache[idBarter] == undefined) {
-                                    //*cache:barter
-                                    let getBarter = await getOnergyItem(idBarter, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idBarter, data: getBarter });
-                                }
                                 let cacheBarter = arrCache.filter((j) => j.id == idBarter);
                                 let isBarter = cacheBarter[0].data.filter((j) => j.UrlJsonContext.esc_escambo == objPost.barter);
                                 if (isBarter.length == 0) {
@@ -1513,12 +1590,6 @@ async function init(json) {
                             let isItdsProvisional = getTabExcel.filter((j) => j.UrlJsonContext.propro_provisorio__provisorio == objPost.provisional);
                             if (isItdsProvisional.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:provisional
-                                let idProvisional = 'fb6543b9-28a4-4e49-8f4b-2af6557a7cd8';
-                                if (arrCache[idProvisional] == undefined) {
-                                    //*cache:provisional
-                                    let getProvisional = await getOnergyItem(idProvisional, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idProvisional, data: getProvisional });
-                                }
                                 let cacheProvisional = arrCache.filter((j) => j.id == idProvisional);
                                 let isProvisional = cacheProvisional[0].data.filter((j) => j.UrlJsonContext.pro_provisorio == objPost.provisional);
                                 if (isProvisional.length == 0) {
@@ -1541,28 +1612,21 @@ async function init(json) {
                                 objPost.quantidade_provisoria = objPost.cantidad_provisionales;
                                 delete objPost.cantidad_provisionales;
                             }
-
-                            //*save:informacion_tecnica
-                            await gravarRegistro('asset_number', objPost.asset_number, idTabExcel, objPost, data);
                         }
 
                         //*aba:clientes_sitio
                         if (tabExcel == 'clientes_sitio') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.asset_number;
+
                             //*id_one_ref:sitios
-                            let paiGrid = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
                             let strFiltro = gerarFiltro('asset_number', objPost.asset_number.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(idSitios, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*item:nit_cliente
                             let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.COLCCOLC_nit_cliente == objPost.nit_cliente);
                             if (isNITCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:nit_cliente
-                                let idClientes = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
-                                if (arrCache[idClientes] == undefined) {
-                                    //*cache:nit_cliente
-                                    let getClientes = await getOnergyItem(idClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idClientes, data: getClientes });
-                                }
                                 let cacheClientes = arrCache.filter((j) => j.id == idClientes);
                                 let isClientes = cacheClientes[0].data.filter((j) => j.UrlJsonContext.COLC_nit_cliente == objPost.nit_cliente);
                                 if (isClientes.length == 0) {
@@ -1582,7 +1646,9 @@ async function init(json) {
                             }
 
                             //*item:codigo_sitio_cliente
-                            let isCodigoSitioCliente = getTabExcel.filter((j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente);
+                            let isCodigoSitioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.clsit__codigo_do_sitio_do_cliente == objPost.codigo_sitio_cliente
+                            );
                             if (isCodigoSitioCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*obj:codigo_sitio_cliente
                                 objPost.clsit__codigo_do_sitio_do_cliente = objPost.codigo_sitio_cliente;
@@ -1590,17 +1656,15 @@ async function init(json) {
                             }
 
                             //*item:nombre_regional
-                            let isNombreRegional = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional);
+                            let isNombreRegional = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__clsit__regional_do_cliente == objPost.nombre_regional
+                            );
                             if (isNombreRegional.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:nombre_regional
-                                let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
-                                if (arrCache[idRegionalClientes] == undefined) {
-                                    //*cache:nombre_regional
-                                    let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idRegionalClientes, data: getRegionalClientes });
-                                }
                                 let cacheRegionalClientes = arrCache.filter((j) => j.id == idRegionalClientes);
-                                let isRegionalClientes = cacheRegionalClientes[0].data.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
+                                let isRegionalClientes = cacheRegionalClientes[0].data.filter(
+                                    (j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional
+                                );
                                 if (isRegionalClientes.length == 0) {
                                     //*err:nombre_regional
                                     status_desc = `ERROR: no hay Nombre Regional "${objPost.nombre_regional}" registrado para ${tabExcel} en NIT Cliente "${objPost.nit_cliente}"`;
@@ -1609,23 +1673,22 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:nombre_regional
-                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSRCS_nome_regional__clsit__regional_do_cliente =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                                 objPost.RCSclsit__regional_do_cliente_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
                                 delete objPost.nombre_regional;
                             }
 
                             //*item:portafolio_cliente
-                            let isPcsPortafolioCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente);
+                            let isPcsPortafolioCliente = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente == objPost.portafolio_cliente
+                            );
                             if (isPcsPortafolioCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:portafolio_cliente
-                                let idPortafolioCliente = 'b36cf260-c691-4d36-9339-137041e6fb63';
-                                if (arrCache[idPortafolioCliente] == undefined) {
-                                    //*cache:portafolio_cliente
-                                    let getPortafolioCliente = await getOnergyItem(idPortafolioCliente, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idPortafolioCliente, data: getPortafolioCliente });
-                                }
                                 let cachePortafolioCliente = arrCache.filter((j) => j.id == idPortafolioCliente);
-                                let isPortafolioCliente = cachePortafolioCliente[0].data.filter((j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente);
+                                let isPortafolioCliente = cachePortafolioCliente[0].data.filter(
+                                    (j) => j.UrlJsonContext.PCS_portafolio_cliente == objPost.portafolio_cliente
+                                );
                                 if (isPortafolioCliente.length == 0) {
                                     //*err:portafolio_cliente
                                     status_desc = `ERROR: no hay Portafolio Cliente "${objPost.portafolio_cliente}" registrado para ${tabExcel} en NIT Cliente "${objPost.nit_cliente}"`;
@@ -1634,7 +1697,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:portafolio_cliente
-                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
+                                objPost.PCSPCS_portafolio_cliente__clsit__portifolio_cliente =
+                                    isPortafolioCliente.length > 0 ? isPortafolioCliente[0].UrlJsonContext.PCS_portafolio_cliente : '';
                                 objPost.PCSclsit__portifolio_cliente_id = isPortafolioCliente.length > 0 ? isPortafolioCliente[0].ID : '';
                                 delete objPost.portafolio_cliente;
                             }
@@ -1700,13 +1764,13 @@ async function init(json) {
                                 objPost.regio_regional = objPost.regional_atc;
                                 delete objPost.regional_atc;
                             }
-
-                            //*save:clientes_sitio
-                            await gravarRegistro('asset_number', objPost.asset_number, idTabExcel, objPost, data);
                         }
 
                         //*aba:clientes
                         if (tabExcel == 'clientes') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.COLC_nit_cliente;
+
                             //*item:nit_cliente
                             let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.COLC_nit_cliente == objPost.nit_cliente);
                             if (isNITCliente.length == 0 || data.em_caso_de_duplicidade == '1') {
@@ -1743,12 +1807,6 @@ async function init(json) {
                             let isColcMunicipio = getTabExcel.filter((j) => j.UrlJsonContext.loca_cida_municipio__COLC_cidade == objPost.municipio);
                             if (isColcMunicipio.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:municipio
-                                let idMunicipio = 'a95b4721-fc79-445c-b964-14a4ccbf1d7b';
-                                if (arrCache[idMunicipio] == undefined) {
-                                    //*cache:municipio
-                                    let getMunicipio = await getOnergyItem(idMunicipio, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idMunicipio, data: getMunicipio });
-                                }
                                 let cacheMunicipio = arrCache.filter((j) => j.id == idMunicipio);
                                 let isMunicipio = cacheMunicipio[0].data.filter((j) => j.UrlJsonContext.municipio == objPost.municipio);
                                 if (isMunicipio.length == 0) {
@@ -1765,17 +1823,16 @@ async function init(json) {
                                 delete objPost.municipio;
                                 delete objPost.departamento;
                             }
-
-                            //*save:clientes
-                            await gravarRegistro('COLC_nit_cliente', objPost.COLC_nit_cliente, idTabExcel, objPost, data);
                         }
 
                         //*aba:regional_clientes
                         if (tabExcel == 'regional_clientes') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.RCS_nome_regional;
+
                             //*id_one_ref:clientes
-                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
                             let strFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(idClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*item:nit_cliente
                             let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.RCS_nit_cliente == objPost.nit_cliente);
@@ -1793,17 +1850,16 @@ async function init(json) {
                                 objPost.RCS_nome_regional = objPost.nombre_regional;
                                 delete objPost.nombre_regional;
                             }
-
-                            //*save:regional_clientes
-                            await gravarRegistro('RCS_nome_regional', objPost.RCS_nome_regional, idTabExcel, objPost, data);
                         }
 
                         //*aba:contactos_clientes
                         if (tabExcel == 'contactos_clientes') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.RCSRCS_nome_regional__CCS_nombre_regional;
+
                             //*id_one_ref:clientes
-                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
                             let strFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(idClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*item:nit_cliente
                             let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.CCS_nit_cliente == objPost.nit_cliente);
@@ -1815,17 +1871,15 @@ async function init(json) {
                             }
 
                             //*item:nombre_regional
-                            let isRcsRegionalClientes = getTabExcel.filter((j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional);
+                            let isRcsRegionalClientes = getTabExcel.filter(
+                                (j) => j.UrlJsonContext.RCSRCS_nome_regional__CCS_nombre_regional == objPost.nombre_regional
+                            );
                             if (isRcsRegionalClientes.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:regional_clientes
-                                let idRegionalClientes = 'b45777ee-f5f3-429c-9fd7-9ee4578b0b63';
-                                if (arrCache[idRegionalClientes] == undefined) {
-                                    //*cache:regional_clientes
-                                    let getRegionalClientes = await getOnergyItem(idRegionalClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
-                                    arrCache.push({ id: idRegionalClientes, data: getRegionalClientes });
-                                }
                                 let cacheRegionalClientes = arrCache.filter((j) => j.id == idRegionalClientes);
-                                let isRegionalClientes = cacheRegionalClientes[0].data.filter((j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional);
+                                let isRegionalClientes = cacheRegionalClientes[0].data.filter(
+                                    (j) => j.UrlJsonContext.RCS_nome_regional == objPost.nombre_regional
+                                );
                                 if (isRegionalClientes.length == 0) {
                                     //*err:regional_clientes
                                     status_desc = `ERROR: no hay Nombre Regional "${objPost.nombre_regional}" registrado para ${tabExcel} en NIT Cliente "${objPost.nit_cliente}"`;
@@ -1834,7 +1888,8 @@ async function init(json) {
                                     return false;
                                 }
                                 //*obj:nombre_regional
-                                objPost.RCSRCS_nome_regional__CCS_nombre_regional = isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
+                                objPost.RCSRCS_nome_regional__CCS_nombre_regional =
+                                    isRegionalClientes.length > 0 ? isRegionalClientes[0].UrlJsonContext.RCS_nome_regional : '';
                                 objPost.RCSCCS_nombre_regional_id = isRegionalClientes.length > 0 ? isRegionalClientes[0].ID : '';
                                 delete objPost.nombre_regional;
                             }
@@ -1870,17 +1925,16 @@ async function init(json) {
                                 objPost.CCS_correo_eletronico = objPost.correo_electronico.toString();
                                 delete objPost.correo_electronico;
                             }
-
-                            //*save:contactos_clientes
-                            await gravarRegistro('RCSRCS_nome_regional__CCS_nombre_regional', objPost.RCSRCS_nome_regional__CCS_nombre_regional, idTabExcel, objPost, data);
                         }
 
                         //*aba:portafolio_clientes
                         if (tabExcel == 'portafolio_clientes') {
+                            fielNameQ = getKey(tabExcel);
+                            valueQ = objPost.PCS_portafolio_cliente;
+
                             //*id_one_ref:clientes
-                            let paiGrid = '0694dd6e-299a-4b46-b8fd-5e08da24f72d';
                             let strFiltro = gerarFiltro('COLC_nit_cliente', objPost.nit_cliente.toString());
-                            let paiRegistro = await getOnergyItem(paiGrid, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
+                            let paiRegistro = await getOnergyItem(idClientes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, strFiltro);
 
                             //*item:nit_cliente
                             let isNITCliente = getTabExcel.filter((j) => j.UrlJsonContext.PCS_nit_cliente == objPost.nit_cliente);
@@ -1898,10 +1952,22 @@ async function init(json) {
                                 objPost.PCS_portafolio_cliente = objPost.portafolio_cliente;
                                 delete objPost.portafolio_cliente;
                             }
-
-                            //*save:portafolio_clientes
-                            await gravarRegistro('PCS_portafolio_cliente', objPost.PCS_portafolio_cliente, idTabExcel, objPost, data);
                         }
+
+                        //*save
+                        let update = false;
+                        let id = '';
+                        let r = getTabExcel.find((x) => x['UrlJsonContext'][fielNameQ] == valueQ);
+                        update = r ? true : false;
+                        if (update) id = r.ID;
+                        await gravarRegistro(idTabExcel, objPost, data, update, id);
+
+                        //*postSave
+                        dataHoje = new Date();
+                        time = gerarDataHora(dataHoje, -5); //?Bogota
+                        status_desc = `OK: ${tabExcel} - ${getKey(tabExcel, true)} - ${JSON.stringify(valueQ)}`;
+                        statusPost.push(`${time}, ${status_desc} \n`);
+                        await postStatus(status_desc, statusPost, data);
                     }
 
                     //*limpar cache
@@ -1998,25 +2064,25 @@ async function getOnergyItem(fdtid, assid, usrid, filtro, fedid) {
     return result;
 }
 async function postStatus(status_desc, statusPost, data) {
+    const idCargaGeral = '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f';
+
     //*envia update para registro de carga
     let postInfo = {
         processamento: status_desc,
         horas: data.time,
         processo: statusPost,
     };
-    onergy.log(`JFS ~ postStatus ~ postInfo: ${JSON.stringify(postInfo)}`);
+    onergy.log(`JFS ~ postInfo: ${JSON.stringify(postInfo.processamento)}`);
+
     //!node:test (return true)
-    return true;
-    // let idCargaGeral = '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f';
-    // let result = await gravarRegistro('fedid', data.id_upload_planilha, idCargaGeral, postInfo, data);
-    // return result;
+    // return true;
+    let valueQ = data.id_upload_planilha;
+    let result = await gravarRegistro(idCargaGeral, postInfo, data, true, valueQ);
+    return result;
 }
-async function gravarRegistro(fielNameQ, valueQ, idTabExcel, objPost, data) {
-    //*consulta registro
-    let filItem = gerarFiltro(fielNameQ, valueQ);
-    let getItem = await getOnergyItem(idTabExcel, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filItem);
-    if (getItem.length > 0) {
-        //*se houver registro, atualizar
+async function gravarRegistro(idTabExcel, objPost, data, update, id) {
+    //*se houver registro, atualizar
+    if (update) {
         let postInfo = {
             UrlJsonContext: objPost,
         };
@@ -2024,7 +2090,7 @@ async function gravarRegistro(fielNameQ, valueQ, idTabExcel, objPost, data) {
             fdtid: idTabExcel,
             assid: data.onergy_js_ctx.assid,
             usrid: data.onergy_js_ctx.usrid,
-            id: getItem[0].ID,
+            id: id,
             data: JSON.stringify(postInfo),
         });
         return result;
@@ -2061,58 +2127,206 @@ function gerarDataHora(dataHoje, utc) {
     let horaTimezoneFormat = JSON.stringify(horaTimezone24h).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
     return dataHojeFormatada + ' ' + horaTimezoneFormat;
 }
+function removeDuplicados(ctxExcel, tabExcel) {
+    let key = getKey(tabExcel, true);
+    return ctxExcel.filter((v, i, a) => a.findIndex((v2) => v2[key] === v[key]) === i);
+}
+function getKey(tabExcel, isRemoveDuplicados) {
+    let key = '';
+    let key_es = '';
+    if (tabExcel == 'categorias') {
+        key = 'categorias';
+        key_es = 'categorias';
+    }
+    if (tabExcel == 'departamento') {
+        key = 'uf';
+        key_es = 'departamento';
+    }
+    if (tabExcel == 'municipio') {
+        key = 'municipio';
+        key_es = 'municipio';
+    }
+    if (tabExcel == 'compania_atc') {
+        key = 'site';
+        key_es = 'compania_atc';
+    }
+    if (tabExcel == 'suscriptor') {
+        key = 'suscriptor';
+        key_es = 'suscriptor';
+    }
+    if (tabExcel == 'forma_pago') {
+        key = 'formas_de_pagamentos';
+        key_es = 'forma_pago';
+    }
+    if (tabExcel == 'frecuencia_pago') {
+        key = 'frequencia';
+        key_es = 'frecuencia_pago';
+    }
+    if (tabExcel == 'lecturas') {
+        key = 'LCT_ferramentas';
+        key_es = 'herramientas';
+    }
+    if (tabExcel == 'motogenerador') {
+        key = 'ger_gerador';
+        key_es = 'motogenerador';
+    }
+    if (tabExcel == 'tablero_independiente') {
+        key = 'dir_diretoria_independente';
+        key_es = 'tablero_independiente';
+    }
+    if (tabExcel == 'barter') {
+        key = 'esc_escambo';
+        key_es = 'barter';
+    }
+    if (tabExcel == 'provisional') {
+        key = 'pro_provisorio';
+        key_es = 'provisional';
+    }
+    if (tabExcel == 'portafolio_atc') {
+        key = 'tipo_portifolio';
+        key_es = 'portafolio_atc';
+    }
+    if (tabExcel == 'regional_atc') {
+        key = 'regional';
+        key_es = 'regional_atc';
+    }
+    if (tabExcel == 'servicios') {
+        key = 'servicos';
+        key_es = 'servicios';
+    }
+    if (tabExcel == 'estado_cuenta') {
+        key = 'status_conta';
+        key_es = 'estado_cuenta';
+    }
+    if (tabExcel == 'estado_sitio') {
+        key = 'status';
+        key_es = 'estado_sitio';
+    }
+    if (tabExcel == 'sujeto_pasivo') {
+        key = 'sujeito';
+        key_es = 'sujeto_pasivo';
+    }
+    if (tabExcel == 'tipo_cobro') {
+        key = 'tipos_cobrancas';
+        key_es = 'tipo_cobro';
+    }
+    if (tabExcel == 'tipo_tercero') {
+        key = 'tipo_de_terceiro';
+        key_es = 'tipo_tercero';
+    }
+    if (tabExcel == 'tipo_acceso') {
+        key = 'tipo_de_acesso';
+        key_es = 'tipo_acceso';
+    }
+    if (tabExcel == 'tipo_cuenta') {
+        key = 'TC_tipo_de_conta';
+        key_es = 'tipo_cuenta';
+    }
+    if (tabExcel == 'estrato') {
+        key = 'LST_estrato';
+        key_es = 'estrato';
+    }
+    if (tabExcel == 'nivel_tension') {
+        key = 'NVT_nivel';
+        key_es = 'nivel_tension';
+    }
+    if (tabExcel == 'clasificacion_passthru') {
+        key = 'classificacao_passthru';
+        key_es = 'clasificacion_passthru';
+    }
+    if (tabExcel == 'proveedores') {
+        key = 'nit_provedor';
+        key_es = 'nit_proveedor';
+    }
+    if (tabExcel == 'sitios') {
+        key = 'asset_number';
+        key_es = 'asset_number';
+    }
+    if (tabExcel == 'informacion_cuenta') {
+        key = 'conta_interna_nic';
+        key_es = 'cuenta_interna_nic';
+    }
+    if (tabExcel == 'informacion_tecnica') {
+        key = 'asset_number';
+        key_es = 'asset_number';
+    }
+    if (tabExcel == 'clientes_sitio') {
+        key = 'asset_number';
+        key_es = 'asset_number';
+    }
+    if (tabExcel == 'clientes') {
+        key = 'COLC_nit_cliente';
+        key_es = 'nit_cliente';
+    }
+    if (tabExcel == 'regional_clientes') {
+        key = 'RCS_nome_regional';
+        key_es = 'nombre_regional';
+    }
+    if (tabExcel == 'contactos_clientes') {
+        key = 'RCSRCS_nome_regional__CCS_nombre_regional';
+        key_es = 'nit_cliente';
+    }
+    if (tabExcel == 'portafolio_clientes') {
+        key = 'PCS_portafolio_cliente';
+        key_es = 'portafolio_cliente';
+    }
+    if (isRemoveDuplicados) {
+        return key_es;
+    } else {
+        return key;
+    }
+}
 /**MET_PADRAO =====================================================================================
  */
 let json = {
     processo: '',
     horas: '',
-    dataDate: '2022-12-17T19:23:27Z',
-    data: '2022-12-17 16:23:27',
+    dataDate: '2022-12-30T09:54:13Z',
+    data: '2022-12-30 06:54:13',
     load_index_equipe: 'COL',
-    load_index_id_equipe: '',
-    load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
+    load_index_id_do_card: 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/carga_maestra_v9.xlsxb4dd7541-4366-4717-9b0e-80526b49ee4e.xlsx?sv=2018-03-28&sr=b&sig=g1olQAKQd%2FVl26E5GaBTxFF8qaIDo7stwQ%2ByvI6AM0E%3D&se=2023-07-05T19%3A23%3A05Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/88443605-74d6-4ea4-b426-a6c3e26aa615/tablas_maestras_produccion_v2_duplicado.xlsxe94711c7-0894-48ca-8df7-3783dbd46f3b.xlsx?sv=2018-03-28&sr=b&sig=sqGgNKKSAfvMjYuEC9j4HFXu7DhMI3%2BAFw1kaesw5SY%3D&se=2023-07-18T14%3A48%3A35Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/carga_maestra_v9.xlsxb4dd7541-4366-4717-9b0e-80526b49ee4e.xlsx?sv=2018-03-28&sr=b&sig=g1olQAKQd%2FVl26E5GaBTxFF8qaIDo7stwQ%2ByvI6AM0E%3D&se=2023-07-05T19%3A23%3A05Z&sp=r',
-            Name: 'carga_maestra_v9.xlsx',
+                'https://onebackupservices.blob.core.windows.net/88443605-74d6-4ea4-b426-a6c3e26aa615/tablas_maestras_produccion_v2_duplicado.xlsxe94711c7-0894-48ca-8df7-3783dbd46f3b.xlsx?sv=2018-03-28&sr=b&sig=sqGgNKKSAfvMjYuEC9j4HFXu7DhMI3%2BAFw1kaesw5SY%3D&se=2023-07-18T14%3A48%3A35Z&sp=r',
+            Name: 'tablas_maestras_produccion_v2_duplicado.xlsx',
         },
     ],
-    load_index_tab_excel: 'informacion_cuenta',
-    load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
+    load_index_tab_excel: 'sitios',
+    load_index_id: 'ea2c764b-d958-4905-af1e-669239bce62e',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de informacion_cuenta iniciada',
-    time: '16:22',
-    em_caso_de_duplicidade_desc: 'Sobrescribir',
+    processamento: 'Carga de sitios iniciada',
+    time: '6:54',
+    em_caso_de_duplicidade_desc: 'Sobrescrever',
     oneTemplateTitle: '',
-    ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: 'c7fc8a73-0a84-4390-af97-ee65f0bd51f4',
+    ass_id: '88443605-74d6-4ea4-b426-a6c3e26aa615',
+    assid: '88443605-74d6-4ea4-b426-a6c3e26aa615',
+    fedid: '22dc446d-7d3d-4c4e-b4b2-25cb391d6159',
     fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
-    usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-    email: 'admin-colombia@atc.com.co',
-    onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
+    usrid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
+    email: 'prod@atc.com.br',
+    onergy_rolid: '',
     timezone: null,
     onergy_js_ctx: {
-        assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: 'c7fc8a73-0a84-4390-af97-ee65f0bd51f4',
+        assid: '88443605-74d6-4ea4-b426-a6c3e26aa615',
+        fedid: '22dc446d-7d3d-4c4e-b4b2-25cb391d6159',
         fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
-        usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-12-17T19:23:26.307Z',
-        updateDt: '2022-12-17T19:23:26.307Z',
-        cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        email: 'admin-colombia@atc.com.co',
-        user_name: 'Administrador Colômbia',
-        onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: 'cffda0b7-a129-495b-a11e-9d6215844ec5',
-        pcvid: '8810eaa3-9b4c-427a-90ca-cdb8dab79667',
+        usrid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
+        insertDt: '2022-12-30T09:54:16.018Z',
+        updateDt: '2022-12-30T09:54:16.018Z',
+        cur_userid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
+        email: 'prod@atc.com.br',
+        user_name: 'prod@atc.com.br',
+        onergy_rolid: '',
+        praid: '607b6715-bd54-44db-9d1a-8a5fc424f0a0',
+        pcvid: '7a91a263-72a8-458b-845e-5efe4e42c81a',
         prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
         timezone: null,
         timezone_value: '-03:00',
         pubNubHook: null,
     },
-    id_upload_planilha: 'a7cd9a27-e453-5b70-4488-781ab6c611db',
+    id_upload_planilha: 'cc2e5dfd-7eaa-0155-4f15-af8857e8acdc',
 };
 
 init(JSON.stringify(json));
