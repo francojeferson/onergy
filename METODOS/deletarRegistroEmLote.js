@@ -70,7 +70,8 @@ async function onergy_get(args) {
 async function init(strData) {
     var data = JSON.parse(strData);
     //*inserir fdtid de onde o registro se encontra
-    let idGridRegistro = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
+    let idInformacionesDeLaCuenta = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3'; /*'21672360-869c-4c29-8cf8-2bafa8530923';*/
+    let idGridRegistro = idInformacionesDeLaCuenta;
     let strInfo = await getOnergyItem(idGridRegistro, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
     //*função para deletar os registros em lote
     if (strInfo.length > 0) {
@@ -140,9 +141,12 @@ async function DeletarRegistro(data, usrid, fedid) {
         contentType: 'application/json',
     }).then(
         (response) => {
+            // eslint-disable-next-line no-undef
             strRespToken = response.data;
         },
+        // eslint-disable-next-line no-unused-vars
         (error) => {
+            // eslint-disable-next-line no-undef
             strRespToken = '';
         }
     );
