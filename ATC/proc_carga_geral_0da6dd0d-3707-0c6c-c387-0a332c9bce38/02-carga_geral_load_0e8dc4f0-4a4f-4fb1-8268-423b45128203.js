@@ -1,31 +1,46 @@
 /**ENV_NODE** =====================================================================================
  */
-// const { date } = require('assert-plus');
-// const { formatDate } = require('tough-cookie');
-// const { log } = require('console');
-// const { memory } = require('console');
-// const { resolve } = require('path');
-// const { type } = require('os');
-// const axios = require('axios');
-// const fs = require('fs');
-// const jsuser = require('../../onergy/onergy-utils');
+// eslint-disable-next-line no-unused-vars
+const { date } = require('assert-plus');
+// eslint-disable-next-line no-unused-vars
+const { formatDate } = require('tough-cookie');
+// eslint-disable-next-line no-unused-vars
+const { log } = require('console');
+// eslint-disable-next-line no-unused-vars
+const { memory } = require('console');
+// eslint-disable-next-line no-unused-vars
+const { resolve } = require('path');
+// eslint-disable-next-line no-unused-vars
+const { type } = require('os');
+// eslint-disable-next-line no-unused-vars
+const axios = require('axios');
+// eslint-disable-next-line no-unused-vars
+const fs = require('fs');
+// eslint-disable-next-line no-unused-vars
+const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
-// const utils = require('../../onergy/onergy-utils');
-// async function ajax(args) {
-//     return await onergy.ajax(args);
-// }
-// async function ajaxPost(args) {
-//     return await onergy.ajaxPost(args);
-// }
-// async function hashMd5(args) {
-//     return await onergy.hashMd5(args);
-// }
-// async function increment(args) {
-//     return await onergy.increment(args);
-// }
-// async function onergy_countdocs(args) {
-//     return await onergy.onergy_countdocs(args);
-// }
+// eslint-disable-next-line no-unused-vars
+const utils = require('../../onergy/onergy-utils');
+// eslint-disable-next-line no-unused-vars
+async function ajax(args) {
+    return await onergy.ajax(args);
+}
+// eslint-disable-next-line no-unused-vars
+async function ajaxPost(args) {
+    return await onergy.ajaxPost(args);
+}
+// eslint-disable-next-line no-unused-vars
+async function hashMd5(args) {
+    return await onergy.hashMd5(args);
+}
+// eslint-disable-next-line no-unused-vars
+async function increment(args) {
+    return await onergy.increment(args);
+}
+// eslint-disable-next-line no-unused-vars
+async function onergy_countdocs(args) {
+    return await onergy.onergy_countdocs(args);
+}
 async function onergy_get(args) {
     let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
@@ -36,31 +51,39 @@ async function onergy_save(args) {
 async function ReadExcelToJson(args) {
     return await onergy.ReadExcelToJson(args);
 }
-// async function ReadTextPdf(args) {
-//     return await onergy.ReadTextPdf(args);
-// }
-// async function sendmail(args) {
-//     return await onergy.sendmail(args);
-// }
-// async function onergy_sendto(args) {
-//     let r = await onergy.onergy_sendto(args);
-//     return JSON.stringify(r);
-// }
+// eslint-disable-next-line no-unused-vars
+async function ReadTextPdf(args) {
+    return await onergy.ReadTextPdf(args);
+}
+// eslint-disable-next-line no-unused-vars
+async function sendmail(args) {
+    return await onergy.sendmail(args);
+}
+// eslint-disable-next-line no-unused-vars
+async function onergy_sendto(args) {
+    let r = await onergy.onergy_sendto(args);
+    return JSON.stringify(r);
+}
 async function onergy_updatemany(args) {
+    args.executeAction = false;
     return await onergy.onergy_save(args);
 }
-// function failureCallback(error) {
-//     console.log('It failed with ' + error);
-// }
-// function get_usr_tmz_dt_now(data) {
-//     return data;
-// }
-// function replaceAll(content, needle, replacement) {
-//     return content.split(needle).join(replacement);
-// }
-// function successCallback(result) {
-//     console.log('It succeeded with ' + result);
-// }
+// eslint-disable-next-line no-unused-vars
+function failureCallback(error) {
+    console.log('It failed with ' + error);
+}
+// eslint-disable-next-line no-unused-vars
+function get_usr_tmz_dt_now(data) {
+    return data;
+}
+// eslint-disable-next-line no-unused-vars
+function replaceAll(content, needle, replacement) {
+    return content.split(needle).join(replacement);
+}
+// eslint-disable-next-line no-unused-vars
+function successCallback(result) {
+    console.log('It succeeded with ' + result);
+}
 /**CLI_SCRIPT** ===================================================================================
  * Executar automático quando em processo: Não
  * Atividade de longa duração: Não
@@ -1023,7 +1046,7 @@ async function init(json) {
                         //*aba:informacion_cuenta
                         if (tabExcel == 'informacion_cuenta') {
                             fielNameQ = getKey(tabExcel);
-                            valueQ = objPost.conta_interna_nic;
+                            valueQ = objPost.cuenta_interna_nic;
                             objPost.registro_salvo_ = 'sim';
 
                             //*id_one_ref:sitios
@@ -2019,12 +2042,17 @@ async function init(json) {
     // return true;
     return SetObjectResponse(true, data, true);
 }
-// function initBefore(json) {
-//     //return true;
-// }
-// function initDelete(json) {
-//     //return true;
-// }
+
+// eslint-disable-next-line no-unused-vars
+function initBefore(json) {
+    //return true;
+}
+
+// eslint-disable-next-line no-unused-vars
+function initDelete(json) {
+    //return true;
+}
+
 function SetObjectResponse(cond, json, WaitingWebHook) {
     if (WaitingWebHook == undefined) WaitingWebHook = false;
     let obj = {
@@ -2034,6 +2062,7 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
     };
     return obj;
 }
+
 async function getOnergyItem(fdtid, assid, usrid, filtro, fedid) {
     let keepSearching = true;
     let skip = 0;
@@ -2063,6 +2092,7 @@ async function getOnergyItem(fdtid, assid, usrid, filtro, fedid) {
     }
     return result;
 }
+
 async function postStatus(status_desc, statusPost, data) {
     const idCargaGeral = '181c67a8-e7a9-4c9a-9ea1-ca4719c0e23f';
 
@@ -2080,6 +2110,7 @@ async function postStatus(status_desc, statusPost, data) {
     let result = await gravarRegistro(idCargaGeral, postInfo, data, true, valueQ);
     return result;
 }
+
 async function gravarRegistro(idTabExcel, objPost, data, update, id) {
     //*se houver registro, atualizar
     if (update) {
@@ -2105,6 +2136,7 @@ async function gravarRegistro(idTabExcel, objPost, data, update, id) {
         return result;
     }
 }
+
 function gerarFiltro(fielNameP, valueP) {
     return JSON.stringify([
         {
@@ -2115,6 +2147,7 @@ function gerarFiltro(fielNameP, valueP) {
         },
     ]);
 }
+
 function gerarDataHora(dataHoje, utc) {
     let dataHojeFormat = dataHoje.getFullYear() + '-' + (dataHoje.getMonth() + 1) + '-' + dataHoje.getDate();
     let arrayData = dataHojeFormat.split('-');
@@ -2127,10 +2160,12 @@ function gerarDataHora(dataHoje, utc) {
     let horaTimezoneFormat = JSON.stringify(horaTimezone24h).padStart(2, '0') + ':' + arrayHora[1].padStart(2, '0') + ':' + arrayHora[2].padStart(2, '0');
     return dataHojeFormatada + ' ' + horaTimezoneFormat;
 }
+
 function removeDuplicados(ctxExcel, tabExcel) {
     let key = getKey(tabExcel, true);
     return ctxExcel.filter((v, i, a) => a.findIndex((v2) => v2[key] === v[key]) === i);
 }
+
 function getKey(tabExcel, isRemoveDuplicados) {
     let key = '';
     let key_es = '';
@@ -2278,55 +2313,55 @@ function getKey(tabExcel, isRemoveDuplicados) {
 }
 /**MET_PADRAO =====================================================================================
  */
-let json = {
+let json_test = {
     processo: '',
     horas: '',
-    dataDate: '2022-12-30T09:54:13Z',
-    data: '2022-12-30 06:54:13',
+    dataDate: '2023-01-17T12:00:05Z',
+    data: '2023-01-17 09:00:05',
     load_index_equipe: 'COL',
-    load_index_id_do_card: 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4',
+    load_index_id_equipe: '',
+    load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/88443605-74d6-4ea4-b426-a6c3e26aa615/tablas_maestras_produccion_v2_duplicado.xlsxe94711c7-0894-48ca-8df7-3783dbd46f3b.xlsx?sv=2018-03-28&sr=b&sig=sqGgNKKSAfvMjYuEC9j4HFXu7DhMI3%2BAFw1kaesw5SY%3D&se=2023-07-18T14%3A48%3A35Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_produccion_v4.xlsx08392f75-231f-4231-9cc5-15610a2f362f.xlsx?sv=2018-03-28&sr=b&sig=Cp9dtxHc287k%2BR2u1c%2FkyjCgAMhgZiKVQg2SEcaNL50%3D&se=2023-08-05T11%3A59%3A53Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/88443605-74d6-4ea4-b426-a6c3e26aa615/tablas_maestras_produccion_v2_duplicado.xlsxe94711c7-0894-48ca-8df7-3783dbd46f3b.xlsx?sv=2018-03-28&sr=b&sig=sqGgNKKSAfvMjYuEC9j4HFXu7DhMI3%2BAFw1kaesw5SY%3D&se=2023-07-18T14%3A48%3A35Z&sp=r',
-            Name: 'tablas_maestras_produccion_v2_duplicado.xlsx',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_produccion_v4.xlsx08392f75-231f-4231-9cc5-15610a2f362f.xlsx?sv=2018-03-28&sr=b&sig=Cp9dtxHc287k%2BR2u1c%2FkyjCgAMhgZiKVQg2SEcaNL50%3D&se=2023-08-05T11%3A59%3A53Z&sp=r',
+            Name: 'tablas_maestras_produccion_v4.xlsx',
         },
     ],
-    load_index_tab_excel: 'sitios',
-    load_index_id: 'ea2c764b-d958-4905-af1e-669239bce62e',
+    load_index_tab_excel: 'informacion_cuenta',
+    load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
     em_caso_de_duplicidade: '1',
-    processamento: 'Carga de sitios iniciada',
-    time: '6:54',
-    em_caso_de_duplicidade_desc: 'Sobrescrever',
+    processamento: 'Carga de informacion_cuenta iniciada',
+    time: '8:59',
+    em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: '',
-    ass_id: '88443605-74d6-4ea4-b426-a6c3e26aa615',
-    assid: '88443605-74d6-4ea4-b426-a6c3e26aa615',
-    fedid: '22dc446d-7d3d-4c4e-b4b2-25cb391d6159',
+    ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+    assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+    fedid: '3a9a3c1a-119f-4577-8e03-25cb496f94d1',
     fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
-    usrid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
-    email: 'prod@atc.com.br',
+    usrid: '1ec86197-d331-483a-b325-62cc26433ea5',
+    email: 'adm@atc.com.br',
     onergy_rolid: '',
     timezone: null,
     onergy_js_ctx: {
-        assid: '88443605-74d6-4ea4-b426-a6c3e26aa615',
-        fedid: '22dc446d-7d3d-4c4e-b4b2-25cb391d6159',
+        assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
+        fedid: '3a9a3c1a-119f-4577-8e03-25cb496f94d1',
         fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
-        usrid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
-        insertDt: '2022-12-30T09:54:16.018Z',
-        updateDt: '2022-12-30T09:54:16.018Z',
-        cur_userid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
-        email: 'prod@atc.com.br',
-        user_name: 'prod@atc.com.br',
+        usrid: '1ec86197-d331-483a-b325-62cc26433ea5',
+        insertDt: '2023-01-17T12:00:04.939Z',
+        updateDt: '2023-01-17T12:00:04.939Z',
+        cur_userid: '1ec86197-d331-483a-b325-62cc26433ea5',
+        email: 'adm@atc.com.br',
+        user_name: 'ADM ATC',
         onergy_rolid: '',
-        praid: '607b6715-bd54-44db-9d1a-8a5fc424f0a0',
-        pcvid: '7a91a263-72a8-458b-845e-5efe4e42c81a',
+        praid: 'd03ac164-46fa-4590-ab1c-af048bc2b562',
+        pcvid: 'b5a97f81-7636-4bc5-88e7-3f2ce426d9f8',
         prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
         timezone: null,
         timezone_value: '-03:00',
         pubNubHook: null,
     },
-    id_upload_planilha: 'cc2e5dfd-7eaa-0155-4f15-af8857e8acdc',
+    id_upload_planilha: '45e87872-ba5b-bb7a-1678-d925e7a38b51',
 };
-
-init(JSON.stringify(json));
+init(JSON.stringify(json_test));
