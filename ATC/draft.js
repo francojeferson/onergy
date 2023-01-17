@@ -2,7 +2,7 @@
  */
 let { date } = require('assert-plus');
 let { formatDate } = require('tough-cookie');
-let { log } = require('console');
+let { log, debug } = require('console');
 let { memory } = require('console');
 let { resolve } = require('path');
 let { type } = require('os');
@@ -75,6 +75,19 @@ function initBefore(json) {
 
 async function init(strData) {
     var data = JSON.parse(strData);
+    let x = JSON.parse(
+        await onergy_get({ fdtid: '59bb645e-3729-48eb-baaa-0e30fc3210d3', assid: data.assid, usrid: data.usrid, filter: null, page: 0, rows: 10 })
+    );
+    for (let index = 0; index < x.length; index++) {
+        const element = x[index];
+        console.log(element.UrlJsonContext.conta_interna_nic + ' ' + element.ID + ' ' + element.UrlJsonContext.numero_da_nota_fiscal);
+    }
+    x = JSON.parse(await onergy_get({ fdtid: '59bb645e-3729-48eb-baaa-0e30fc3210d3', assid: data.assid, usrid: data.usrid, filter: null, page: 10, rows: 10 }));
+    for (let index = 0; index < x.length; index++) {
+        const element = x[index];
+        console.log(element.UrlJsonContext.conta_interna_nic + ' ' + element.ID + ' ' + element.UrlJsonContext.numero_da_nota_fiscal);
+    }
+    debugger;
 
     let date = new Date();
     let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bogota' });
@@ -179,7 +192,7 @@ function SetObjectResponse(cond, json, WaitingWebHook, UsrID, GrpID) {
 async function getOnergyItem(fdtid, assid, usrid, filtro) {
     let keepSearching = true;
     let skip = 0;
-    take = 500;
+    take = 50;
     let result = [];
     while (keepSearching) {
         let strPageResp = await onergy_get({
@@ -229,7 +242,7 @@ let json = {
     usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
 };
 
-// init(JSON.stringify(json));
-let b64txt = utils.GetTextFromBase64('dWcyOXM2YjhuamtoZGtjcmgydXp2YWdkOm5uUk5CclRuMzI=');
-const encode = Buffer.from(b64txt).toString('base64');
-debugger;
+init(JSON.stringify(json));
+// let b64txt = utils.GetTextFromBase64('dWcyOXM2YjhuamtoZGtjcmgydXp2YWdkOm5uUk5CclRuMzI=');
+// const encode = Buffer.from(b64txt).toString('base64');
+// debugger;
