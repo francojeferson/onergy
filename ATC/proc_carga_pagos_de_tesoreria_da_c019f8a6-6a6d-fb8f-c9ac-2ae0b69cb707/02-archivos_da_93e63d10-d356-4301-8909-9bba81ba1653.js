@@ -1,28 +1,43 @@
 /**ENV_NODE** =====================================================================================
  */
+// eslint-disable-next-line no-unused-vars
 const { date } = require('assert-plus');
+// eslint-disable-next-line no-unused-vars
 const { formatDate } = require('tough-cookie');
+// eslint-disable-next-line no-unused-vars
 const { log, debug } = require('console');
+// eslint-disable-next-line no-unused-vars
 const { memory } = require('console');
+// eslint-disable-next-line no-unused-vars
 const { resolve } = require('path');
+// eslint-disable-next-line no-unused-vars
 const { type } = require('os');
+// eslint-disable-next-line no-unused-vars
 const axios = require('axios');
+// eslint-disable-next-line no-unused-vars
 const fs = require('fs');
+// eslint-disable-next-line no-unused-vars
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
+// eslint-disable-next-line no-unused-vars
 const utils = require('../../onergy/onergy-utils');
+// eslint-disable-next-line no-unused-vars
 async function ajax(args) {
     return await onergy.ajax(args);
 }
+// eslint-disable-next-line no-unused-vars
 async function ajaxPost(args) {
     return await onergy.ajaxPost(args);
 }
+// eslint-disable-next-line no-unused-vars
 async function hashMd5(args) {
     return await onergy.hashMd5(args);
 }
+// eslint-disable-next-line no-unused-vars
 async function increment(args) {
     return await onergy.increment(args);
 }
+// eslint-disable-next-line no-unused-vars
 async function onergy_countdocs(args) {
     return await onergy.onergy_countdocs(args);
 }
@@ -30,18 +45,22 @@ async function onergy_get(args) {
     let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
+// eslint-disable-next-line no-unused-vars
 async function onergy_save(args) {
     return await onergy.onergy_save(args);
 }
 async function ReadExcelToJson(args) {
     return await onergy.ReadExcelToJson(args);
 }
+// eslint-disable-next-line no-unused-vars
 async function ReadTextPdf(args) {
     return await onergy.ReadTextPdf(args);
 }
+// eslint-disable-next-line no-unused-vars
 async function sendmail(args) {
     return await onergy.sendmail(args);
 }
+// eslint-disable-next-line no-unused-vars
 async function onergy_sendto(args) {
     let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
@@ -49,15 +68,19 @@ async function onergy_sendto(args) {
 async function onergy_updatemany(args) {
     return await onergy.onergy_save(args);
 }
+// eslint-disable-next-line no-unused-vars
 function failureCallback(error) {
     console.log('It failed with ' + error);
 }
+// eslint-disable-next-line no-unused-vars
 function get_usr_tmz_dt_now(data) {
     return data;
 }
+// eslint-disable-next-line no-unused-vars
 function replaceAll(content, needle, replacement) {
     return content.split(needle).join(replacement);
 }
+// eslint-disable-next-line no-unused-vars
 function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
@@ -92,7 +115,7 @@ async function init(json) {
         let strArrExcel = await ReadExcelToJson({
             url: data.CPDA_carregar_arquivo_da_tesouraria[0].UrlAzure,
         });
-        dataExcel = JSON.parse(strArrExcel);
+        let dataExcel = JSON.parse(strArrExcel);
 
         let resultValidarExcel = validarExcel(dataExcel);
         if (resultValidarExcel.status == 'NOK') {
@@ -248,10 +271,12 @@ async function init(json) {
     }
 }
 
+// eslint-disable-next-line no-unused-vars
 function initBefore(json) {
     //return true;
 }
 
+// eslint-disable-next-line no-unused-vars
 function initDelete(json) {
     //return true;
 }
