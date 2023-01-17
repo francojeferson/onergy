@@ -264,7 +264,7 @@ exports.onergy_save = function (args) {
         if (args.deleteFeed != undefined) {
             SaveDataByTemplate.deleteFeed = args.deleteFeed;
         }
-        if(args.executeAction != undefined) {
+        if (args.executeAction != undefined) {
             SaveDataByTemplate.executeAction = args.executeAction;
         }
         if (args.data != undefined) {
