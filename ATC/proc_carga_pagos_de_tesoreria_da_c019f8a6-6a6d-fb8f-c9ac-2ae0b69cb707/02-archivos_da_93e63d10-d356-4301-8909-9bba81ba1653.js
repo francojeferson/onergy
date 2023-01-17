@@ -90,7 +90,7 @@ async function init(json) {
         await atualizaRegistros(data, [`${data.onergy_js_ctx.fdtid}/${data.onergy_js_ctx.fedid}`], { status: 'PROCESANDO' });
 
         let strArrExcel = await ReadExcelToJson({
-            url: data.CPDT_carregar_arquivo_da_tesouraria[0].UrlAzure,
+            url: data.CPDA_carregar_arquivo_da_tesouraria[0].UrlAzure,
         });
         dataExcel = JSON.parse(strArrExcel);
 
@@ -381,49 +381,41 @@ const gerarData = async (dataHoje) => {
  */
 let json = {
     archivos: '',
-    hora_da_carga: '15:41',
-    CPDT_carregar_arquivo_da_tesouraria: [
+    hora_da_carga: '06:56',
+    CPDA_carregar_arquivo_da_tesouraria: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/ATC_AP_Payment_Report_Onergy_251122.xls89b0a217-00d8-4866-82ad-3810a66f56fa.xls?sv=2018-03-28&sr=b&sig=jsevMiK8Xk8hT%2BsYePWxS4IneP6FvNl3CPdECCoUkcs%3D&se=2023-06-24T18%3A40%3A48Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/DEBITOS ENERO BANCO COLPATRIA REPORTE 1.xlsx2d3121d1-c812-40b4-ac60-e10d047e3d5b.xlsx?sv=2018-03-28&sr=b&sig=rUSCjeY%2FXlNahgvzJMAtJqDeozjJU6XR%2B%2FQCzmpJwNs%3D&se=2023-08-05T09%3A56%3A22Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/ATC_AP_Payment_Report_Onergy_251122.xls89b0a217-00d8-4866-82ad-3810a66f56fa.xls?sv=2018-03-28&sr=b&sig=jsevMiK8Xk8hT%2BsYePWxS4IneP6FvNl3CPdECCoUkcs%3D&se=2023-06-24T18%3A40%3A48Z&sp=r',
-            Name: 'ATC_AP_Payment_Report_Onergy_251122.xls',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/DEBITOS ENERO BANCO COLPATRIA REPORTE 1.xlsx2d3121d1-c812-40b4-ac60-e10d047e3d5b.xlsx?sv=2018-03-28&sr=b&sig=rUSCjeY%2FXlNahgvzJMAtJqDeozjJU6XR%2B%2FQCzmpJwNs%3D&se=2023-08-05T09%3A56%3A22Z&sp=r',
+            Name: 'DEBITOS ENERO BANCO COLPATRIA REPORTE 1.xlsx',
         },
     ],
-    oneTemplateTitle: 'Archivos',
-    aquivo: [
-        {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/ATC_AP_Payment_Report_Onergy_251122.xls89b0a217-00d8-4866-82ad-3810a66f56fa.xls?sv=2018-03-28&sr=b&sig=jsevMiK8Xk8hT%2BsYePWxS4IneP6FvNl3CPdECCoUkcs%3D&se=2023-06-24T18%3A40%3A48Z&sp=r',
-            UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/ATC_AP_Payment_Report_Onergy_251122.xls89b0a217-00d8-4866-82ad-3810a66f56fa.xls?sv=2018-03-28&sr=b&sig=jsevMiK8Xk8hT%2BsYePWxS4IneP6FvNl3CPdECCoUkcs%3D&se=2023-06-24T18%3A40%3A48Z&sp=r',
-            Name: 'ATC_AP_Payment_Report_Onergy_251122.xls',
-        },
-    ],
-    data_de_upload: '2022-12-06 15:40:56',
-    data_de_uploadDate: '2022-12-06T18:40:56Z',
+    oneTemplateTitle: 'Archivos - DA',
+    data_de_upload: '2023-01-17 06:56:52',
+    data_de_uploadDate: '2023-01-17T09:56:52Z',
     status: 'PROCESANDO',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    email: 'admin-colombia@atc.com.co',
-    fdtid: 'e966c904-9be6-4028-b0e1-b83164b1bde0',
-    fedid: '29bbe885-4133-6bfd-9b42-f669d5145f0c',
-    onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
+    email: 'adm@atc.com.br',
+    fdtid: '93e63d10-d356-4301-8909-9bba81ba1653',
+    fedid: 'ec6195d1-e7b3-b717-74b2-5aff91020d43',
+    onergy_rolid: '',
     timezone: null,
-    usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
+    usrid: '1ec86197-d331-483a-b325-62cc26433ea5',
     onergy_js_ctx: {
         assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: '29bbe885-4133-6bfd-9b42-f669d5145f0c',
-        fdtid: 'e966c904-9be6-4028-b0e1-b83164b1bde0',
-        usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-12-06T18:40:51.086Z',
-        updateDt: '2022-12-06T18:40:56.684Z',
-        cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        email: 'admin-colombia@atc.com.co',
-        user_name: 'Administrador Colômbia',
-        onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: '6ac1683d-69f6-4c91-b872-780441f02ee9',
-        pcvid: 'b8d010be-dc54-4ee0-8c52-ea40ecc239c4',
-        prcid: '28868fc3-4629-cfb3-636e-fc12fb0eeb20',
+        fedid: 'ec6195d1-e7b3-b717-74b2-5aff91020d43',
+        fdtid: '93e63d10-d356-4301-8909-9bba81ba1653',
+        usrid: '1ec86197-d331-483a-b325-62cc26433ea5',
+        insertDt: '2023-01-17T09:56:49.924Z',
+        updateDt: '2023-01-17T09:56:52.357Z',
+        cur_userid: '1ec86197-d331-483a-b325-62cc26433ea5',
+        email: 'adm@atc.com.br',
+        user_name: 'ADM ATC',
+        onergy_rolid: '',
+        praid: 'edd996d2-f463-4fbc-94af-3955d767f994',
+        pcvid: 'be0b5d8d-601b-4ced-a96f-383c3f73c273',
+        prcid: 'c019f8a6-6a6d-fb8f-c9ac-2ae0b69cb707',
         timezone: null,
         timezone_value: '-03:00',
         pubNubHook: null,
