@@ -235,6 +235,8 @@ exports.onergy_get_internal = function (usrid, fdtid, assid, filter, vtake, vski
             skip +
             '&type=' +
             fdtid +
+            // '&orderField=' +
+            // 'conta_pai' + // TODO: INSERIR VARIAVEL DE ORDENACAO
             '&filter=' +
             encodeURI(filter);
     //console.log(url);
@@ -245,8 +247,9 @@ exports.onergy_get_internal = function (usrid, fdtid, assid, filter, vtake, vski
         var continuefind = true;
         if (complete != null) complete(body);
         skip += take;
-        if (body.length == take) this.onergy_get_internal(usrid, fdtid, assid, filter, take, skip, fedid, complete, end);
-        else if (end != null) end();
+        /*if (body.length == take) this.onergy_get_internal(usrid, fdtid, assid, filter, take, skip, fedid, complete, end);
+        else if (end != null) end();*/
+        end();
     });
 };
 
