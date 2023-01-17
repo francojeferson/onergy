@@ -70,21 +70,14 @@ function successCallback(result) {
  */
 async function init(json) {
     let data = JSON.parse(json);
-    onergy.log(`JFS ~ asignar_actividad_por_lotes ~ init: ${JSON.stringify(data)}`);
 
-    let idAsignarActividadporLotes = '8a46f1a6-e2ae-48a2-9480-352493d9cb17';
-    let getAsignarActividadporLotes = await getOnergyItem(idAsignarActividadporLotes, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+    const idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
+    const idCargarExcel = 'af7df2b1-1962-4157-bd19-4c70271945ca';
+    let filtroLote = gerarFiltro('faturas_selecionadas_legalizacion_pago', data.onergy_js_ctx.fedid);
+    let getFaturaHijaIndividual = await getOnergyItem(idFaturaHijaIndividual, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filtroLote);
 
-    let idSeleccionDeCarga = 'ec2d14aa-a0c9-4e33-8856-4e16d703f0b8';
-    let getSeleccionDeCarga = await getOnergyItem(
-        idSeleccionDeCarga,
-        data.onergy_js_ctx.assid,
-        data.onergy_js_ctx.usrid,
-        gerarFiltro('ID_ONE_REF', data.onergy_js_ctx.fedid)
-    );
-
-    for (let fatura of getSeleccionDeCarga) {
-        let idFaturaHijaIndividual = '11bb183c-d30d-4ed9-af2d-286b2dcb1a89';
+    let cache = [];
+    for (let fatura of getFaturaHijaIndividual) {
         let actualizarEstadoLegalizacionID = fatura.UrlJsonContext.ESTLlegalizacao_do_status_id;
         let actualizarEstadoLegalizacion = fatura.UrlJsonContext.ESTLstatus__legalizacao_do_status;
         let actualizarEstadoPago = fatura.UrlJsonContext.ESTPstatus__status_pagamento;
@@ -102,11 +95,11 @@ async function init(json) {
                 : '9a5e2aa8-27b4-93bc-5772-b456f1bbffa2';
         }
 
-        let result = await onergy_updatemany({
+        let result_update = await onergy_updatemany({
             fdtid: idFaturaHijaIndividual,
             assid: data.onergy_js_ctx.assid,
             usrid: data.onergy_js_ctx.usrid,
-            id: fatura.UrlJsonContext.one_copied_from,
+            id: fatura.ID,
             data: JSON.stringify({
                 UrlJsonContext: {
                     ESTLlegalizacao_do_status_id: actualizarEstadoLegalizacionID,
@@ -116,8 +109,34 @@ async function init(json) {
                 },
             }),
         });
+
+        fatura.UrlJsonContext.hasOwnProperty('oneTemplateTitle') ? delete fatura.UrlJsonContext.oneTemplateTitle : '';
+        fatura.UrlJsonContext.hasOwnProperty('ass_id') ? delete fatura.UrlJsonContext.ass_id : '';
+        fatura.UrlJsonContext.hasOwnProperty('assid') ? delete fatura.UrlJsonContext.oneTemplateTitle : '';
+        fatura.UrlJsonContext.hasOwnProperty('fedid') ? delete fatura.UrlJsonContext.fedid : '';
+        fatura.UrlJsonContext.hasOwnProperty('usrid') ? delete fatura.UrlJsonContext.usrid : '';
+        fatura.UrlJsonContext.hasOwnProperty('fdtid') ? delete fatura.UrlJsonContext.fdtid : '';
+        fatura.UrlJsonContext.hasOwnProperty('email') ? delete fatura.UrlJsonContext.email : '';
+        fatura.UrlJsonContext.hasOwnProperty('assid') ? delete fatura.UrlJsonContext.assid : '';
+        fatura.UrlJsonContext.hasOwnProperty('onergy_rolid') ? delete fatura.UrlJsonContext.onergy_rolid : '';
+        fatura.UrlJsonContext.hasOwnProperty('timezone') ? delete fatura.UrlJsonContext.timezone : '';
+        fatura.UrlJsonContext.hasOwnProperty('onergy_js_ctx') ? delete fatura.UrlJsonContext.onergy_js_ctx : '';
+        fatura.UrlJsonContext.hasOwnProperty('onergy_js_ctx_ORIGINAL') ? delete fatura.UrlJsonContext.onergy_js_ctx_ORIGINAL : '';
+        fatura.UrlJsonContext.ID_ONE_REF = data.fedid;
+
+        cache.push(fatura.UrlJsonContext);
+
+        //!node:test - comentar result_insert
+        // let onergySaveData = {
+        //     fdtid: idCargarExcel,
+        //     assid: data.onergy_js_ctx.assid,
+        //     usrid: data.onergy_js_ctx.usrid,
+        //     data: JSON.stringify(data),
+        // };
+        // let result_save = await onergy_save(onergySaveData);
     }
 
+    let result_insert = await onergy.InsertManyOnergy(cache, idCargarExcel, data.onergy_js_ctx.usrid);
     return false;
 }
 function initBefore(json) {
