@@ -1,4 +1,5 @@
-/**ENV_NODE** =====================================================================================
+/******************** ENV_NODE ********************
+ ******************** NAO_MEXA ********************
  */
 // eslint-disable-next-line no-unused-vars
 const { date } = require('assert-plus');
@@ -84,12 +85,16 @@ function replaceAll(content, needle, replacement) {
 function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
-/**CLI_SCRIPT** ===================================================================================
+/******************** NODE_SCRIPT ********************
+ * Nome Tarefa: Carga Geral - Load
+ * ID: 0e8dc4f0-4a4f-4fb1-8268-423b45128203
  * Executar automático quando em processo: Não
- * Atividade de longa duração: Não
- * Esconder Menu: Não
+ * Atividade de longa duração: Sim
+ * Esconder Menu: Sim
+ * SLA: nenhum
  * Condicional: nenhum
  * Aprovação: nenhum
+ ******************** NODE_SCRIPT ********************
  */
 async function init(json) {
     let data = JSON.parse(json);
@@ -2311,9 +2316,11 @@ function getKey(tabExcel, isRemoveDuplicados) {
         return key;
     }
 }
-/**MET_PADRAO =====================================================================================
+/******************** MET_PADRAO ********************
+ ******************** JSON_INIT ********************
  */
-let json_test = {
+// eslint-disable-next-line no-unused-vars
+const json_homol = {
     processo: '',
     horas: '',
     dataDate: '2023-01-17T12:00:05Z',
@@ -2364,4 +2371,55 @@ let json_test = {
     },
     id_upload_planilha: '45e87872-ba5b-bb7a-1678-d925e7a38b51',
 };
-init(JSON.stringify(json_test));
+const json_prod = {
+    processo: '',
+    horas: '',
+    dataDate: '2023-01-17T17:23:53Z',
+    data: '2023-01-17 14:23:53',
+    load_index_equipe: 'COL',
+    load_index_id_equipe: '',
+    load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
+    planilha: [
+        {
+            Url: 'https://onebackupservices.blob.core.windows.net/88443605-74d6-4ea4-b426-a6c3e26aa615/tablas_maestras_produccion_v4.xlsx4bd1a131-2b3d-4b01-9bfd-d0b22028609f.xlsx?sv=2018-03-28&sr=b&sig=T%2BL40v0NnacWDC6cHmpHhWWlz7vlV3RyPRpv%2BR226hQ%3D&se=2023-08-05T17%3A23%3A41Z&sp=r',
+            UrlAzure:
+                'https://onebackupservices.blob.core.windows.net/88443605-74d6-4ea4-b426-a6c3e26aa615/tablas_maestras_produccion_v4.xlsx4bd1a131-2b3d-4b01-9bfd-d0b22028609f.xlsx?sv=2018-03-28&sr=b&sig=T%2BL40v0NnacWDC6cHmpHhWWlz7vlV3RyPRpv%2BR226hQ%3D&se=2023-08-05T17%3A23%3A41Z&sp=r',
+            Name: 'tablas_maestras_produccion_v4.xlsx',
+        },
+    ],
+    load_index_tab_excel: 'informacion_cuenta',
+    load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
+    em_caso_de_duplicidade: '1',
+    processamento: 'Carga de informacion_cuenta iniciada',
+    time: '14:23',
+    em_caso_de_duplicidade_desc: 'Sobrescribir',
+    oneTemplateTitle: '',
+    ass_id: '88443605-74d6-4ea4-b426-a6c3e26aa615',
+    assid: '88443605-74d6-4ea4-b426-a6c3e26aa615',
+    fedid: '316ad334-d2de-4728-a390-b80b5fb8b4ee',
+    fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
+    usrid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
+    email: 'prod@atc.com.br',
+    onergy_rolid: '',
+    timezone: null,
+    onergy_js_ctx: {
+        assid: '88443605-74d6-4ea4-b426-a6c3e26aa615',
+        fedid: '316ad334-d2de-4728-a390-b80b5fb8b4ee',
+        fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
+        usrid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
+        insertDt: '2023-01-17T17:23:52.303Z',
+        updateDt: '2023-01-17T17:23:52.303Z',
+        cur_userid: '40ddc5fc-2ef7-4b78-bcc4-5e2048d22331',
+        email: 'prod@atc.com.br',
+        user_name: 'prod@atc.com.br',
+        onergy_rolid: '',
+        praid: '42a859fa-aef7-4f6a-a7ae-ea14d7b44d28',
+        pcvid: 'c336706d-fa50-431c-94ee-7f19a1dd0fdd',
+        prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
+        timezone: null,
+        timezone_value: '-03:00',
+        pubNubHook: null,
+    },
+    id_upload_planilha: 'a34d4417-0a1d-3562-e77f-70bcbb602dc6',
+};
+init(JSON.stringify(json_prod));
