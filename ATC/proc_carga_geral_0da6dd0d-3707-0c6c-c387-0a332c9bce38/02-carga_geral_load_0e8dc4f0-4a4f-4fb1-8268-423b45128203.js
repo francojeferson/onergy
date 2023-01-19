@@ -144,18 +144,31 @@ async function init(json) {
                         let prop = y;
                         let value = val[y];
 
-                        //*se prop possuir tag, remove tag e manipula value
-                        if (prop.includes('{{int}}' || '{{INT}}')) {
-                            value = parseInt(value);
-                            prop = prop.replace('{{int}}', '').replace('{{INT}}', '');
-                        } else if (prop.includes('{{float}}' || '{{FLOAT}}')) {
-                            value = parseFloat(value);
-                            prop = prop.replace('{{float}}', '').replace('{{FLOAT}}', '');
+                        try {
+                            //*se prop possuir tag, remove tag e manipula value
+                            if (prop.includes('{{int}}' || '{{INT}}')) {
+                                // remover caracteres especiais de value
+                                value = value ? value.toString().replace(/[^0-9]/g, '') : '';
+                                value = parseInt(value);
+                                prop = prop.replace('{{int}}', '').replace('{{INT}}', '');
+                            } else if (prop.includes('{{float}}' || '{{FLOAT}}')) {
+                                value = value ? parseFloat(value) : '';
+                                prop = prop.replace('{{float}}', '').replace('{{FLOAT}}', '');
+                            }
+                        } catch (e) {
+                            onergy.log(
+                                JSON.stringify({
+                                    mensagem: e.message,
+                                    stack: e.stack,
+                                    value: value,
+                                })
+                            );
+                            return;
                         }
-
                         //*se valor for string, remove espaços em branco
                         if (typeof value == 'string') {
-                            value = value.trim();
+                            // remover aspas simples de value
+                            value = value ? value.trim().replace(/^\s+|\s+$/g, '') : '';
                         }
                         objLine[prop] = value;
                     }
@@ -1982,20 +1995,22 @@ async function init(json) {
                             }
                         }
 
-                        //*save
-                        let update = false;
-                        let id = '';
-                        let r = getTabExcel.find((x) => x['UrlJsonContext'][fielNameQ] == valueQ);
-                        update = r ? true : false;
-                        if (update) id = r.ID;
-                        await gravarRegistro(idTabExcel, objPost, data, update, id);
+                        if (data.em_caso_de_duplicidade == '1') {
+                            //*save
+                            let update = false;
+                            let id = '';
+                            let r = getTabExcel.find((x) => x['UrlJsonContext'][fielNameQ] == valueQ);
+                            update = r ? true : false;
+                            if (update) id = r.ID;
+                            await gravarRegistro(idTabExcel, objPost, data, update, id);
 
-                        //*postSave
-                        dataHoje = new Date();
-                        time = gerarDataHora(dataHoje, -5); //?Bogota
-                        status_desc = `OK: ${tabExcel} - ${getKey(tabExcel, true)} - ${JSON.stringify(valueQ)}`;
-                        statusPost.push(`${time}, ${status_desc} \n`);
-                        await postStatus(status_desc, statusPost, data);
+                            //*postSave
+                            dataHoje = new Date();
+                            time = gerarDataHora(dataHoje, -5); //?Bogota
+                            status_desc = `OK: ${tabExcel} - ${getKey(tabExcel, true)} - ${JSON.stringify(valueQ)}`;
+                            statusPost.push(`${time}, ${status_desc} \n`);
+                            await postStatus(status_desc, statusPost, data);
+                        }
                     }
 
                     //*limpar cache
@@ -2323,16 +2338,16 @@ function getKey(tabExcel, isRemoveDuplicados) {
 const json_homol = {
     processo: '',
     horas: '',
-    dataDate: '2023-01-17T12:00:05Z',
-    data: '2023-01-17 09:00:05',
+    dataDate: '2023-01-19T17:49:21Z',
+    data: '2023-01-19 14:49:21',
     load_index_equipe: 'COL',
     load_index_id_equipe: '',
     load_index_id_do_card: '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3',
     planilha: [
         {
-            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_produccion_v4.xlsx08392f75-231f-4231-9cc5-15610a2f362f.xlsx?sv=2018-03-28&sr=b&sig=Cp9dtxHc287k%2BR2u1c%2FkyjCgAMhgZiKVQg2SEcaNL50%3D&se=2023-08-05T11%3A59%3A53Z&sp=r',
+            Url: 'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_produccion_v4.xlsx4b995509-39ae-461f-8ec8-a2735ccd6880.xlsx?sv=2018-03-28&sr=b&sig=8b6iZD1rGgFVwSJjVn4PnY5ewilcP%2By7kUqydYrIycE%3D&se=2023-08-07T17%3A49%3A06Z&sp=r',
             UrlAzure:
-                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_produccion_v4.xlsx08392f75-231f-4231-9cc5-15610a2f362f.xlsx?sv=2018-03-28&sr=b&sig=Cp9dtxHc287k%2BR2u1c%2FkyjCgAMhgZiKVQg2SEcaNL50%3D&se=2023-08-05T11%3A59%3A53Z&sp=r',
+                'https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/tablas_maestras_produccion_v4.xlsx4b995509-39ae-461f-8ec8-a2735ccd6880.xlsx?sv=2018-03-28&sr=b&sig=8b6iZD1rGgFVwSJjVn4PnY5ewilcP%2By7kUqydYrIycE%3D&se=2023-08-07T17%3A49%3A06Z&sp=r',
             Name: 'tablas_maestras_produccion_v4.xlsx',
         },
     ],
@@ -2340,12 +2355,12 @@ const json_homol = {
     load_index_id: '1a86654a-fda1-413f-9b84-1ab4c46918b0',
     em_caso_de_duplicidade: '1',
     processamento: 'Carga de informacion_cuenta iniciada',
-    time: '8:59',
+    time: '14:49',
     em_caso_de_duplicidade_desc: 'Sobrescribir',
     oneTemplateTitle: '',
     ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
     assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: '3a9a3c1a-119f-4577-8e03-25cb496f94d1',
+    fedid: '85e3f7a3-3736-4dcf-a4ef-59cd24309a92',
     fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
     usrid: '1ec86197-d331-483a-b325-62cc26433ea5',
     email: 'adm@atc.com.br',
@@ -2353,24 +2368,26 @@ const json_homol = {
     timezone: null,
     onergy_js_ctx: {
         assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: '3a9a3c1a-119f-4577-8e03-25cb496f94d1',
+        fedid: '85e3f7a3-3736-4dcf-a4ef-59cd24309a92',
         fdtid: '0e8dc4f0-4a4f-4fb1-8268-423b45128203',
         usrid: '1ec86197-d331-483a-b325-62cc26433ea5',
-        insertDt: '2023-01-17T12:00:04.939Z',
-        updateDt: '2023-01-17T12:00:04.939Z',
+        insertDt: '2023-01-19T17:49:21.013Z',
+        updateDt: '2023-01-19T17:49:21.013Z',
         cur_userid: '1ec86197-d331-483a-b325-62cc26433ea5',
         email: 'adm@atc.com.br',
         user_name: 'ADM ATC',
         onergy_rolid: '',
-        praid: 'd03ac164-46fa-4590-ab1c-af048bc2b562',
-        pcvid: 'b5a97f81-7636-4bc5-88e7-3f2ce426d9f8',
+        praid: '0ff0b174-0185-432b-b4f3-d3939126990a',
+        pcvid: 'cd195059-980b-454c-bd2c-1cfd8270964d',
         prcid: '0da6dd0d-3707-0c6c-c387-0a332c9bce38',
         timezone: null,
         timezone_value: '-03:00',
         pubNubHook: null,
     },
-    id_upload_planilha: '45e87872-ba5b-bb7a-1678-d925e7a38b51',
+    id_upload_planilha: 'c2ab04c5-e105-18f8-a078-0e0820d8c6e0',
 };
+
+// eslint-disable-next-line no-unused-vars
 const json_prod = {
     processo: '',
     horas: '',
@@ -2422,4 +2439,4 @@ const json_prod = {
     },
     id_upload_planilha: 'a34d4417-0a1d-3562-e77f-70bcbb602dc6',
 };
-init(JSON.stringify(json_prod));
+init(JSON.stringify(json_homol));
