@@ -184,7 +184,7 @@ exports.onergy_get = function (args) {
     return new Promise((resolve, reject) => {
         var data = new Array();
         if (args.page == undefined) args.page = 0;
-        if (args.rows == undefined) args.rows = 100;
+        if (args.rows == undefined) args.rows = 10000;
         this.onergy_get_internal(
             args.usrid,
             args.fdtid,
@@ -259,9 +259,13 @@ exports.onergy_save = function (args) {
             assid: args.assid,
             usrid: args.usrid,
             fdtid: args.fdtid,
+            executeAction: true,
         };
         if (args.deleteFeed != undefined) {
             SaveDataByTemplate.deleteFeed = args.deleteFeed;
+        }
+        if (args.executeAction != undefined) {
+            SaveDataByTemplate.executeAction = args.executeAction;
         }
         if (args.data != undefined) {
             let data = JSON.parse(args.data);
