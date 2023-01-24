@@ -228,7 +228,12 @@ async function init(json) {
             if (faturaPostInfo.ESTPstatus__status_pagamento != 'ERROR PAGO') {
                 if (FATURA.UrlJsonContext.ESTLstatus__legalizacao_do_status == 'RELIQUIDADA') {
                     let filtroFaturareliquidadas = JSON.stringify([{ FielName: 'id_fatura_original', Type: 'string', FixedType: 'string', Value1: FATURA.ID }]);
-                    let FATURAS_RELIQUIDADAS = await getOnergyItem(faturaFilhasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filtroFaturareliquidadas);
+                    let FATURAS_RELIQUIDADAS = await getOnergyItem(
+                        faturaFilhasID,
+                        data.onergy_js_ctx.assid,
+                        data.onergy_js_ctx.usrid,
+                        filtroFaturareliquidadas
+                    );
                     if (FATURAS_RELIQUIDADAS.length > 0) {
                         let FATURAS_RELIQUIDADAS_IDs = FATURAS_RELIQUIDADAS.map((VALUE) => `${faturaFilhasID}/${VALUE.ID}`);
                         await atualizaRegistros(data, FATURAS_RELIQUIDADAS_IDs, faturaPostInfo);
@@ -371,7 +376,7 @@ const validarExcel = (excel) => {
     // eslint-disable-next-line no-prototype-builtins, no-undef
     if (!dataExcel.hasOwnProperty(['Pagos Banco'])) {
         result.push('TAB Pagos Banco no encontrada.');
-    // eslint-disable-next-line no-undef
+        // eslint-disable-next-line no-undef
     } else if (dataExcel['Pagos Banco'].length == 0) {
         result.push('Planilla Excel sin valores.');
     } else {
