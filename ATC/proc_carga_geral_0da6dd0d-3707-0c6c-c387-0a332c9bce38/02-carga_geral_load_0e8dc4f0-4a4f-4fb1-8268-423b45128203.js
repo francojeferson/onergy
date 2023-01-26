@@ -1198,6 +1198,7 @@ async function init(json) {
                             }
 
                             //*item:proveedores
+                            //TODO: cambiar de nombre_proveedor para nombre_comercial
                             let isIdlcProveedores = getTabExcel.filter((j) => j.UrlJsonContext.prvd_nome_provedor == objPost.nombre_proveedor);
                             if (isIdlcProveedores.length == 0 || data.em_caso_de_duplicidade == '1') {
                                 //*pesq.ref:proveedores
