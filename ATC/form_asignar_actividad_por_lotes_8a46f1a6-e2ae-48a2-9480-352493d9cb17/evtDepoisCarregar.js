@@ -1,3 +1,5 @@
+const idAsignarActividadporLotes = '8a46f1a6-e2ae-48a2-9480-352493d9cb17';
+
 // eslint-disable-next-line no-undef
 let onergyCtx = mtdOnergy.JsEvtGetCurrentCtx();
 
@@ -29,7 +31,6 @@ let aplicarNumeroLote = async () => {
     // eslint-disable-next-line no-undef
     mtdOnergy.JsEvtSetItemValue('CDE__status_lote', 'Procesado');
 
-    let idAsignarActividadporLotes = '8a46f1a6-e2ae-48a2-9480-352493d9cb17';
     // eslint-disable-next-line no-undef
     let getNumeroLote = await mtdOnergy.JsEvtGetFeedData({
         fdtID: idAsignarActividadporLotes,
