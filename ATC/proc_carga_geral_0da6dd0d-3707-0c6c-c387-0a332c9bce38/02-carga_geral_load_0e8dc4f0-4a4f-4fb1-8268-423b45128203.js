@@ -1,44 +1,29 @@
 /******************** ENV_NODE ********************
  ******************** NAO_MEXA ********************
  */
-// eslint-disable-next-line no-unused-vars
 const { date } = require('assert-plus');
-// eslint-disable-next-line no-unused-vars
 const { formatDate } = require('tough-cookie');
-// eslint-disable-next-line no-unused-vars
 const { log } = require('console');
-// eslint-disable-next-line no-unused-vars
 const { memory } = require('console');
-// eslint-disable-next-line no-unused-vars
 const { resolve } = require('path');
-// eslint-disable-next-line no-unused-vars
 const { type } = require('os');
-// eslint-disable-next-line no-unused-vars
 const axios = require('axios');
-// eslint-disable-next-line no-unused-vars
 const fs = require('fs');
-// eslint-disable-next-line no-unused-vars
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
-// eslint-disable-next-line no-unused-vars
 const utils = require('../../onergy/onergy-utils');
-// eslint-disable-next-line no-unused-vars
 async function ajax(args) {
     return await onergy.ajax(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function ajaxPost(args) {
     return await onergy.ajaxPost(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function hashMd5(args) {
     return await onergy.hashMd5(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function increment(args) {
     return await onergy.increment(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function onergy_countdocs(args) {
     return await onergy.onergy_countdocs(args);
 }
@@ -52,15 +37,12 @@ async function onergy_save(args) {
 async function ReadExcelToJson(args) {
     return await onergy.ReadExcelToJson(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function ReadTextPdf(args) {
     return await onergy.ReadTextPdf(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function sendmail(args) {
     return await onergy.sendmail(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function onergy_sendto(args) {
     let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
@@ -69,19 +51,15 @@ async function onergy_updatemany(args) {
     args.executeAction = false;
     return await onergy.onergy_save(args);
 }
-// eslint-disable-next-line no-unused-vars
 function failureCallback(error) {
     console.log('It failed with ' + error);
 }
-// eslint-disable-next-line no-unused-vars
 function get_usr_tmz_dt_now(data) {
     return data;
 }
-// eslint-disable-next-line no-unused-vars
 function replaceAll(content, needle, replacement) {
     return content.split(needle).join(replacement);
 }
-// eslint-disable-next-line no-unused-vars
 function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
@@ -98,7 +76,7 @@ function successCallback(result) {
  */
 async function init(json) {
     let data = JSON.parse(json);
-    onergy.log(`JFS ~ carga_geral_load ~ init: ${JSON.stringify(data)}`);
+    onergy.log(`JFS => init => ${JSON.stringify(data)}`);
 
     //*cloud:onergy == UTC+0, node:test == UTC-3
     let dataHoje = new Date();
@@ -2064,12 +2042,10 @@ async function init(json) {
     return SetObjectResponse(true, data, true);
 }
 
-// eslint-disable-next-line no-unused-vars
 function initBefore(json) {
     //return true;
 }
 
-// eslint-disable-next-line no-unused-vars
 function initDelete(json) {
     //return true;
 }
@@ -2335,7 +2311,6 @@ function getKey(tabExcel, isRemoveDuplicados) {
 /******************** MET_PADRAO ********************
  ******************** JSON_INIT ********************
  */
-// eslint-disable-next-line no-unused-vars
 const json_homol = {
     processo: '',
     horas: '',
@@ -2388,7 +2363,6 @@ const json_homol = {
     id_upload_planilha: 'c2ab04c5-e105-18f8-a078-0e0820d8c6e0',
 };
 
-// eslint-disable-next-line no-unused-vars
 const json_prod = {
     processo: '',
     horas: '',
