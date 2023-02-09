@@ -1,44 +1,29 @@
 /******************** ENV_NODE ********************
  ******************** NAO_MEXA ********************
  */
-// eslint-disable-next-line no-unused-vars
 const { date } = require('assert-plus');
-// eslint-disable-next-line no-unused-vars
 const { formatDate } = require('tough-cookie');
-// eslint-disable-next-line no-unused-vars
 const { log, debug } = require('console');
-// eslint-disable-next-line no-unused-vars
 const { memory } = require('console');
-// eslint-disable-next-line no-unused-vars
 const { resolve } = require('path');
-// eslint-disable-next-line no-unused-vars
 const { type } = require('os');
-// eslint-disable-next-line no-unused-vars
 const axios = require('axios');
-// eslint-disable-next-line no-unused-vars
 const fs = require('fs');
-// eslint-disable-next-line no-unused-vars
 const jsuser = require('../../onergy/onergy-utils');
 const onergy = require('../../onergy/onergy-client');
-// eslint-disable-next-line no-unused-vars
 const utils = require('../../onergy/onergy-utils');
-// eslint-disable-next-line no-unused-vars
 async function ajax(args) {
     return await onergy.ajax(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function ajaxPost(args) {
     return await onergy.ajaxPost(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function hashMd5(args) {
     return await onergy.hashMd5(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function increment(args) {
     return await onergy.increment(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function onergy_countdocs(args) {
     return await onergy.onergy_countdocs(args);
 }
@@ -46,22 +31,18 @@ async function onergy_get(args) {
     let r = await onergy.onergy_get(args);
     return JSON.stringify(r);
 }
-// eslint-disable-next-line no-unused-vars
 async function onergy_save(args) {
     return await onergy.onergy_save(args);
 }
 async function ReadExcelToJson(args) {
     return await onergy.ReadExcelToJson(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function ReadTextPdf(args) {
     return await onergy.ReadTextPdf(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function sendmail(args) {
     return await onergy.sendmail(args);
 }
-// eslint-disable-next-line no-unused-vars
 async function onergy_sendto(args) {
     let r = await onergy.onergy_sendto(args);
     return JSON.stringify(r);
@@ -69,19 +50,15 @@ async function onergy_sendto(args) {
 async function onergy_updatemany(args) {
     return await onergy.onergy_save(args);
 }
-// eslint-disable-next-line no-unused-vars
 function failureCallback(error) {
     console.log('It failed with ' + error);
 }
-// eslint-disable-next-line no-unused-vars
 function get_usr_tmz_dt_now(data) {
     return data;
 }
-// eslint-disable-next-line no-unused-vars
 function replaceAll(content, needle, replacement) {
     return content.split(needle).join(replacement);
 }
-// eslint-disable-next-line no-unused-vars
 function successCallback(result) {
     console.log('It succeeded with ' + result);
 }
@@ -120,10 +97,8 @@ async function init(json) {
         let strArrExcel = await ReadExcelToJson({
             url: data.CPDA_carregar_arquivo_da_tesouraria[0].UrlAzure,
         });
-        // eslint-disable-next-line no-undef
         dataExcel = JSON.parse(strArrExcel);
 
-        // eslint-disable-next-line no-undef
         let resultValidarExcel = validarExcel(dataExcel);
         if (resultValidarExcel.status == 'NOK') {
             result.log = resultValidarExcel.message;
@@ -131,9 +106,7 @@ async function init(json) {
             return SetObjectResponse(false, result, false);
         }
 
-        // eslint-disable-next-line no-undef
         for (let s in dataExcel['Pagos Banco']) {
-            // eslint-disable-next-line no-undef
             let resultValidacaoValores = validarValores(s, dataExcel['Pagos Banco'][s]);
             if (resultValidacaoValores.status == 'NOK') {
                 log.push(resultValidacaoValores.message);
@@ -141,18 +114,14 @@ async function init(json) {
             }
 
             let filtroFaturaIndividuais = JSON.stringify([
-                // eslint-disable-next-line no-undef
                 { FielName: 'nit_provedor', Type: 'string', FixedType: 'string', Value1: dataExcel['Pagos Banco'][s]['Nit'].toString() },
-                // eslint-disable-next-line no-undef
                 { FielName: 'conta_interna_nic', Type: 'string', FixedType: 'string', Value1: dataExcel['Pagos Banco'][s]['Número Obligación'].toString() },
                 { FielName: 'tipo_de_conta', Type: 'string', FixedType: 'string', Value1: 'I' },
             ]);
             let faturaFilha = await getOnergyItem(faturaFilhasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filtroFaturaIndividuais);
 
             let filtroFaturaPadres = JSON.stringify([
-                // eslint-disable-next-line no-undef
                 { FielName: 'nit_provedor', Type: 'string', FixedType: 'string', Value1: dataExcel['Pagos Banco'][s]['Nit'].toString() },
-                // eslint-disable-next-line no-undef
                 { FielName: 'conta_interna_nic', Type: 'string', FixedType: 'string', Value1: dataExcel['Pagos Banco'][s]['Número Obligación'].toString() },
                 { FielName: 'tipo_de_conta', Type: 'string', FixedType: 'string', Value1: ['P', 'PH'] },
             ]);
@@ -164,7 +133,6 @@ async function init(json) {
                 let messageLog = [];
                 messageLog.push(`Linea ${Number(s) + 2}:`);
                 messageLog.push(
-                    // eslint-disable-next-line no-undef
                     `    Factura con NIT Proveedor: ${dataExcel['Pagos Banco'][s]['Nit']} y Cuenta Interna NIC: ${dataExcel['Pagos Banco'][s]['Número Obligación']} no encontrada.`
                 );
                 log.push(messageLog.join('\n'));
@@ -176,14 +144,12 @@ async function init(json) {
                 let messageLog = [];
                 messageLog.push(`Linha ${Number(s) + 2}:`);
                 messageLog.push(
-                    // eslint-disable-next-line no-undef
                     `    Factura con NIT Proveedor: ${dataExcel['Pagos Banco'][s]['Nit']} y Cuenta Interna NIC: ${dataExcel['Pagos Banco'][s]['Número Obligación']} no encontrada.`
                 );
                 log.push(messageLog.join('\n'));
                 continue;
             }
 
-            // eslint-disable-next-line no-undef
             const LINHA = dataExcel['Pagos Banco'][s];
             let faturaPostInfo = {
                 valor_pago: LINHA['Valor Pago'] ? LINHA['Valor Pago'] : 0,
@@ -292,12 +258,10 @@ async function init(json) {
     }
 }
 
-// eslint-disable-next-line no-unused-vars
 function initBefore(json) {
     //return true;
 }
 
-// eslint-disable-next-line no-unused-vars
 function initDelete(json) {
     //return true;
 }
@@ -373,41 +337,27 @@ const validarValores = (index, linha) => {
 const validarExcel = (excel) => {
     let result = [];
 
-    // eslint-disable-next-line no-prototype-builtins, no-undef
     if (!dataExcel.hasOwnProperty(['Pagos Banco'])) {
         result.push('TAB Pagos Banco no encontrada.');
-        // eslint-disable-next-line no-undef
     } else if (dataExcel['Pagos Banco'].length == 0) {
         result.push('Planilla Excel sin valores.');
     } else {
-        // eslint-disable-next-line no-prototype-builtins
         if (!excel['Pagos Banco'][0].hasOwnProperty('Nit')) {
-            // eslint-disable-next-line quotes
             result.push("Columna 'Nit' no encontrada.");
         }
-        // eslint-disable-next-line no-prototype-builtins
         if (!excel['Pagos Banco'][0].hasOwnProperty('Número Obligación')) {
-            // eslint-disable-next-line quotes
             result.push("Columna 'Número Obligación' no encontrada.");
         }
-        // eslint-disable-next-line no-prototype-builtins
         if (!excel['Pagos Banco'][0].hasOwnProperty('Estado')) {
-            // eslint-disable-next-line quotes
             result.push("Columna 'Estado' no encontrada.");
         }
-        // eslint-disable-next-line no-prototype-builtins
         if (!excel['Pagos Banco'][0].hasOwnProperty('Valor Pago')) {
-            // eslint-disable-next-line quotes
             result.push("Columna 'Valor Pago' no encontrada.");
         }
-        // eslint-disable-next-line no-prototype-builtins
         if (!excel['Pagos Banco'][0].hasOwnProperty('Fecha Programada')) {
-            // eslint-disable-next-line quotes
             result.push("Columna 'Fecha Programada' no encontrada.");
         }
-        // eslint-disable-next-line no-prototype-builtins
         if (!excel['Pagos Banco'][0].hasOwnProperty('Fecha Pago')) {
-            // eslint-disable-next-line quotes
             result.push("Columna 'Fecha Pago' no encontrada.");
         }
     }
@@ -431,7 +381,6 @@ const atualizaRegistros = async (data, IDS, postInfo) => {
     }
 };
 
-// eslint-disable-next-line no-unused-vars
 const gerarData = async (dataHoje) => {
     let dataHojeFormat = dataHoje.getFullYear() + '-' + (dataHoje.getMonth() + 1) + '-' + dataHoje.getDate();
     let arrayData = dataHojeFormat.split('-');
