@@ -98,18 +98,19 @@ async function init(json) {
         await atualizaRegistros(data, [`${data.onergy_js_ctx.fdtid}/${data.onergy_js_ctx.fedid}`], { status: 'PROCESANDO' });
 
         let strArrExcel = await ReadExcelToJson({
-            url: data.CPDA_carregar_arquivo_da_tesouraria[0].UrlAzure,
+            url: data.planilha[0].UrlAzure,
         });
         dataExcel = JSON.parse(strArrExcel);
 
-        let resultValidarExcel = validarExcel(dataExcel);
+        let tabExcel = data.load_index_tab_excel;
+        let resultValidarExcel = validarExcel(dataExcel, tabExcel);
         if (resultValidarExcel.status == 'NOK') {
             result.log = resultValidarExcel.message;
             result.status = 'FINALIZADO';
             return SetObjectResponse(false, result, false);
         }
 
-        for (let s in dataExcel['Pagos Banco']) {
+        for (let s in dataExcel[tabExcel]) {
             let resultValidacaoValores = validarValores(s, dataExcel['Pagos Banco'][s]);
             if (resultValidacaoValores.status == 'NOK') {
                 log.push(resultValidacaoValores.message);
@@ -267,14 +268,19 @@ const validarValores = (index, linha) => {
     };
 };
 
-const validarExcel = (excel) => {
+const validarExcel = (excel, tab) => {
     let result = [];
 
-    if (!dataExcel.hasOwnProperty(['Pagos Banco'])) {
-        result.push('TAB Pagos Banco no encontrada.');
-    } else if (dataExcel['Pagos Banco'].length == 0) {
+    if (!dataExcel.hasOwnProperty([tab])) {
+        result.push('TAB Excel no encontrada.');
+    } else if (dataExcel[tab].length == 0) {
         result.push('Planilla Excel sin valores.');
     } else {
+        /**
+         * TODO:
+         * aqui cabe fazer validação de tabExcel
+         * separadamente através de funções
+         */
         if (!excel['Pagos Banco'][0].hasOwnProperty('Nit')) {
             result.push("Columna 'Nit' no encontrada.");
         }
