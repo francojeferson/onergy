@@ -69,34 +69,54 @@ const passthruReadOnlyID = 'acb34798-0a36-424f-9f0e-619238120d33';
 async function init(json) {
     const data = JSON.parse(json);
 
-    // factura valor neto
-    // capturar dados da fatura original (criar clone)
-    // tt fatura - contribucion - alumbrado - cnac == valor neto
     let objFatReadOnly = await getOnergyItem(passthruReadOnlyID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('_id', data.pstr_ids_faturas_selecionadas[0]));
-    let totalFatura = objFatReadOnly[0].UrlJsonContext.valor_total_informado;
-    let totalContribucion = objFatReadOnly[0].UrlJsonContext.energia_de_contribuicao;
-    let totalAlumbrado = objFatReadOnly[0].UrlJsonContext.taxa_de_iluminacao;
-    let totalCnac = '100';// objFatReadOnly[0].UrlJsonContext.total_cnac;
-    let checkCnac = +totalCnac;
-    debugger;
-    let valorNetoPuro = totalFatura - totalContribucion - totalAlumbrado - totalCnac;
-    let valorNeto = (`${typeof totalFatura == 'number' || 'string' ? +totalFatura : ''}`) - (`${typeof totalContribucion == 'number' || 'string' ? +totalContribucion : ''}`) - (`${typeof totalAlumbrado == 'number' || 'string' ? +totalAlumbrado : ''}`) - (`${typeof totalCnac == 'number' || 'string' ? +totalCnac : ''}`);
+    let totalFatura = formatNumber(objFatReadOnly[0].UrlJsonContext.valor_total_informado);
+    let totalContribucion = formatNumber(objFatReadOnly[0].UrlJsonContext.energia_de_contribuicao);
+    let totalAlumbrado = formatNumber(objFatReadOnly[0].UrlJsonContext.taxa_de_iluminacao);
+    let totalCnac = formatNumber(objFatReadOnly[0].UrlJsonContext.total_cnac);
+
+    // factura valor neto
+    // total factura - contribucion - alumbrado - cnac == valor neto
+    let valorNeto = totalFatura - totalContribucion - totalAlumbrado - totalCnac;
 
     // tarifa energia
-    // ( ( valor neto / consumo kwh ) * 100 ) / 120
-    let tarifaEnergia = (`${typeof valorNeto == 'number' ? valorNeto : ''}`) / 120;
+    // ( ( valor neto / consumo kwh ) * 100 ) / 120 == tarifa energia
+    let tarifaEnergia = (Number(((valorNeto * 100) / 120).toFixed(2)) > 0) ? Number(((valorNeto * 100) / 120).toFixed(2)) : 0;
 
     // reembolso energia
+    // tarifa energia * consumo noc == reembolso energia
+    let consumoNoc = 0; //import from consumo telemedidas
+    let reembolsoEnergia = formatNumber(tarifaEnergia * consumoNoc);
 
     // reembolso contribucion
+    // reembolso energia * constante contribucion == reembolso contribucion
+    let constanteContribucion = 0; //import from tablas auxiliares: constante
+    let reembolsoContribucion = formatNumber(reembolsoEnergia * constanteContribucion);
 
     // reembolso alumbrado publico
+    // alumbrado * sujeto pasivo == reembolso alumbrado
+    // inserir coluna Valor em tablas auxiliares: sujeto pasivo
+    // dependendo de qtd provisional, sujeto pasivo é alterado
+    let sujetoPasivo = 0; //import from tablas auxiliares: sujeto pasivo
+    let reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * sujetoPasivo);
 
     // reembolso cnac / cnac occasio operador
+    // se cnac == occasio operador,
+    // ( cnac * consumo ami ) / consumo kwh == cnac tigo
+    // (cnac - cnac tigo) == cnac atc
+    // senão,
+    // cnac * constante cnac == reembolso cnac
+    let constanteCnac = 0; //import from tablas auxiliares: constante
+    let reembolsoCnac = formatNumber(totalCnac - constanteCnac);
 
     // total reembolso
+    // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
+    let totalReembolso = formatNumber(reembolsoEnergia + reembolsoContribucion + reembolsoAlumbradoPublico + reembolsoCnac);
 
     // costo atc
+    // total factura - total reembolso == costo atc
+    let costoAtc = formatNumber(totalFatura - totalReembolso);
+    debugger;
 
     // promedio total reembolso
 
@@ -152,6 +172,18 @@ async function sendItemToOnergy(templateid, assid, usrid, data, fedid, ukField) 
 
     return await onergy_save(onergySaveData);
 }
+
+const formatNumber = (value) => {
+    if (typeof value === 'undefined') {
+        return 0;
+    }
+    const number = Number(value);
+    if (isNaN(number)) {
+        return 0;
+    } else {
+        return Math.floor(number);
+    }
+};
 
 const getISODate = (strDate) => {
     if (!strDate) { return undefined; }
