@@ -66,6 +66,9 @@ function successCallback(result) {
 =============================   SCRIPT    =============================
 */
 const passthruReadOnlyID = 'acb34798-0a36-424f-9f0e-619238120d33';
+const consumoTelemedidasID = '40e7f11b-8a6c-4190-b004-80196324c2a9';
+const constanteID = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
+
 async function init(json) {
     const data = JSON.parse(json);
 
@@ -81,17 +84,19 @@ async function init(json) {
 
     // tarifa energia
     // ( ( valor neto / consumo kwh ) * 100 ) / 120 == tarifa energia
-    let tarifaEnergia = (Number(((valorNeto * 100) / 120).toFixed(2)) > 0) ? Number(((valorNeto * 100) / 120).toFixed(2)) : 0;
+    let tarifaEnergia = (Number(((valorNeto * 100) / 120)) > 0) ? Number(((valorNeto * 100) / 120).toFixed(2)) : 0.00;
 
     // reembolso energia
     // tarifa energia * consumo noc == reembolso energia
-    let consumoNoc = 0; //import from consumo telemedidas
+    let objConsumoNoc = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', objFatReadOnly[0].UrlJsonContext.asset_number));
+    let consumoNoc = objConsumoNoc[0].UrlJsonContext.CONT_consumo_sugerido_kwh;
     let reembolsoEnergia = formatNumber(tarifaEnergia * consumoNoc);
 
     // reembolso contribucion
     // reembolso energia * constante contribucion == reembolso contribucion
-    let constanteContribucion = 0; //import from tablas auxiliares: constante
-    let reembolsoContribucion = formatNumber(reembolsoEnergia * constanteContribucion);
+    let objConstContribucion = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_contribuicao'));
+    let constanteContribucion = formatNumber(objConstContribucion[0].UrlJsonContext.valor);
+    let reembolsoContribucion = formatNumber(reembolsoEnergia * (constanteContribucion / 100));
 
     // reembolso alumbrado publico
     // alumbrado * sujeto pasivo == reembolso alumbrado
@@ -99,6 +104,7 @@ async function init(json) {
     // dependendo de qtd provisional, sujeto pasivo é alterado
     let sujetoPasivo = 0; //import from tablas auxiliares: sujeto pasivo
     let reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * sujetoPasivo);
+    debugger;
 
     // reembolso cnac / cnac occasio operador
     // se cnac == occasio operador,
@@ -116,7 +122,6 @@ async function init(json) {
     // costo atc
     // total factura - total reembolso == costo atc
     let costoAtc = formatNumber(totalFatura - totalReembolso);
-    debugger;
 
     // promedio total reembolso
 
@@ -227,16 +232,17 @@ var jsonInput = {
     "pstr_registro_salvo": "sim",
     "pstr_status_processo": "ENVIADO A PROCESO",
     "pstr_ids_faturas_selecionadas": [
-        "c578a729-462f-4f0b-99db-a21b43331c71",
-        "e6c35464-db66-4da1-bf46-67cafdf8fe54"
+        "1a6ff99e-4f9a-4ac3-943d-b1c66c6a5c48",
+        "3387ada5-730a-449c-8f62-3b1b38e6b2f3",
+        "11719b9d-e47e-45fd-9920-661e63a6405b"
     ],
     "onergy_js_ctx_ORIGINAL": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "7961814b-dc63-6e01-12e7-4db7a7b8661e",
+        "fedid": "9ed3dc62-6a3b-6a71-41ca-dd1ee527c469",
         "fdtid": "06456424-a022-46a3-93b9-67e65eb31726",
         "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-04-17T13:59:38.29Z",
-        "updateDt": "2023-04-17T13:59:38.29Z",
+        "insertDt": "2023-04-17T19:32:43.425Z",
+        "updateDt": "2023-04-17T19:32:43.425Z",
         "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
         "email": "adm@atc.com.br",
         "user_name": "ADM ATC",
@@ -251,7 +257,7 @@ var jsonInput = {
     "oneTemplateTitle": "",
     "ass_id": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
     "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-    "fedid": "ee7f44cd-9ce7-4f27-ba3e-56615a488f87",
+    "fedid": "cf6c9965-192f-499c-a6f2-991299c531da",
     "fdtid": "89594537-4225-46d5-96c4-dcbf5629f754",
     "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
     "email": "adm@atc.com.br",
@@ -259,11 +265,11 @@ var jsonInput = {
     "timezone": null,
     "onergy_js_ctx": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "ee7f44cd-9ce7-4f27-ba3e-56615a488f87",
+        "fedid": "cf6c9965-192f-499c-a6f2-991299c531da",
         "fdtid": "89594537-4225-46d5-96c4-dcbf5629f754",
         "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-04-17T13:59:41.693Z",
-        "updateDt": "2023-04-17T13:59:41.693Z",
+        "insertDt": "2023-04-17T19:32:48.533Z",
+        "updateDt": "2023-04-17T19:32:48.533Z",
         "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
         "email": "adm@atc.com.br",
         "user_name": "ADM ATC",
