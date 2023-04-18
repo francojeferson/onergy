@@ -1,111 +1,65 @@
-const { JSDOM } = require("jsdom");
-const { window } = new JSDOM("");
-const $ = require("jquery")(window);
-const axios = require('axios');
-const fs = require('fs');
-
-
-const { date, func } = require('assert-plus');
-const { type } = require('os');
-const { formatDate } = require('tough-cookie');
-var onergy = require('../onergy/onergy-client');
-// let UriJSONSubscriptionConfig = "C:/Users/TallesAndrade/Documents/Onergy Local/SubscriptionConfig.json";
-const bodyParser = require('body-parser');
-
+/**NODE_ENV ===
+ */
+let { date } = require('assert-plus');
+let { formatDate } = require('tough-cookie');
+let { log, debug } = require('console');
+let { memory } = require('console');
+let { resolve } = require('path');
+let { type } = require('os');
+let axios = require('axios');
+let fs = require('fs');
+let jsuser = require('../onergy/onergy-utils');
+let onergy = require('../onergy/onergy-client');
+let utils = require('../onergy/onergy-utils');
 replaceAll = function (content, needle, replacement) {
     return content.split(needle).join(replacement);
 };
-
-async function ReadExcelToJson(args) {
-    return await onergy.ReadExcelToJson(args);
+async function ajax(args) {
+    return await onergy.ajax(args);
 }
-
-async function onergy_get(args) {
-    var r = await onergy.onergy_get(args);
-    return JSON.stringify(r);
+async function ajaxPost(args) {
+    return await onergy.ajaxPost(args);
 }
-
+function failureCallback(error) {
+    console.log('It failed with ' + error);
+}
+function get_usr_tmz_dt_now(data) {
+    return data;
+}
 async function hashMd5(args) {
     return await onergy.hashMd5(args);
 }
-
-async function onergy_save(args) {
-    return await onergy.onergy_save(args);
-}
-
-async function onergy_updatemany(args) {
-    return await onergy.onergy_save(args);
-}
-
-async function sendmail(args) {
-    return await onergy.sendmail(args);
-}
-
 async function increment(args) {
     return await onergy.increment(args);
 }
-
-class Memory {
-    valMemory = [];
-    TryAdd(key, value, time) {
-        var exist = false;
-        for (let s in this.valMemory) {
-            if (this.valMemory[s].key == key) {
-                exist = true;
-            }
-        }
-        if (exist) {
-            return false;
-        } else {
-            this.valMemory.push({ 'key': key, 'value': value, 'time': time });
-            return true;
-        }
-    }
-    Remove(key) {
-
-    }
-}
-let memory = new Memory();
-
-class Utils {
-    GetUserDtNow(format) {
-        let dataAtual = new Date();
-        let ano = dataAtual.getFullYear();
-        let mes = ((dataAtual.getMonth() + 1).toString().padStart(2, 0));
-        let dia = (dataAtual.getDate().toString().padStart(2, 0));
-        let horas = (dataAtual.getHours()).toString().padStart(2, 0);
-        let minutos = (dataAtual.getMinutes()).toString().padStart(2, 0);
-        let segundos = (dataAtual.getSeconds()).toString().padStart(2, 0);
-        return `${ano}-${mes}-${dia} ${horas}:${minutos}:${segundos}`;
-    }
-
-    sleep(milliseconds) {
-        var start = new Date().getTime();
-        for (var i = 0; i < 1e7; i++) {
-            if ((new Date().getTime() - start) > milliseconds) {
-                break;
-            }
-        }
-    }
-
-}
-let utils = new Utils();
-
-function get_usr_tmz_dt_now(args) {
-    let dataAtual = new Date();
-    let ano = dataAtual.getFullYear();
-    let mes = ((dataAtual.getMonth() + 1).toString().padStart(2, 0));
-    let dia = (dataAtual.getDate().toString().padStart(2, 0));
-    return `${ano}-${mes}-${dia} 00:00:00`;
-}
-
 async function onergy_countdocs(args) {
-    let result = await getOnergyItem(args["fdtid"], args["assid"], args["usrid"], args["filter"]);
-    return result.length;
+    return await onergy.onergy_countdocs(args);
 }
-
-function ConvertUrlFileToB64(args) {
-    return "VGVzdGUNClRlc3RlDQpUZXN0ZQ0KVGVzdGUNClRlc3RlDQpUZXN0ZQ0KVGVzdGU=";
+async function onergy_get(args) {
+    let r = await onergy.onergy_get(args);
+    return JSON.stringify(r);
+}
+async function onergy_save(args) {
+    return await onergy.onergy_save(args);
+}
+async function ReadExcelToJson(args) {
+    return await onergy.ReadExcelToJson(args);
+}
+async function ReadTextPdf(args) {
+    return await onergy.ReadTextPdf(args);
+}
+async function sendmail(args) {
+    return await onergy.sendmail(args);
+}
+async function onergy_sendto(args) {
+    let r = await onergy.onergy_sendto(args);
+    return JSON.stringify(r);
+}
+async function onergy_updatemany(data) {
+    return data;
+}
+function successCallback(result) {
+    console.log('It succeeded with ' + result);
 }
 
 /*
@@ -257,10 +211,9 @@ const getISODate = (strDate) => {
     })();
 };
 
-
 //====================================================================================================
 var jsonInput = {
-    "Url": "https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/Planilha Fatura.xlsxac1746ba-c12d-439d-be99-3bf84ad753a5.xlsx?sv=2018-03-28&sr=b&sig=W8mu3Bc9keKgDmcAikez4wTeMip5gZ5mmqK6JaQQWMM%3D&se=2023-10-31T13%3A11%3A32Z&sp=r", // carga telemedidas
+    "Url": "https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/Copy of Planilha Fatura - Edwin.xlsx897dfedc-16ac-4d6a-9dad-e907629fc903.xlsx?sv=2018-03-28&sr=b&sig=36Okr3q7evTMfiQZDVdoqZZrGZsrr1QPl0cmhfpURHc%3D&se=2023-11-04T19%3A32%3A15Z&sp=r", // carga telemedidas
     "onergy_js_ctx": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
         "fedid": "3b156c58-6363-d6ec-8fc6-b901c020b6b9",
