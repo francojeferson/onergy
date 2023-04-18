@@ -73,82 +73,133 @@ const informacionesDeLaCuentaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
 const sujetoPasivoID = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
 const sitiosID = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
 
-async function init(json) {
-    const data = JSON.parse(json);
-    let objFatReadOnly = await getOnergyItem(passthruReadOnlyID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('_id', data.pstr_ids_faturas_selecionadas[0]));
-
-    // factura valor neto
+const facturaValorNeto = async (objFatReadOnly) => {
     // total factura - contribucion - alumbrado - cnac == valor neto
-    let totalFatura = formatNumber(objFatReadOnly[0].UrlJsonContext.valor_total_informado);
-    let totalContribucion = formatNumber(objFatReadOnly[0].UrlJsonContext.energia_de_contribuicao);
-    let totalAlumbrado = formatNumber(objFatReadOnly[0].UrlJsonContext.taxa_de_iluminacao);
-    let totalCnac = formatNumber(objFatReadOnly[0].UrlJsonContext.total_cnac);
+    let totalFatura = formatNumber(objFatReadOnly.UrlJsonContext.valor_total_informado);
+    let totalContribucion = formatNumber(objFatReadOnly.UrlJsonContext.energia_de_contribuicao);
+    let totalAlumbrado = formatNumber(objFatReadOnly.UrlJsonContext.taxa_de_iluminacao);
+    let totalCnac = formatNumber(objFatReadOnly.UrlJsonContext.total_cnac);
     let valorNeto = totalFatura - totalContribucion - totalAlumbrado - totalCnac;
+    return valorNeto;
+};
 
-    // tarifa energia
+const calcTarifaEnergia = async (objFatReadOnly) => {
     // ( ( valor neto / consumo kwh ) * 100 ) / 120 == tarifa energia
-    let tarifaEnergia = (Number(((valorNeto * 100) / 120)) > 0) ? Number(((valorNeto * 100) / 120).toFixed(2)) : 0.00;
+    let consumoKwh = formatNumber(objFatReadOnly.UrlJsonContext.consumo_kwh);
+    let valorNeto = await facturaValorNeto(objFatReadOnly);
+    let tarifaEnergia = (Number((((valorNeto / consumoKwh) * 100) / 120)) > 0) ? Number((((valorNeto / consumoKwh) * 100) / 120).toFixed(2)) : 0.00;
+    return tarifaEnergia;
+};
 
-    // reembolso energia
+const calcReembolsoEnergia = async (objFatReadOnly, objConsumoNoc) => {
     // tarifa energia * consumo noc == reembolso energia
-    let objConsumoNoc = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', objFatReadOnly[0].UrlJsonContext.asset_number));
-    let consumoNoc = formatNumber(objConsumoNoc[0].UrlJsonContext.CONT_consumo_sugerido_kwh);
+    let tarifaEnergia = await calcTarifaEnergia(objFatReadOnly);
+    let consumoNoc = formatNumber(objConsumoNoc.UrlJsonContext.CONT_consumo_sugerido_kwh);
     let reembolsoEnergia = formatNumber(tarifaEnergia * consumoNoc);
+    return reembolsoEnergia;
+};
 
-    // reembolso contribucion
+const calcReembolsoContribucion = async (objFatReadOnly, objConsumoNoc, objConstContribucion) => {
     // reembolso energia * constante contribucion == reembolso contribucion
-    let objConstContribucion = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_contribuicao'));
-    let constanteContribucion = formatNumber(objConstContribucion[0].UrlJsonContext.valor);
+    let reembolsoEnergia = await calcReembolsoEnergia(objFatReadOnly, objConsumoNoc);
+    let constanteContribucion = formatNumber(objConstContribucion.UrlJsonContext.valor);
     let reembolsoContribucion = formatNumber(reembolsoEnergia * (constanteContribucion / 100));
+    return reembolsoContribucion;
+};
 
-    // reembolso alumbrado publico
+const calcReembolsoAlumbrado = async (objFatReadOnly, objITS, objSujetoPasivo) => {
     // alumbrado * sujeto pasivo == reembolso alumbrado
     // inserir coluna Valor em tablas auxiliares: sujeto pasivo
     // dependendo de qtd provisional, sujeto pasivo é alterado
-    let objITS = await getOnergyItem(informacionesTecnicasDelSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
-    let qtdProvisionales = formatNumber(objITS[0].UrlJsonContext.quantidade_provisoria);
-    let objIDC = await getOnergyItem(informacionesDeLaCuentaID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
-    let objSujetoPasivo = await getOnergyItem(sujetoPasivoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('sujeito', objIDC[0].UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico));
+    let totalAlumbrado = formatNumber(objFatReadOnly.UrlJsonContext.taxa_de_iluminacao);
+    let qtdProvisionales = formatNumber(objITS.UrlJsonContext.quantidade_provisoria);
     let sujetoPasivo, reembolsoAlumbradoPublico;
-    if (objSujetoPasivo[0].UrlJsonContext.sujeito == 'TIGO') {
-        sujetoPasivo = formatNumber((objSujetoPasivo[0].UrlJsonContext.valor) / (qtdProvisionales + 1));
+    if (objSujetoPasivo.UrlJsonContext.sujeito == 'TIGO') {
+        sujetoPasivo = formatNumber((objSujetoPasivo.UrlJsonContext.valor) / (qtdProvisionales + 1));
         reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * (sujetoPasivo / 100));
-    } else if (objSujetoPasivo[0].UrlJsonContext.sujeito == 'TIGO-ATC 50%-50%') {
-        sujetoPasivo = formatNumber((objSujetoPasivo[0].UrlJsonContext.valor) / (qtdProvisionales + 2));
+    } else if (objSujetoPasivo.UrlJsonContext.sujeito == 'TIGO-ATC 50%-50%') {
+        sujetoPasivo = formatNumber((objSujetoPasivo.UrlJsonContext.valor) / (qtdProvisionales + 2));
         reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * (sujetoPasivo / 100));
     } else {
-        sujetoPasivo = formatNumber(objSujetoPasivo[0].UrlJsonContext.valor);
+        sujetoPasivo = formatNumber(objSujetoPasivo.UrlJsonContext.valor);
         reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * (sujetoPasivo / 100));
     }
-    debugger;
+    return reembolsoAlumbradoPublico;
+};
 
-    // reembolso cnac / cnac occasio operador
+const calcReembolsoCnac = async (objFatReadOnly, objSitios, objConsumoAmi, objConstCnac) => {
     // se cnac == occasio operador,
     // ( cnac * consumo ami ) / consumo kwh == cnac tigo
     // (cnac - cnac tigo) == cnac atc
-    // senão,
-    // cnac * constante cnac == reembolso cnac
-    let objSitios = await getOnergyItem(sitiosID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
-    let portafolioAtc = objSitios[0].UrlJsonContext.tppf_tipo_portifolio;
+    // senão, cnac * constante cnac == reembolso cnac
+    let totalCnac = formatNumber(objFatReadOnly.UrlJsonContext.total_cnac);
+    let consumoKwh = formatNumber(objFatReadOnly.UrlJsonContext.consumo_kwh);
+    let portafolioAtc = objSitios.UrlJsonContext.tppf_tipo_portifolio;
     let cnacTigo, cnacAtc, reembolsoCnac;
     if (portafolioAtc == 'TIGO OCCASIO') {
-        let objConsumoAmi = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', objFatReadOnly[0].UrlJsonContext.asset_number));
-        let consumoAmi = objConsumoAmi[0].UrlJsonContext.CONT_consumo_sugerido_kwh;
+        let consumoAmi = objConsumoAmi.UrlJsonContext.CONT_consumo_sugerido_kwh;
         cnacTigo = (totalCnac * consumoAmi) / consumoKwh;
         cnacAtc = (totalCnac - cnacTigo);
+        reembolsoCnac = formatNumber(cnacTigo);
     } else {
-        let objConstCnac = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_cnac'));
-        let constanteCnac = formatNumber(objConstCnac[0].UrlJsonContext.valor);
+        let constanteCnac = formatNumber(objConstCnac.UrlJsonContext.valor);
         reembolsoCnac = formatNumber(totalCnac * (constanteCnac / 100));
     }
+    return reembolsoCnac;
+};
+
+const calcTotalReembolso = async (objFatReadOnly, objConsumoNoc, objConstContribucion, objITS, objSujetoPasivo, objSitios, objConsumoAmi, objConstCnac) => {
+    // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
+    let reembolsoEnergia = await calcReembolsoEnergia(objFatReadOnly, objConsumoNoc);
+    let reembolsoContribucion = await calcReembolsoContribucion(objFatReadOnly, objConsumoNoc, objConstContribucion);
+    let reembolsoAlumbradoPublico = await calcReembolsoAlumbrado(objFatReadOnly, objITS, objSujetoPasivo);
+    let reembolsoCnac = await calcReembolsoCnac(objFatReadOnly, objSitios, objConsumoAmi, objConstCnac);
+    let totalReembolso = formatNumber(reembolsoEnergia + reembolsoContribucion + reembolsoAlumbradoPublico + reembolsoCnac);
+    return totalReembolso;
+};
+
+const calcCostoAtc = async (objFatReadOnly, objConsumoNoc, objConstContribucion, objITS, objSujetoPasivo, objSitios, objConsumoAmi, objConstCnac) => {
+    // total factura - total reembolso == costo atc
+    let totalFatura = formatNumber(objFatReadOnly.UrlJsonContext.valor_total_informado);
+    let totalReembolso = await calcTotalReembolso(objFatReadOnly, objConsumoNoc, objConstContribucion, objITS, objSujetoPasivo, objSitios, objConsumoAmi, objConstCnac);
+    let costoAtc = formatNumber(totalFatura - totalReembolso);
+    return costoAtc;
+};
+
+async function init(json) {
+    const data = JSON.parse(json);
+
+    // factura valor neto
+    // tarifa energia
+    let objFatReadOnly = await getOnergyItem(passthruReadOnlyID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('_id', data.pstr_ids_faturas_selecionadas[0]));
+    let valorNeto = await facturaValorNeto(objFatReadOnly[0]);
+    let tarifaEnergia = await calcTarifaEnergia(objFatReadOnly[0]);
+
+    // reembolso energia
+    let objConsumoNoc = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', objFatReadOnly[0].UrlJsonContext.asset_number));
+    let reembolsoEnergia = await calcReembolsoEnergia(objFatReadOnly[0], objConsumoNoc[0]);
+
+    // reembolso contribucion
+    let objConstContribucion = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_contribuicao'));
+    let reembolsoContribucion = await calcReembolsoContribucion(objFatReadOnly[0], objConsumoNoc[0], objConstContribucion[0]);
+
+    // reembolso alumbrado
+    let objITS = await getOnergyItem(informacionesTecnicasDelSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
+    let objIDC = await getOnergyItem(informacionesDeLaCuentaID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
+    let objSujetoPasivo = await getOnergyItem(sujetoPasivoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('sujeito', objIDC[0].UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico));
+    let reembolsoAlumbradoPublico = await calcReembolsoAlumbrado(objFatReadOnly[0], objITS[0], objSujetoPasivo[0]);
+
+    // reembolso cnac
+    let objSitios = await getOnergyItem(sitiosID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
+    let objConsumoAmi = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', objFatReadOnly[0].UrlJsonContext.asset_number));
+    let objConstCnac = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_cnac'));
+    let reembolsoCnac = await calcReembolsoCnac(objFatReadOnly[0], objSitios[0], objConsumoAmi[0], objConstCnac[0]);
 
     // total reembolso
-    // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
-    let totalReembolso = formatNumber(reembolsoEnergia + reembolsoContribucion + reembolsoAlumbradoPublico + (portafolioAtc == 'TIGO OCCASIO' ? cnacTigo : reembolsoCnac));
-
     // costo atc
-    // total factura - total reembolso == costo atc
-    let costoAtc = formatNumber(totalFatura - totalReembolso);
+    let totalReembolso = await calcTotalReembolso(objFatReadOnly[0], objConsumoNoc[0], objConstContribucion[0], objITS[0], objSujetoPasivo[0], objSitios[0], objConsumoAmi[0], objConstCnac[0]);
+    let costoAtc = await calcCostoAtc(objFatReadOnly[0], objConsumoNoc[0], objConstContribucion[0], objITS[0], objSujetoPasivo[0], objSitios[0], objConsumoAmi[0], objConstCnac[0]);
+    debugger;
 
     // promedio total reembolso
 
