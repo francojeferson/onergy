@@ -68,6 +68,7 @@ function successCallback(result) {
 const passthruReadOnlyID = 'acb34798-0a36-424f-9f0e-619238120d33';
 const consumoTelemedidasID = '40e7f11b-8a6c-4190-b004-80196324c2a9';
 const constanteID = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
+const informacionesTecnicasDelSitioID = '5ea06f19-d11a-4d61-b4ff-c74610e933cd';
 const informacionesDeLaCuentaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
 const sujetoPasivoID = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
 const sitiosID = 'e43b9fe0-6752-446d-8495-0b4fdd7a70b4';
@@ -104,10 +105,21 @@ async function init(json) {
     // alumbrado * sujeto pasivo == reembolso alumbrado
     // inserir coluna Valor em tablas auxiliares: sujeto pasivo
     // dependendo de qtd provisional, sujeto pasivo é alterado
+    let objITS = await getOnergyItem(informacionesTecnicasDelSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
+    let qtdProvisionales = formatNumber(objITS[0].UrlJsonContext.quantidade_provisoria);
     let objIDC = await getOnergyItem(informacionesDeLaCuentaID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', objFatReadOnly[0].UrlJsonContext.asset_number));
     let objSujetoPasivo = await getOnergyItem(sujetoPasivoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('sujeito', objIDC[0].UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico));
-    let sujetoPasivo = formatNumber(objSujetoPasivo[0].UrlJsonContext.valor);
-    let reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * (sujetoPasivo / 100));
+    let sujetoPasivo, reembolsoAlumbradoPublico;
+    if (objSujetoPasivo[0].UrlJsonContext.sujeito == 'TIGO') {
+        sujetoPasivo = formatNumber((objSujetoPasivo[0].UrlJsonContext.valor) / (qtdProvisionales + 1));
+        reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * (sujetoPasivo / 100));
+    } else if (objSujetoPasivo[0].UrlJsonContext.sujeito == 'TIGO-ATC 50%-50%') {
+        sujetoPasivo = formatNumber((objSujetoPasivo[0].UrlJsonContext.valor) / (qtdProvisionales + 2));
+        reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * (sujetoPasivo / 100));
+    } else {
+        sujetoPasivo = formatNumber(objSujetoPasivo[0].UrlJsonContext.valor);
+        reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * (sujetoPasivo / 100));
+    }
     debugger;
 
     // reembolso cnac / cnac occasio operador
