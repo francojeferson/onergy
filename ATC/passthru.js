@@ -104,7 +104,6 @@ async function init(json) {
     // dependendo de qtd provisional, sujeto pasivo é alterado
     let sujetoPasivo = 0; //import from tablas auxiliares: sujeto pasivo
     let reembolsoAlumbradoPublico = formatNumber(totalAlumbrado * sujetoPasivo);
-    debugger;
 
     // reembolso cnac / cnac occasio operador
     // se cnac == occasio operador,
@@ -112,8 +111,10 @@ async function init(json) {
     // (cnac - cnac tigo) == cnac atc
     // senão,
     // cnac * constante cnac == reembolso cnac
-    let constanteCnac = 0; //import from tablas auxiliares: constante
-    let reembolsoCnac = formatNumber(totalCnac - constanteCnac);
+    let objConstCnac = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_cnac'));
+    let constanteCnac = formatNumber(objConstCnac[0].UrlJsonContext.valor);
+    let reembolsoCnac = formatNumber(totalCnac * (constanteCnac / 100));
+    debugger;
 
     // total reembolso
     // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
