@@ -92,7 +92,7 @@ async function init(json) {
             "numero_do_medidor": VALUE["No Medidor"]?.toString(),
             "tipo_de_leitura": VALUE["Tipo Lectura"],
             "data_vencimento": getISODate(VALUE["Pago Oportuno"]),
-            "valor_total_informado": Number(VALUE["TOTAL FACTURA"]) ? Number(VALUE["TOTAL FACTURA"]) : 0,
+            "valor_total_informado": Number(VALUE["TOTAL FACTURA"]),
             "valor_energia": Number(VALUE["TOTAL ENERGIA"]) ? Number(VALUE["TOTAL ENERGIA"]) : 0,
             "energia_de_contribuicao": Number(VALUE["Contribuicion Energia"]) ? Number(VALUE["Contribuicion Energia"]) : 0,
             "taxa_de_iluminacao": Number(VALUE["Alumbrado Publico"]) ? Number(VALUE["Alumbrado Publico"]) : 0,
@@ -111,6 +111,7 @@ async function init(json) {
             "consumo_kwh": Number(VALUE["Consumo KWH"]) ? Number(VALUE["Consumo KWH"]) : 0,
             "valor_kwh": Number(VALUE["Tarifa"]) ? Number(VALUE["Tarifa"]) : 0
         };
+        // debugger;
         postInfo.cargaHash = await hashMd5({ content: JSON.stringify(postInfo) });
         console.log(JSON.stringify(postInfo));
 
@@ -118,7 +119,8 @@ async function init(json) {
         let faturaCarga = await getOnergyItem(faturasFilhasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filtroFaturaCarga);
         if (faturaCarga.length > 0) { continue; }
 
-        await sendItemToOnergy(faturasFilhasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, postInfo);
+        let result = await sendItemToOnergy(faturasFilhasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, postInfo);
+        // onergy.log(postInfo);
     }
     debugger;
 }
@@ -213,7 +215,7 @@ const getISODate = (strDate) => {
 
 //====================================================================================================
 var jsonInput = {
-    "Url": "https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/Copy of Planilha Fatura - Edwin.xlsx897dfedc-16ac-4d6a-9dad-e907629fc903.xlsx?sv=2018-03-28&sr=b&sig=36Okr3q7evTMfiQZDVdoqZZrGZsrr1QPl0cmhfpURHc%3D&se=2023-11-04T19%3A32%3A15Z&sp=r", // carga telemedidas
+    "Url": "https://onebackupservices.blob.core.windows.net/67c0b77d-abae-4c48-ba4b-6c8faf27e14a/Copy of Planilha Fatura.xlsxd6d43943-d5d3-4f0b-9f4a-c9522bdde441.xlsx?sv=2018-03-28&sr=b&sig=94AdjgJ%2B0wdrw6y9u422O%2B%2B8Ez2DnzT%2FMP095HLOzhg%3D&se=2023-11-19T22%3A43%3A42Z&sp=r", // carga telemedidas
     "onergy_js_ctx": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
         "fedid": "3b156c58-6363-d6ec-8fc6-b901c020b6b9",
