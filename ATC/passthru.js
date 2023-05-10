@@ -92,15 +92,15 @@ async function init(json) {
         for (let s in data.pstr_ids_faturas_selecionadas) {
             //========== FATURA =============//
             let objFatReadOnly = await getOnergyItem(passthruReadOnlyID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('_id', data.pstr_ids_faturas_selecionadas[s]));
-            let assetNumber = objFatReadOnly[0].UrlJsonContext.asset_number;
-            let numeroFactura = objFatReadOnly[0].UrlJsonContext.numero_da_nota_fiscal;
-            let consumoFactura = objFatReadOnly[0].UrlJsonContext.consumo_kwh;
-            let alumbradoFactura = objFatReadOnly[0].UrlJsonContext.taxa_de_iluminacao;
-            let cnacFactura = objFatReadOnly[0].UrlJsonContext.total_cnac;
-            let tarifaFactura = objFatReadOnly[0].UrlJsonContext.valor_kwh;
-            let contribucionFactura = objFatReadOnly[0].UrlJsonContext.energia_de_contribuicao;
-            let energiaFactura = objFatReadOnly[0].UrlJsonContext.valor_energia;
-            let totalFactura = objFatReadOnly[0].UrlJsonContext.valor_total_informado;
+            let assetNumber = objFatReadOnly[0]?.UrlJsonContext?.asset_number;
+            let numeroFactura = objFatReadOnly[0]?.UrlJsonContext?.numero_da_nota_fiscal;
+            let consumoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.consumo_kwh);
+            let alumbradoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.taxa_de_iluminacao);
+            let cnacFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.total_cnac);
+            let tarifaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_kwh);
+            let contribucionFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.energia_de_contribuicao);
+            let energiaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_energia);
+            let totalFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_total_informado);
             //============================//
 
             //========== DADOS MESTRES =============//
@@ -109,32 +109,32 @@ async function init(json) {
 
             // clientes del sitio
             let objCDS = await getOnergyItem(clienteSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
-            let codigoCliente = objCDS[0].UrlJsonContext.clsit__codigo_do_sitio_do_cliente;
-            let portafolioCliente = objCDS[0].UrlJsonContext.PCSPCS_portafolio_cliente__clsit__portifolio_cliente;
+            let codigoCliente = objCDS[0]?.UrlJsonContext?.clsit__codigo_do_sitio_do_cliente;
+            let portafolioCliente = objCDS[0]?.UrlJsonContext?.PCSPCS_portafolio_cliente__clsit__portifolio_cliente;
 
             // informaciones de la cuenta
             let objIDC = await getOnergyItem(informacionesDeLaCuentaID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
-            let tipoAlumbrado = objIDC[0].UrlJsonContext.tipo_cobr_tipos_cobrancas__tipo_de_cobranca;
-            let clasifPassthru = objIDC[0].UrlJsonContext.CPTclassificacao_passthru__prcs__clasificacion_passthru;
-            let sujetoPasivo = objIDC[0].UrlJsonContext.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico;
+            let tipoAlumbrado = objIDC[0]?.UrlJsonContext?.tipo_cobr_tipos_cobrancas__tipo_de_cobranca;
+            let clasifPassthru = objIDC[0]?.UrlJsonContext?.CPTclassificacao_passthru__prcs__clasificacion_passthru;
+            let sujetoPasivo = objIDC[0]?.UrlJsonContext?.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico;
 
             // sujeto pasivo
             let objSujetoPasivo = await getOnergyItem(sujetoPasivoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('sujeito', sujetoPasivo));
-            let valorSujetoPasivo = objSujetoPasivo[0].UrlJsonContext.valor;
+            let valorSujetoPasivo = formatNumber(objSujetoPasivo[0]?.UrlJsonContext?.valor);
 
             // informaciones tecnicas del sitio
             let objITS = await getOnergyItem(informacionesTecnicasDelSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
-            let qtdProvisionales = objITS[0].UrlJsonContext.qtd_provisionales;
+            let qtdProvisionales = formatNumber(objITS[0]?.UrlJsonContext?.qtd_provisionales);
 
             // carga consumo telemedidas
             let objConsumoSugerido = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', assetNumber));
-            let consumoSugerido = objConsumoSugerido[0].UrlJsonContext.CONT_consumo_sugerido_kwh;
+            let consumoSugerido = formatNumber(objConsumoSugerido[0]?.UrlJsonContext?.CONT_consumo_sugerido_kwh);
 
             // tabla auxiliar constante
             let objConstContribucion = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_contribuicao'));
-            let constanteContribucion = objConstContribucion[0].UrlJsonContext.valor;
+            let constanteContribucion = formatNumber(objConstContribucion[0]?.UrlJsonContext?.valor);
             let objConstCnac = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_cnac'));
-            let constanteCnac = objConstCnac[0].UrlJsonContext.valor;
+            let constanteCnac = formatNumber(objConstCnac[0]?.UrlJsonContext?.valor);
             //============================//
 
             //========== FILTRO =============//
@@ -183,33 +183,33 @@ async function init(json) {
             let postInfo = {
                 "pstr_asset_number": assetNumber,
                 "pstr_numero_de_factura": numeroFactura,
-                "pstr_alumbrado_factura": Number(alumbradoFactura),
-                "pstr_cnac_factura": Number(cnacFactura),
-                "pstr_contribucion_factura": Number(contribucionFactura),
-                "pstr_consumo_factura": Number(consumoFactura),
-                "pstr_tarifa_factura": Number(tarifaFactura),
-                "pstr_energia_factura": Number(energiaFactura),
-                "pstr_total_factura": Number(totalFactura),
+                "pstr_alumbrado_factura": parseFloat(alumbradoFactura.toFixed(0)),
+                "pstr_cnac_factura": parseFloat(cnacFactura.toFixed(0)),
+                "pstr_contribucion_factura": parseFloat(contribucionFactura.toFixed(0)),
+                "pstr_consumo_factura": parseFloat(consumoFactura.toFixed(0)),
+                "pstr_tarifa_factura": parseFloat(tarifaFactura.toFixed(3)),
+                "pstr_energia_factura": parseFloat(energiaFactura.toFixed(0)),
+                "pstr_total_factura": parseFloat(totalFactura.toFixed(0)),
 
                 "pstr_codigo_cliente": codigoCliente,
                 "pstr_portifolio": portafolioCliente,
                 "pstr_tipo_alumbrado": tipoAlumbrado,
                 "pstr_tipologia": clasifPassthru,
                 "pstr_sujeto_pasivo": sujetoPasivo,
-                "pstr_valor_sujeto_pasivo": Number(valorSujetoPasivo),
-                "pstr_provisionales": Number(qtdProvisionales),
-                "pstr_consumo_sugerido": isReembolsoTotalFactura ? Number(consumoFactura) : Number(consumoSugerido),
-                "pstr_constante_contribucion": Number(constanteContribucion),
-                "pstr_constante_cnac": Number(constanteCnac),
+                "pstr_valor_sujeto_pasivo": parseFloat(valorSujetoPasivo.toFixed(0)),
+                "pstr_provisionales": parseFloat(qtdProvisionales.toFixed(0)),
+                "pstr_consumo_sugerido": isReembolsoTotalFactura ? parseFloat(consumoFactura.toFixed(0)) : parseFloat(consumoSugerido.toFixed(0)),
+                "pstr_constante_contribucion": parseFloat(constanteContribucion.toFixed(0)),
+                "pstr_constante_cnac": parseFloat(constanteCnac.toFixed(0)),
 
-                "passthru__valor_neto": isReembolsoTotalFactura ? 0 : Number(passthru__valor_neto),
-                "passthru__tarifa_energia": isReembolsoTotalFactura ? Number(tarifaFactura) : Number(passthru__tarifa_energia),
-                "passthru__reembolso_energia": isReembolsoTotalFactura ? 0 : Number(passthru__reembolso_energia),
-                "passthru__reembolso_contribucion": isReembolsoTotalFactura ? 0 : Number(passthru__reembolso_contribucion),
-                "passthru__reembolso_alumbrado_publico": isReembolsoTotalFactura ? Number(alumbradoFactura) : Number(passthru__reembolso_alumbrado_publico),
-                "passthru__reembolso_cnac": isReembolsoTotalFactura ? 0 : Number(passthru__reembolso_cnac),
-                "passthru__total_reembolso": isReembolsoTotalFactura ? Number(totalFactura) : Number(passthru__total_reembolso),
-                "passthru__costo_atc": isReembolsoTotalFactura ? 0 : Number(passthru__costo_atc),
+                "passthru__valor_neto": isReembolsoTotalFactura ? 0 : parseFloat(passthru__valor_neto.toFixed(0)),
+                "passthru__tarifa_energia": isReembolsoTotalFactura ? parseFloat(tarifaFactura.toFixed(3)) : parseFloat(passthru__tarifa_energia.toFixed(3)),
+                "passthru__reembolso_energia": isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_energia.toFixed(0)),
+                "passthru__reembolso_contribucion": isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_contribucion.toFixed(0)),
+                "passthru__reembolso_alumbrado_publico": isReembolsoTotalFactura ? parseFloat(alumbradoFactura.toFixed(0)) : parseFloat(passthru__reembolso_alumbrado_publico.toFixed(0)),
+                "passthru__reembolso_cnac": isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_cnac.toFixed(0)),
+                "passthru__total_reembolso": isReembolsoTotalFactura ? parseFloat(totalFactura.toFixed(0)) : parseFloat(passthru__total_reembolso.toFixed(0)),
+                "passthru__costo_atc": isReembolsoTotalFactura ? 0 : parseFloat(passthru__costo_atc.toFixed(0)),
                 "ID_ONE_REF": data.onergy_js_ctx_ORIGINAL.fedid
             };
 
@@ -314,7 +314,7 @@ const calcFacturaValorNeto = async (energiaFactura, contribucionFactura) => {
     // let totalCnac = formatNumber(objFatReadOnly.UrlJsonContext.total_cnac);
 
     // mla-bts: energia + contribucion == valor neto
-    let passthru__valor_neto = formatNumber(energiaFactura) + formatNumber(contribucionFactura);
+    let passthru__valor_neto = energiaFactura + contribucionFactura;
     return passthru__valor_neto;
 };
 
@@ -324,7 +324,7 @@ const calcTarifaEnergia = async (energiaFactura, consumoFactura) => {
 
     // mla-bts: tarifa energia == tarifa energia
     let tarifaEnergia = energiaFactura / consumoFactura;
-    return tarifaEnergia;
+    return (tarifaEnergia > 0) ? tarifaEnergia : 0;
 };
 
 const calcReembolsoEnergia = async (passthru__tarifa_energia, consumoSugerido) => {
@@ -332,7 +332,7 @@ const calcReembolsoEnergia = async (passthru__tarifa_energia, consumoSugerido) =
     // let tarifaEnergia = await calcTarifaEnergia(energiaFactura, consumoFactura);
 
     // mla-bts: tarifa energia * consumo sugerido == reembolso energia
-    let reembolsoEnergia = formatNumber(passthru__tarifa_energia * consumoSugerido);
+    let reembolsoEnergia = passthru__tarifa_energia * consumoSugerido;
     return reembolsoEnergia;
 };
 
@@ -342,8 +342,8 @@ const calcReembolsoContribucion = async (contribucionFactura, consumoSugerido, c
     // let constanteContribucion = formatNumber(objConstContribucion.UrlJsonContext.valor);
 
     // mla-bts: (contribucion factura * consumo sugerido) / consumo factura == reembolso contribucion
-    let reembolsoContribucion = formatNumber((contribucionFactura * consumoSugerido) / consumoFactura);
-    return reembolsoContribucion;
+    let reembolsoContribucion = (contribucionFactura * consumoSugerido) / consumoFactura;
+    return (reembolsoContribucion > 0) ? reembolsoContribucion : 0;
 };
 
 const calcReembolsoAlumbrado = async (sujetoPasivo, valorSujetoPasivo, qtdProvisionales, alumbradoFactura) => {
@@ -354,16 +354,16 @@ const calcReembolsoAlumbrado = async (sujetoPasivo, valorSujetoPasivo, qtdProvis
     // dependendo de qtd provisional, reduz sujeto pasivo
     let calcSujetoPasivo, reembolsoAlumbradoPublico;
     if (sujetoPasivo == 'TIGO') {
-        calcSujetoPasivo = formatNumber(valorSujetoPasivo) / (formatNumber(qtdProvisionales) + 1);
-        reembolsoAlumbradoPublico = formatNumber(alumbradoFactura * (calcSujetoPasivo / 100));
+        calcSujetoPasivo = valorSujetoPasivo / (qtdProvisionales + 1);
+        reembolsoAlumbradoPublico = alumbradoFactura * (calcSujetoPasivo / 100);
     } else if (sujetoPasivo == 'TIGO-ATC 50%-50%') {
-        calcSujetoPasivo = formatNumber(valorSujetoPasivo) / (formatNumber(qtdProvisionales) + 2);
-        reembolsoAlumbradoPublico = formatNumber(alumbradoFactura * (calcSujetoPasivo / 100));
+        calcSujetoPasivo = valorSujetoPasivo / (qtdProvisionales + 2);
+        reembolsoAlumbradoPublico = alumbradoFactura * (calcSujetoPasivo / 100);
     } else {
-        calcSujetoPasivo = formatNumber(valorSujetoPasivo);
-        reembolsoAlumbradoPublico = formatNumber(alumbradoFactura * (calcSujetoPasivo / 100));
+        calcSujetoPasivo = valorSujetoPasivo;
+        reembolsoAlumbradoPublico = alumbradoFactura * (calcSujetoPasivo / 100);
     }
-    return reembolsoAlumbradoPublico;
+    return (reembolsoAlumbradoPublico > 0) ? reembolsoAlumbradoPublico : 0;
 };
 
 const calcReembolsoCnac = async (cnacFactura, consumoFactura, consumoSugerido, portafolioCliente, constanteCnac) => {
@@ -380,14 +380,14 @@ const calcReembolsoCnac = async (cnacFactura, consumoFactura, consumoSugerido, p
         // let consumoAmi = objConsumoSugerido.UrlJsonContext.CONT_consumo_sugerido_kwh;
 
         cnacTigo = (cnacFactura * consumoSugerido) / consumoFactura;
-        cnacAtc = (cnacFactura - cnacTigo);
-        reembolsoCnac = formatNumber(cnacTigo);
+        cnacAtc = cnacFactura - cnacTigo;
+        reembolsoCnac = cnacTigo;
     } else {
         // let constanteCnac = formatNumber(objConstCnac.UrlJsonContext.valor);
 
-        reembolsoCnac = formatNumber(cnacFactura * (constanteCnac / 100));
+        reembolsoCnac = cnacFactura * (constanteCnac / 100);
     }
-    return reembolsoCnac;
+    return (reembolsoCnac > 0) ? reembolsoCnac : 0;
 };
 
 const calcTotalReembolso = async (passthru__reembolso_energia, passthru__reembolso_contribucion, passthru__reembolso_alumbrado_publico, passthru__reembolso_cnac) => {
@@ -397,7 +397,7 @@ const calcTotalReembolso = async (passthru__reembolso_energia, passthru__reembol
     // let reembolsoCnac = await calcReembolsoCnac(objFatReadOnly, objSitios, objConsumoSugerido, objConstCnac);
 
     // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
-    let totalReembolso = formatNumber(passthru__reembolso_energia + passthru__reembolso_contribucion + passthru__reembolso_alumbrado_publico + passthru__reembolso_cnac);
+    let totalReembolso = passthru__reembolso_energia + passthru__reembolso_contribucion + passthru__reembolso_alumbrado_publico + passthru__reembolso_cnac;
     return totalReembolso;
 };
 
@@ -406,7 +406,7 @@ const calcCostoAtc = async (totalFactura, passthru__total_reembolso) => {
     // let totalReembolso = await calcTotalReembolso(passthru__reembolso_energia, passthru__reembolso_contribucion, passthru__reembolso_alumbrado_publico, passthru__reembolso_cnac);
 
     // total factura - total reembolso == costo atc
-    let costoAtc = formatNumber(totalFactura - passthru__total_reembolso);
+    let costoAtc = totalFactura - passthru__total_reembolso;
     return costoAtc;
 };
 
