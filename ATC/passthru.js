@@ -138,7 +138,7 @@ async function init(json) {
             //============================//
 
             //========== FILTRO =============//
-            let reembolsoTotalFactura = ['VMLA', 'Occasio Reintegro', 'DAS'];
+            let reembolsoTotalFactura = ['VMLA', 'OCCASIO', 'DAS'];
             let isReembolsoTotalFactura = reembolsoTotalFactura.some(i => portafolioCliente.includes(i));
             //============================//
 
@@ -175,6 +175,9 @@ async function init(json) {
             // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
             let passthru__total_reembolso = await calcTotalReembolso(passthru__reembolso_energia, passthru__reembolso_contribucion, passthru__reembolso_alumbrado_publico, passthru__reembolso_cnac);
 
+            // total energia contribucion cnac
+            let passthru__total_energ_contrib_cnac = await calcTotalEnergContribCnac(passthru__reembolso_energia, passthru__reembolso_contribucion, passthru__reembolso_cnac);
+
             // costo atc
             // total factura - total reembolso == costo atc
             let passthru__costo_atc = await calcCostoAtc(totalFactura, passthru__total_reembolso);
@@ -209,12 +212,13 @@ async function init(json) {
                 "passthru__reembolso_alumbrado_publico": isReembolsoTotalFactura ? parseFloat(alumbradoFactura.toFixed(0)) : parseFloat(passthru__reembolso_alumbrado_publico.toFixed(0)),
                 "passthru__reembolso_cnac": isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_cnac.toFixed(0)),
                 "passthru__total_reembolso": isReembolsoTotalFactura ? parseFloat(totalFactura.toFixed(0)) : parseFloat(passthru__total_reembolso.toFixed(0)),
+                "passthru__total_energ_contrib_cnac": isReembolsoTotalFactura ? parseFloat((energiaFactura + contribucionFactura + cnacFactura).toFixed(0)) : parseFloat(passthru__total_energ_contrib_cnac.toFixed(0)),
                 "passthru__costo_atc": isReembolsoTotalFactura ? 0 : parseFloat(passthru__costo_atc.toFixed(0)),
                 "ID_ONE_REF": data.onergy_js_ctx_ORIGINAL.fedid
             };
 
             // debugger;
-            await sendItemToOnergy(passthruCalculoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, postInfo);
+            // await sendItemToOnergy(passthruCalculoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, postInfo);
         }
         result.status = 'FINALIZADO';
         result.log = log.length > 0 ? log.join('\n') : '';
@@ -399,6 +403,11 @@ const calcTotalReembolso = async (passthru__reembolso_energia, passthru__reembol
     // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
     let totalReembolso = passthru__reembolso_energia + passthru__reembolso_contribucion + passthru__reembolso_alumbrado_publico + passthru__reembolso_cnac;
     return totalReembolso;
+};
+
+const calcTotalEnergContribCnac = async (passthru__reembolso_energia, passthru__reembolso_contribucion, passthru__reembolso_cnac) => {
+    let totalEnergContribCnac = passthru__reembolso_energia + passthru__reembolso_contribucion + passthru__reembolso_cnac;
+    return totalEnergContribCnac;
 };
 
 const calcCostoAtc = async (totalFactura, passthru__total_reembolso) => {
