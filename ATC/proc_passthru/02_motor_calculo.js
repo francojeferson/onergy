@@ -269,23 +269,26 @@ const calcularLinha = async (LINHA, reembolsoPromedio) => {
     //============================//
 
     //========== FILTRO =============//
-    let reembolsoTotalFactura = ['VMLA', 'OCCASIO REINTEGRO', 'DAS', 'Otros Operadores'];
-    let isReembolsoTotalFactura = reembolsoTotalFactura.some(i => linhaContext.pstr_tipologia.includes(i));
+    let reembolsoTotalFactura = ['VMLA', 'OCCASIO REINTEGRO'];
+    let isReembolsoTotalFactura = reembolsoTotalFactura.some(i => clasifPassthru.includes(i));
+
+    let noCobroFactura = ['Desmantelado', 'Otros Operadores', 'DAS', 'SIN INFORMACIÓN', 'Equipos Apagados', 'Sin Equipos sin Consumo'];
+    let isNoCobroFactura = noCobroFactura.some(i => clasifPassthru.includes(i));
     //============================//
 
     LINHA.UrlJsonContext = {
         ...linhaContext,
-        "passthru__valor_neto": isReembolsoTotalFactura ? 0 : parseFloat(passthru__valor_neto.toFixed(0)),
-        "passthru__tarifa_energia": isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_tarifa_factura.toFixed(3)) : parseFloat(passthru__tarifa_energia.toFixed(3)),
-        "passthru__reembolso_energia": isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_energia.toFixed(0)),
-        "passthru__reembolso_contribucion": isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_contribucion.toFixed(0)),
-        "passthru__reembolso_alumbrado_publico": isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_alumbrado_factura.toFixed(0)) : parseFloat(passthru__reembolso_alumbrado_publico.toFixed(0)),
-        "passthru__alumbrado_asumido_atc": isReembolsoTotalFactura ? 0 : parseFloat(passthru__alumbrado_asumido_atc.toFixed(0)),
-        "passthru__reembolso_cnac": isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_cnac.toFixed(0)),
-        "passthru__total_reembolso": isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_total_factura.toFixed(0)) : parseFloat(passthru__total_reembolso.toFixed(0)),
-        "passthru__total_energ_contrib_cnac": isReembolsoTotalFactura ? parseFloat((linhaContext.pstr_energia_factura + linhaContext.pstr_contribucion_factura + linhaContext.pstr_cnac_factura).toFixed(0)) : parseFloat(passthru__total_energ_contrib_cnac.toFixed(0)),
-        "passthru__costo_atc": isReembolsoTotalFactura ? 0 : parseFloat(passthru__costo_atc.toFixed(0)),
-        "passthru__reembolso_promedio": passthru__reembolso_promedio
+        "passthru__valor_neto": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__valor_neto.toFixed(0)),
+        "passthru__tarifa_energia": isNoCobroFactura || isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_tarifa_factura.toFixed(3)) : parseFloat(passthru__tarifa_energia.toFixed(3)),
+        "passthru__reembolso_energia": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_energia.toFixed(0)),
+        "passthru__reembolso_contribucion": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_contribucion.toFixed(0)),
+        "passthru__reembolso_alumbrado_publico": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_alumbrado_factura.toFixed(0)) : parseFloat(passthru__reembolso_alumbrado_publico.toFixed(0)),
+        "passthru__alumbrado_asumido_atc": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__alumbrado_asumido_atc.toFixed(0)),
+        "passthru__reembolso_cnac": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_cnac.toFixed(0)),
+        "passthru__total_reembolso": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_total_factura.toFixed(0)) : parseFloat(passthru__total_reembolso.toFixed(0)),
+        "passthru__total_energ_contrib_cnac": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat((linhaContext.pstr_energia_factura + linhaContext.pstr_contribucion_factura + linhaContext.pstr_cnac_factura).toFixed(0)) : parseFloat(passthru__total_energ_contrib_cnac.toFixed(0)),
+        "passthru__costo_atc": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__costo_atc.toFixed(0)),
+        "passthru__reembolso_promedio": isNoCobroFactura || isReembolsoTotalFactura ? 0 : passthru__reembolso_promedio
     };
 
     return LINHA;
