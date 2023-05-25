@@ -103,12 +103,24 @@ async function init(json) {
             let finalCobro = objFatReadOnly[0]?.UrlJsonContext?.data_fim_pagamento;
             let numeroFactura = objFatReadOnly[0]?.UrlJsonContext?.numero_da_nota_fiscal;
             let consumoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.consumo_kwh);
-            let alumbradoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.taxa_de_iluminacao);
-            let cnacFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.total_cnac);
             let tarifaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_kwh);
-            let contribucionFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.energia_de_contribuicao);
-            let energiaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_energia);
             let totalFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_total_informado);
+            let energiaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_energia);
+            let contribucionFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.energia_de_contribuicao);
+            let alumbradoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.taxa_de_iluminacao);
+            let compensacionEnergiaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.compensacao_de_energia);
+            let reliquidacionesFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.reliquidacoes);
+            let otrosEnergiasFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.outras_energias);
+            let ajusteFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.reajuste);
+            let cnacFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.total_cnac);
+            let aseoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.agua_e_esgoto);
+            let vigilanciaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.imposto_de_vigilancia);
+            let interesesMoraFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.juros_de_mora);
+            let financiacionFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.financiamentos);
+            let reconexionFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.reconexao);
+            let tarifaConexionFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.taxa_de_conexao);
+            let alquilerContadoresFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.aluguel_do_medidor);
+            let ivaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.iva);
             //============================//
 
             //========== DADOS MESTRES =============//
@@ -147,8 +159,11 @@ async function init(json) {
             //============================//
 
             //========== FILTRO =============//
-            let reembolsoTotalFactura = ['VMLA', 'OCCASIO REINTEGRO', 'DAS', 'Otros Operadores'];
+            let reembolsoTotalFactura = ['VMLA', 'OCCASIO REINTEGRO'];
             let isReembolsoTotalFactura = reembolsoTotalFactura.some(i => clasifPassthru.includes(i));
+
+            let noCobroFactura = ['Desmantelado', 'Otros Operadores', 'DAS', 'SIN INFORMACIÓN', 'Equipos Apagados', 'Sin Equipos sin Consumo'];
+            let isNoCobroFactura = noCobroFactura.some(i => clasifPassthru.includes(i));
             //============================//
 
             arrayCaculos.push({
@@ -159,13 +174,25 @@ async function init(json) {
                 "pstr_inicio_cobro": inicioCobro,
                 "pstr_final_cobro": finalCobro,
                 "pstr_numero_de_factura": numeroFactura,
-                "pstr_alumbrado_factura": parseFloat(alumbradoFactura.toFixed(0)),
-                "pstr_cnac_factura": parseFloat(cnacFactura.toFixed(0)),
-                "pstr_contribucion_factura": parseFloat(contribucionFactura.toFixed(0)),
                 "pstr_consumo_factura": parseFloat(consumoFactura.toFixed(0)),
                 "pstr_tarifa_factura": parseFloat(tarifaFactura.toFixed(3)),
-                "pstr_energia_factura": parseFloat(energiaFactura.toFixed(0)),
                 "pstr_total_factura": parseFloat(totalFactura.toFixed(0)),
+                "pstr_energia_factura": parseFloat(energiaFactura.toFixed(0)),
+                "pstr_contribucion_factura": parseFloat(contribucionFactura.toFixed(0)),
+                "pstr_alumbrado_factura": parseFloat(alumbradoFactura.toFixed(0)),
+                "pstr_compensacion_energia_factura": parseFloat(compensacionEnergiaFactura.toFixed(0)),
+                "pstr_reliquidaciones_factura": parseFloat(reliquidacionesFactura.toFixed(0)),
+                "pstr_otros_energias_factura": parseFloat(otrosEnergiasFactura.toFixed(0)),
+                "pstr_ajuste_factura": parseFloat(ajusteFactura.toFixed(0)),
+                "pstr_cnac_factura": parseFloat(cnacFactura.toFixed(0)),
+                "pstr_aseo_factura": parseFloat(aseoFactura.toFixed(0)),
+                "pstr_vigilancia_factura": parseFloat(vigilanciaFactura.toFixed(0)),
+                "pstr_intereses_mora_factura": parseFloat(interesesMoraFactura.toFixed(0)),
+                "pstr_financiacion_factura": parseFloat(financiacionFactura.toFixed(0)),
+                "pstr_reconexion_factura": parseFloat(reconexionFactura.toFixed(0)),
+                "pstr_tarifa_conexion_factura": parseFloat(tarifaConexionFactura.toFixed(0)),
+                "pstr_alquiler_contadores_factura": parseFloat(alquilerContadoresFactura.toFixed(0)),
+                "pstr_iva_factura": parseFloat(ivaFactura.toFixed(0)),
 
                 "pstr_codigo_cliente": codigoCliente,
                 "pstr_portifolio": portafolioCliente,
@@ -174,7 +201,7 @@ async function init(json) {
                 "pstr_sujeto_pasivo": sujetoPasivo,
                 "pstr_valor_sujeto_pasivo": parseFloat(valorSujetoPasivo.toFixed(0)),
                 "pstr_provisionales": parseFloat(qtdProvisionales.toFixed(0)),
-                "pstr_consumo_sugerido": isReembolsoTotalFactura ? parseFloat(consumoFactura.toFixed(0)) : parseFloat(consumoSugerido.toFixed(0)),
+                "pstr_consumo_sugerido": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(consumoFactura.toFixed(0)) : parseFloat(consumoSugerido.toFixed(0)),
                 "pstr_constante_contribucion": parseFloat(constanteContribucion.toFixed(0)),
                 "pstr_constante_cnac": parseFloat(constanteCnac.toFixed(0)),
                 "ID_ONE_REF": data.onergy_js_ctx_ORIGINAL.fedid
