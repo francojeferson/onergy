@@ -1,0 +1,524 @@
+/**NODE_ENV ===
+ */
+let { date } = require('assert-plus');
+let { formatDate } = require('tough-cookie');
+let { log, debug } = require('console');
+let { memory } = require('console');
+let { resolve } = require('path');
+let { type } = require('os');
+let axios = require('axios');
+let fs = require('fs');
+let jsuser = require('../../onergy/onergy-utils');
+let onergy = require('../../onergy/onergy-client');
+let utils = require('../../onergy/onergy-utils');
+replaceAll = function (content, needle, replacement) {
+    return content.split(needle).join(replacement);
+};
+async function ajax(args) {
+    return await onergy.ajax(args);
+}
+async function ajaxPost(args) {
+    return await onergy.ajaxPost(args);
+}
+function failureCallback(error) {
+    console.log('It failed with ' + error);
+}
+function get_usr_tmz_dt_now(data) {
+    return data;
+}
+async function hashMd5(args) {
+    return await onergy.hashMd5(args);
+}
+async function increment(args) {
+    return await onergy.increment(args);
+}
+async function onergy_countdocs(args) {
+    return await onergy.onergy_countdocs(args);
+}
+async function onergy_get(args) {
+    let r = await onergy.onergy_get(args);
+    return JSON.stringify(r);
+}
+async function onergy_save(args) {
+    return await onergy.onergy_save(args);
+}
+async function ReadExcelToJson(args) {
+    return await onergy.ReadExcelToJson(args);
+}
+async function ReadTextPdf(args) {
+    return await onergy.ReadTextPdf(args);
+}
+async function sendmail(args) {
+    return await onergy.sendmail(args);
+}
+async function onergy_sendto(args) {
+    let r = await onergy.onergy_sendto(args);
+    return JSON.stringify(r);
+}
+async function onergy_updatemany(data) {
+    return data;
+}
+function successCallback(result) {
+    console.log('It succeeded with ' + result);
+}
+
+/*
+=============================   SCRIPT    =============================
+*/
+
+const passthruReadOnlyID = 'acb34798-0a36-424f-9f0e-619238120d33';
+const informacionesDeLaCuentaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
+const sujetoPasivoID = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
+const informacionesTecnicasDelSitioID = '5ea06f19-d11a-4d61-b4ff-c74610e933cd';
+const clienteSitioID = 'a727ac73-7e04-46a3-adb1-1fb06cdfbb34';
+const consumoTelemedidasID = '40e7f11b-8a6c-4190-b004-80196324c2a9';
+const constanteID = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
+const passthruCalculoID = 'a8594cca-5f2c-4bcd-b2be-92b5e03d57f3';
+
+async function init(json) {
+    const data = JSON.parse(json);
+
+    //========== LOG =============//
+    if (data?.onergyLog?.log_fluxo) {
+        onergy.log("PASSTHRU - Criar Linhas Cálculo");
+    }
+    if (data?.onergyLog?.logData?.criar_linhas_calculo) {
+        onergy.log(JSON.stringify({
+            type: 'Message',
+            origem: 'Passthru:Criar Linhas Cálculo:init',
+            data: data,
+        }));
+    }
+    //============================//
+
+    try {
+
+        let arrayCaculos = [];
+
+        for (let s in data.pstr_ids_faturas_selecionadas) {
+            //========== FATURA =============//
+            let objFatReadOnly = await getOnergyItem(passthruReadOnlyID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('_id', data.pstr_ids_faturas_selecionadas[s]));
+            let assetNumber = objFatReadOnly[0]?.UrlJsonContext?.asset_number;
+            let inicioCobro = objFatReadOnly[0]?.UrlJsonContext?.data_inicio_pagamento;
+            let finalCobro = objFatReadOnly[0]?.UrlJsonContext?.data_fim_pagamento;
+            let numeroFactura = objFatReadOnly[0]?.UrlJsonContext?.numero_da_nota_fiscal;
+            let consumoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.consumo_kwh);
+            let alumbradoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.taxa_de_iluminacao);
+            let cnacFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.total_cnac);
+            let tarifaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_kwh);
+            let contribucionFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.energia_de_contribuicao);
+            let energiaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_energia);
+            let totalFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_total_informado);
+            //============================//
+
+            //========== DADOS MESTRES =============//
+
+            // clientes del sitio
+            let objCDS = await getOnergyItem(clienteSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
+            let regionalATC = objCDS[0]?.UrlJsonContext?.regio_regional;
+            let regionalCliente = objCDS[0]?.UrlJsonContext?.RCSRCS_nome_regional__clsit__regional_do_cliente;
+            let codigoCliente = objCDS[0]?.UrlJsonContext?.clsit__codigo_do_sitio_do_cliente;
+            let portafolioCliente = objCDS[0]?.UrlJsonContext?.PCSPCS_portafolio_cliente__clsit__portifolio_cliente;
+
+            // informaciones de la cuenta
+            let objIDC = await getOnergyItem(informacionesDeLaCuentaID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
+            let siteName = objIDC[0]?.UrlJsonContext?.site_name;
+            let tipoAlumbrado = objIDC[0]?.UrlJsonContext?.tipo_cobr_tipos_cobrancas__tipo_de_cobranca;
+            let clasifPassthru = objIDC[0]?.UrlJsonContext?.CPTclassificacao_passthru__prcs__clasificacion_passthru;
+            let sujetoPasivo = objIDC[0]?.UrlJsonContext?.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico;
+
+            // sujeto pasivo
+            let objSujetoPasivo = await getOnergyItem(sujetoPasivoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('sujeito', sujetoPasivo));
+            let valorSujetoPasivo = formatNumber(objSujetoPasivo[0]?.UrlJsonContext?.valor);
+
+            // informaciones tecnicas del sitio
+            let objITS = await getOnergyItem(informacionesTecnicasDelSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
+            let qtdProvisionales = formatNumber(objITS[0]?.UrlJsonContext?.qtd_provisionales);
+
+            // carga consumo telemedidas
+            let objConsumoSugerido = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', assetNumber));
+            let consumoSugerido = formatNumber(objConsumoSugerido[0]?.UrlJsonContext?.CONT_consumo_sugerido_kwh);
+
+            // tabla auxiliar constante
+            let objConstContribucion = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_contribuicao'));
+            let constanteContribucion = formatNumber(objConstContribucion[0]?.UrlJsonContext?.valor);
+            let objConstCnac = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_cnac'));
+            let constanteCnac = formatNumber(objConstCnac[0]?.UrlJsonContext?.valor);
+            //============================//
+
+            //========== FILTRO =============//
+            let reembolsoTotalFactura = ['VMLA', 'OCCASIO REINTEGRO', 'DAS', 'Otros Operadores'];
+            let isReembolsoTotalFactura = reembolsoTotalFactura.some(i => clasifPassthru.includes(i));
+            //============================//
+
+            arrayCaculos.push({
+                "pstr_asset_number": assetNumber,
+                "pstr_nombre_sitio": siteName,
+                "pstr_regional_atc": regionalATC,
+                "pstr_regional_cliente": regionalCliente,
+                "pstr_inicio_cobro": inicioCobro,
+                "pstr_final_cobro": finalCobro,
+                "pstr_numero_de_factura": numeroFactura,
+                "pstr_alumbrado_factura": parseFloat(alumbradoFactura.toFixed(0)),
+                "pstr_cnac_factura": parseFloat(cnacFactura.toFixed(0)),
+                "pstr_contribucion_factura": parseFloat(contribucionFactura.toFixed(0)),
+                "pstr_consumo_factura": parseFloat(consumoFactura.toFixed(0)),
+                "pstr_tarifa_factura": parseFloat(tarifaFactura.toFixed(3)),
+                "pstr_energia_factura": parseFloat(energiaFactura.toFixed(0)),
+                "pstr_total_factura": parseFloat(totalFactura.toFixed(0)),
+
+                "pstr_codigo_cliente": codigoCliente,
+                "pstr_portifolio": portafolioCliente,
+                "pstr_tipo_alumbrado": tipoAlumbrado,
+                "pstr_tipologia": clasifPassthru,
+                "pstr_sujeto_pasivo": sujetoPasivo,
+                "pstr_valor_sujeto_pasivo": parseFloat(valorSujetoPasivo.toFixed(0)),
+                "pstr_provisionales": parseFloat(qtdProvisionales.toFixed(0)),
+                "pstr_consumo_sugerido": isReembolsoTotalFactura ? parseFloat(consumoFactura.toFixed(0)) : parseFloat(consumoSugerido.toFixed(0)),
+                "pstr_constante_contribucion": parseFloat(constanteContribucion.toFixed(0)),
+                "pstr_constante_cnac": parseFloat(constanteCnac.toFixed(0)),
+                "ID_ONE_REF": data.onergy_js_ctx_ORIGINAL.fedid
+            });
+        }
+
+        await onergy.InsertManyOnergy(arrayCaculos, passthruCalculoID, data.onergy_js_ctx.usrid);
+
+        return SetObjectResponse(false, null, false);
+    } catch (erro) {
+        onergy.log(
+            JSON.stringify({
+                type: 'Erro',
+                origem: 'Passthru:Motor Calculo Passthru:init',
+                stack: erro.stack,
+                message: erro.message,
+                data: data,
+            })
+        );
+
+        let logErro = [];
+        logErro.push('** ERROR **');
+        logErro.push(`Message: ${erro.message}`);
+        logErro.push(`Stack: ${erro.stack}`);
+        result.log = logErro.join('\n');
+        result.status = 'ERROR';
+        return SetObjectResponse(true, result, false);
+    }
+}
+
+function initBefore(json) {
+    //return true;
+}
+
+function initDelete(json) {
+    //return true;
+}
+
+function SetObjectResponse(cond, json, WaitingWebHook, fimProcesso) {
+    if (WaitingWebHook === undefined) {
+        WaitingWebHook = false;
+    }
+    var obj = {
+        'cond': cond,
+        'WaitingWebHook': WaitingWebHook,
+    };
+    if (json && Object.keys(json).length > 0) {
+        obj.json = JSON.stringify(json);
+    }
+    if (fimProcesso) {
+        obj.onergy_prc_id = "3c17d734-8235-914f-9382-75e79ec29b16"; // Passthru
+        obj.onergy_new_prc_id_fdtid = "659303b2-00bb-4d97-b9e3-83a5d56c450b"; // Fim
+    }
+    return obj;
+}
+
+const getOnergyItem = async (fdtid, assid, usrid, filtro) => {
+    let strResp = await onergy_get({
+        fdtid: fdtid,
+        assid: assid,
+        usrid: usrid,
+        filter: filtro,
+    });
+    return JSON.parse(strResp);
+};
+
+const gerarFiltro = (fielNameP, valueP) => {
+    return JSON.stringify([{ FielName: fielNameP, Type: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`, FixedType: `${typeof valueP == 'number' ? 'Numeric' : 'string'}`, Value1: valueP }]);
+};
+
+const formatNumber = (value) => {
+    if (typeof value === 'undefined') {
+        return 0;
+    }
+    const number = Number(value);
+    if (isNaN(number)) {
+        return 0;
+    } else {
+        return Math.floor(number);
+    }
+};
+
+//====================================================================================================
+const jsonInput = {
+    "facturas_disponibles": null,
+    "facturas_seleccionadas": null,
+    "facturas_seleccionadas_readonly": " ",
+    "pstr_archivos_passthru": " ",
+    "pstr_registro_salvo": "sim",
+    "pstr_status_processo": "ENVIADO A PROCESO",
+    "pstr_ids_faturas_selecionadas": [
+        "924eebaf-7590-495d-be6c-3a2717a45723",
+        "1d6bf4b9-77b4-4466-bd85-4f417b27f745",
+        "e61fa546-b69e-46c2-a8d9-0fa715acf18f",
+        "02a40ddc-e4f6-45e9-86c0-8eae6c9fd46f",
+        "718c4945-8e3c-460a-86d0-0b6046c1498a",
+        "d1fc746d-0718-4b40-8524-8ad02f61a6b3",
+        "38fa07e0-9942-4bbb-a687-ce0c31792ae1",
+        "ca44a147-b21c-1dcb-f6a4-b4ebd4e77251",
+        "43e0c415-15d2-3d6c-5a31-0a0f8e033dca",
+        "5333a925-e576-0fd0-c5d5-ff6ae0250a9f",
+        "b7859557-c411-c5f7-9a1d-8fd4a3f49ea3",
+        "714fd66a-c0a9-903a-68ba-242ebf567151",
+        "080e8fb3-768f-4461-a873-83bb6f5cd49c",
+        "06a149ec-31ae-91b7-6f17-1b28697e56df",
+        "5a7b362e-cd2e-4c9f-9ce1-5193b4c2ca3f",
+        "d4ca566f-322b-494b-b19d-9b7ddbb8476f",
+        "10735f2a-9af8-46de-b262-89b16f81b440",
+        "55bda27e-1d8b-4904-a610-1682cc313e53",
+        "f3bf4be2-8d22-4740-a350-e8f23f8dbcdf",
+        "ae21d05c-31e3-431d-acc0-243fd85028b1",
+        "6b4a8cce-3ba4-4e3c-a49b-cbe716fcdd16",
+        "c4ac4424-6949-4982-8ef5-59e5641bd555",
+        "9f948806-83d3-47f1-98ff-852fda206226",
+        "0d4f1913-dc13-420f-bbc3-f8c4fce35cfa",
+        "d757b031-29be-423a-8851-9cb01afeb5dd",
+        "84e1a547-f5d6-42f6-b61b-971ed65cf959",
+        "2d331c82-32f2-4df1-b43e-642e7d07cc95",
+        "ae80c602-8879-4869-9aa3-55103582be62",
+        "df2b1b10-8024-4590-b851-dd705da0e936",
+        "6de7aae5-7d8b-4777-a903-464620ed381c",
+        "d851cff2-bfa5-4c2e-bf8e-122e4f08cf3c",
+        "992f25bc-f858-452d-a2cd-10ec18c21873",
+        "084b81a5-6e88-49d9-b9ff-f197a15d6e2f",
+        "6d0337a9-594c-4e5d-a045-a09507910d87",
+        "83e07598-7e08-4b4f-95f8-fecf3a3a9b20",
+        "b9db32c3-04cf-4313-b580-fab0859dc55d",
+        "d88dd9fe-f740-41ec-9245-3edac6c8dc48",
+        "db1172ce-4341-423f-8785-b05d8877d3a2",
+        "dd3354aa-3e31-4417-9f2a-dac7c5c5734d",
+        "0a5102a8-64d7-48ae-8033-bb9e93087a00",
+        "3414bdcd-99dd-447a-9e29-cb95cfe1927f",
+        "a8ddcbaa-06f1-4d0a-9ff7-83737ae10be9",
+        "6c605ce4-46ce-4d15-bba2-d671de3f1a8d",
+        "bcb08ac6-5c6b-4371-9542-3a879adb67a8",
+        "8bc765de-e5bb-47aa-8920-469076700d2d",
+        "622398f4-61f8-4adc-bbc1-1bc368b5ee86",
+        "c66a34cf-8f7f-dd01-89e7-86e8fcb86fb6",
+        "06538f98-987f-4052-95c4-3a4e30af287a",
+        "19b836d3-457e-4a19-85dd-dd4ee257175d",
+        "52c29859-5742-5078-10eb-5a75bc629690",
+        "cc1874b5-9883-4d38-a1c4-e4b65b89ed02",
+        "92837fe8-555e-6c12-0c2d-f9dd9ea89cfa",
+        "6e6b87a4-25f2-c42f-0f27-7de2a8e17a63",
+        "569a6789-3b80-46e6-bd56-e869f6db2f67",
+        "65933812-cd57-0306-b5c7-9b5885259bad",
+        "3c6eae52-38f1-4070-b37e-0580f0328def",
+        "db6439e7-a137-455e-ab60-e5599bbbcf6a",
+        "cc08bbd1-a882-f7cc-74a7-80f6dc092619",
+        "785e032f-7d63-4c97-b952-090d12ff47e2",
+        "35d6721c-f954-4e63-9d78-746432129871",
+        "1110a60f-95c6-4eea-9e70-207749be024d",
+        "9253a102-10e3-4baa-9b82-3552c0a595ee",
+        "7b205dbf-16fd-4678-a573-6482a5b8b071",
+        "9c57a113-78e8-458f-8a2c-dc9b321f4bfa",
+        "450690cb-9b48-49a9-a412-1888e8e3cf32",
+        "5606c49a-0a45-4899-a026-f9d2d883473b",
+        "0c7799df-18ba-4edb-8183-a2e02add5b7a",
+        "25d088a8-7d3d-e62a-e7c8-642b7e88e553",
+        "60584e50-47f2-bf9f-b8fe-9fd92221e1de",
+        "3c26ae33-8921-78b9-656d-86d8c572623e",
+        "3f50bbe2-bad3-9798-b3ec-321704e842f4",
+        "4fdce4e8-5961-f152-c8c8-8cb949c356d9",
+        "3494084a-d47c-64e0-2f86-166c77863684",
+        "7724b92b-6e63-f373-3f25-f640813df3e2",
+        "3869887e-f60f-f3eb-0bca-c38db0753943",
+        "71de7f09-002e-1ff6-caf8-44d562b0fe75",
+        "5168a48f-91ae-29d3-34f0-e64dfcf536c3",
+        "52978938-54a8-a49c-ebfd-e217c9c0a57d",
+        "b601162a-09ad-4a1b-a128-8ef2b21079ce",
+        "ab5736f1-04d2-46d7-a8d9-4cf6061be1c8",
+        "bc0107c7-0e4e-4af2-bcc4-ac76bcf71a0b",
+        "70df680a-de62-44f9-a43a-80bc9565345d",
+        "f5d41cdf-49f0-47d2-a925-852eec24a7f0",
+        "92f7c05f-fedb-48be-8de5-ae63e6f37bf1",
+        "2cd56994-c1e4-4dc8-9c10-9670f042a27b",
+        "bbf07b84-cc7c-44fb-b9c6-568ad3279069",
+        "bde797b2-614a-4c8b-b073-151ed932ccf9",
+        "67d77068-731c-4817-b421-d4564da84e84",
+        "e06cadd1-546a-4614-9756-fb7b1d6ac7ab",
+        "20cb0e39-cf9c-4240-9931-35c3601dd1c8",
+        "6bf9a466-6f7c-4a57-81b6-36eb7b7bf220",
+        "12e8f423-87fe-4ab9-b28e-afaaaca59b20",
+        "b0027fd7-c4fb-4983-aedb-82a02cdc7f81",
+        "2470197c-ed81-456a-87a7-6a50ce6dde3d",
+        "7576607c-7355-47ae-905b-cff0dc901639",
+        "8f23882e-2374-46ac-8202-d2a58141c3e7",
+        "37013873-9dd5-4a4f-bd08-0475f5611016",
+        "1c1d14f7-87d9-49bd-a501-c32f733e1280",
+        "ccb210f0-5723-40f6-89e8-7e4b99effe70",
+        "fe63774f-b670-41dc-bb17-61fcf72ad2fe",
+        "3bdfbaae-f36f-4897-a812-4280508e8d8f",
+        "3d798b91-e81e-4773-90bb-fabffc73f47f",
+        "985c82a7-b2e0-4ffc-a984-e23608652333",
+        "0ee31991-a474-4d0e-8123-0703d827d6c3",
+        "175c7d51-2630-465e-a1d1-8e87f3fa215f",
+        "14652e41-678c-4eea-ae1d-99799e89d4ff",
+        "11fc80f3-2e4b-4bdb-8a7a-06598f36c456",
+        "cbf495cc-836e-4a12-a15b-e349ba91c3dc",
+        "936e6eef-eabd-423b-b86a-0e0f671c744c",
+        "228051f2-b4d4-493c-aae1-52f53ac53130",
+        "2f46e43a-a627-47a7-a6f3-5ddfa30739e6",
+        "880b4955-3510-4c37-acbf-bbad680988db",
+        "d66ab71c-f1bd-4b69-9f3a-6e59171d4119",
+        "ce5de5df-2bf3-45bd-a517-abf172db038f",
+        "2452aae1-5777-4c31-87ac-46dcc6e1eea8",
+        "e63e79e4-0ae9-4a85-b9a9-05a8d630314c",
+        "4c4fb72e-18ae-419a-8801-384ef4e2d865",
+        "02be2ebe-1376-4ad4-9c0c-cddf24043fa0",
+        "acb54c46-a6b8-4c0a-9f65-4fb98307d3b6",
+        "8b90bd95-fd89-4bde-a731-619489a406b6",
+        "f83a4082-21da-4cfc-b56d-8f3e0a0ae053",
+        "5e5a4053-9e82-4434-b021-b05b398e308b",
+        "2c110add-09e8-4c27-806c-0fbfc6f15cfe",
+        "c6fbf5d0-0e88-4f1f-98f9-e931e8bbca4d",
+        "c871bca7-e161-4cda-a28d-d1684e775c18",
+        "a7b8c929-6e53-48c0-8a1b-ba364e2023fd",
+        "d9ec94bf-856c-432d-9ffa-f9802c81485f",
+        "cf54e5ee-f67a-47d8-bf60-a90e872f7d07",
+        "217ab6e0-490d-4fc3-9407-96369f3193a6",
+        "367e883f-cba5-455e-b49d-325f0a791d06",
+        "e9157e7f-5a62-4279-80fe-81e27b6bc947",
+        "04e57b34-10f7-3b2d-9833-e7fdf9809d9b",
+        "e1651c0f-0133-443b-866b-c2c81eec8a3d",
+        "77899125-d0cc-419b-b0c0-5daf59be26dc",
+        "92290984-7c65-40a8-8e59-b3fa75018417",
+        "85ecc261-c82d-4ccd-a18d-f3e38101d7df",
+        "7a485c25-5820-4df6-a5cb-ecb807c697be",
+        "c71f6e7c-cf5f-4f7a-8257-07baeb4faee3",
+        "e46a8c5e-881a-49b3-aa2f-15c21e70ce54",
+        "3a7ad53d-f92a-4900-b7fc-d4b6dc41c14f",
+        "65ffbee7-8304-4911-a9b6-3033b7c697a5",
+        "692a1b37-3510-412f-a2f6-310baa3ab7d7",
+        "d01127e7-e17f-4975-ae23-e3d5d4a3c9a7",
+        "ec200fb5-fb68-4d30-b322-544b7aefa82f",
+        "b2a7f807-ed08-45a2-9ee1-4a1ce9c3299b",
+        "eb813729-7313-461e-97d6-c67227021d03",
+        "318e2966-2520-4af8-8cab-27501747934a",
+        "813baac5-64a6-4f21-90e8-a8e5d4f3d4f8",
+        "44936a66-e960-476c-aadc-b8ab8ff89b5f",
+        "8c96a686-eb0f-e1e2-f390-910892eebc36",
+        "fb34efd5-2c9d-42e4-bb91-9aac59c91a10",
+        "e071e52d-8ff1-423f-8693-82862fab19f5",
+        "b304eca4-b38b-47cd-9c2d-a45a222873af",
+        "f6341252-794b-4ad1-af0d-4aec06d97d77",
+        "6842d9a8-362d-40ea-baf6-fc8e7fcfdf69",
+        "41d1b1c4-874d-4fa3-a9bb-1c8448272b43",
+        "51f1431b-6b11-4c04-bdfe-24ca76a423b1",
+        "322d926a-2594-49da-9feb-d90a0b7e056b",
+        "a8adccb2-d58b-4c05-8ecc-07e38160f1f7",
+        "ca198c5c-3d43-44f4-8a5b-748855a9d122",
+        "bb105300-459e-4acc-b613-36bfca7c3553",
+        "50a84f96-e882-45bb-9687-a4e579af5e3e",
+        "a5bd2fe8-830a-4cde-ba39-c1968839656c",
+        "a266b7b1-dec6-4540-b964-586aa81434cc",
+        "13ab5824-2089-40fe-b9b0-d535c27aef6d",
+        "38554ea0-dde0-44d5-b1e4-da960a7d856d",
+        "b40c9bac-ce45-4556-ab83-f27efc4c1b7b",
+        "08e1851c-0058-4419-ae0e-66ec4f747bcb",
+        "7a8d529e-9d63-4a93-8d7c-272513cba98c",
+        "ca4a3961-f10c-448b-ab84-4795e895ba88",
+        "f1322e0e-ad7f-47c0-b04e-77937de04dfe",
+        "3e3534ea-86eb-4019-aaa3-e78e4505d58c",
+        "6463ab02-8202-4e59-9358-bd8fe103891c",
+        "0907154c-2ecb-4b9c-94da-f533fa496e8f",
+        "e079092d-ee1c-4025-bf18-d263860f640f",
+        "83982d2a-4dc7-4bd0-8d81-bde2957bc363",
+        "a688bbe9-aaf2-4015-a135-391221029282",
+        "b3b072ee-20a3-4499-9a32-27a93f5b67a6",
+        "fde1abb0-b52a-4ddc-86a6-6d9c2876835f",
+        "c2446601-8b6c-455a-9528-0630db78ee5d",
+        "8cd2e910-8633-40f2-8111-4a0503498492",
+        "5829ed8b-6628-433e-adc6-6326423d9a46",
+        "38576306-9955-4415-9d69-58acf0448c97",
+        "b6564119-914c-d64b-a4e8-980bacb627b2",
+        "47cc80c6-a8e4-0d2a-0544-94e6b3c88dc4",
+        "c48cffa0-104d-cef1-e383-61d377ba7360",
+        "0a2840c0-7bcc-4862-a76d-99f57195ccb0",
+        "dcb2253e-b0be-4e9d-93f6-acd2bcd0d83d",
+        "7db0b9e4-3d8c-4bbd-91a6-ba6b0a7105ee",
+        "4f22e78a-060c-4b5b-85b5-422d039aa006",
+        "9ae15665-90a2-4bbc-acec-7b5a9fc060f4",
+        "07dfcf7f-a103-4af4-be36-9d3dd1fd5751",
+        "4698cc4a-5688-463c-ab9f-26dd3374b6b4",
+        "14236dad-e82a-4bd2-a7a3-b75743f4a1cb",
+        "3e2cf5eb-eb92-49c0-ae66-e2f0c09a68f4",
+        "5ed88d44-bd86-4ef3-9879-142721577e37",
+        "5772623a-ea3e-4aad-9f9a-035076267a84",
+        "b2d68ecc-980a-4b82-9c36-ad4cc87b5b92",
+        "2e83e1cf-c684-4eb4-9f48-bb74ca70419c",
+        "1acbb0ab-f955-4978-9f9b-cddcf5d27282"
+    ],
+    "onergy_js_ctx_ORIGINAL": {
+        "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
+        "fedid": "ab6a7ac0-990a-11ab-12fc-754a2fe5e289",
+        "fdtid": "06456424-a022-46a3-93b9-67e65eb31726",
+        "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
+        "insertDt": "2023-05-20T22:42:40.697Z",
+        "updateDt": "2023-05-20T22:42:40.697Z",
+        "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
+        "email": "adm@atc.com.br",
+        "user_name": "ADM ATC",
+        "onergy_rolid": "",
+        "praid": "28cb4668-7940-4131-8750-abf35f6eba70",
+        "pcvid": "bad0bc53-29f5-45b6-ac6f-59ce01822202",
+        "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
+        "timezone": null,
+        "timezone_value": "-03:00",
+        "pubNubHook": null
+    },
+    "oneTemplateTitle": "Criar Linhas Cálculo",
+    "onergyLog": {
+        "log_fluxo": true,
+        "logData": {
+            "criar_linhas_calculo": true,
+            "motor_calculo": true
+        }
+    },
+    "ass_id": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
+    "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
+    "email": "adm@atc.com.br",
+    "fdtid": "21af8d42-ac4a-4d84-bce9-740192048fb4",
+    "fedid": "7411b298-6069-43d7-b509-fecc5597a22e",
+    "onergy_rolid": "",
+    "timezone": null,
+    "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
+    "onergy_js_ctx": {
+        "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
+        "fedid": "7411b298-6069-43d7-b509-fecc5597a22e",
+        "fdtid": "21af8d42-ac4a-4d84-bce9-740192048fb4",
+        "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
+        "insertDt": "2023-05-20T22:42:43.309Z",
+        "updateDt": "2023-05-20T22:42:45.231Z",
+        "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
+        "email": "adm@atc.com.br",
+        "user_name": "ADM ATC",
+        "onergy_rolid": "",
+        "praid": "09e1de60-c8e0-4ba4-9717-381b4edd16ba",
+        "pcvid": "bad0bc53-29f5-45b6-ac6f-59ce01822202",
+        "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
+        "timezone": null,
+        "timezone_value": "-03:00",
+        "pubNubHook": null
+    }
+};
+
+init(JSON.stringify(jsonInput));
