@@ -216,10 +216,10 @@ async function gerarObjInt(data) {
                         "CHAVE_NFF_COMP": "",
                         "CREATED_BY": "",
                         "CREATION_DATE": "",
-                        "DESTINATION_CITY_ID": data.conteudo.NFe.infNFe.dest.enderDest.cMun,
-                        "DESTINATION_IBGE_CITY_CODE": "",
+                        "DESTINATION_CITY_ID": "7", //data.conteudo.NFe.infNFe.dest.enderDest.cMun, // not always populated in Oracle. Maintain existing approach/logic
+                        "DESTINATION_IBGE_CITY_CODE": "", //data.conteudo.NFe.infNFe.dest.enderDest.cMun, // not always populated in Oracle. Maintain existing approach/logic
                         "DESTINATION_STATE_CODE": "",
-                        "DESTINATION_STATE_ID": data.conteudo.NFe.infNFe.dest.enderDest.UF,
+                        "DESTINATION_STATE_ID": "21", //data.conteudo.NFe.infNFe.dest.enderDest.UF, // always populated in Oracle. Use Oracle table extract (Excel file)
                         "ID_ARQUIVO": idNf.toString(),
                         "ID_DOCSYS": "",
                         "ID_NF": (idNf + 1).toString(),
@@ -230,10 +230,10 @@ async function gerarObjInt(data) {
                         "LP_INSS_INITIAL_BASE_AMOUNT": "",
                         "LP_INSS_NET_AMOUNT": "",
                         "LP_INSS_RATE": "",
-                        "SOURCE_CITY_ID": data.conteudo.NFe.infNFe.emit.enderEmit.cMun,
-                        "SOURCE_IBGE_CITY_CODE": "",
+                        "SOURCE_CITY_ID": "7", //data.conteudo.NFe.infNFe.emit.enderEmit.cMun, // not always populated in Oracle. Maintain existing approach/logic
+                        "SOURCE_IBGE_CITY_CODE": "", //data.conteudo.NFe.infNFe.emit.enderEmit.cMun, // not always populated in Oracle. Maintain existing approach/logic
                         "SOURCE_STATE_CODE": "",
-                        "SOURCE_STATE_ID": data.conteudo.NFe.infNFe.emit.enderEmit.UF,
+                        "SOURCE_STATE_ID": "21", //data.conteudo.NFe.infNFe.emit.enderEmit.UF, // always populated in Oracle. Use Oracle table extract (Excel file)
                         "STATUS_IFACE": "",
                         "ALIQUOTA_INSS_INDIVIDUAL": "",
                         "BASE_ICMS_CAPA": data.valorNFe,
@@ -241,42 +241,42 @@ async function gerarObjInt(data) {
                         "CNPJ": data.cnpj,
                         "CODIGO_EMPRESA": "",
                         "DATA_EMISSAO": convertDate(data.dtEmissaoNfDate),//DD-Mon-YYYY
-                        "DATA_GL": "",
-                        "DATA_RI": "",
-                        "ESPECIE": "E-014",
+                        "DATA_GL": "", // blank is ok
+                        "DATA_RI": convertDate(data.dtEmissaoNfDate), // The RECEIVING DATE is required in Oracle. Use the date in the CSV/original XML file. Consider using the ‘Issue date’ if applicable
+                        "ESPECIE": "E-014", // INVOICE_TYPE_ID is a required field in Oracle – see values from Excel
                         "ESTABELECIMENTO": "Brazil/INV",
                         "FORNECEDOR": data.razaoSocial,
                         "ICMS_ST_AMOUNT": data.conteudo.NFe.infNFe.total.ICMSTot.vST,
                         "ICMS_ST_BASE": data.conteudo.NFe.infNFe.total.ICMSTot.vBCST,
-                        "INDICADOR_DFE": "",
+                        "INDICADOR_DFE": "1", // value = 1 to be defaulted (oracle = ATTRIBUTE1 on APPS.CLL_F189_INVOICES CFI) - required
                         "INSS_AMOUNT": "",
                         "INSS_BASE": "",
                         "INSS_TAX": "",
-                        "IR_AMOUNT": "0.00",
-                        "IR_BASE": "0.00",
+                        "IR_AMOUNT": "",
+                        "IR_BASE": "",
                         "IR_CATEG": "",
-                        "IR_TAX": "0.00",
-                        "ISS_AMOUNT": "0.00",
-                        "ISS_BASE": "0.00",
-                        "NATUREZA_FRETE": data.conteudo.NFe.infNFe.transp.modFrete,
+                        "IR_TAX": "",
+                        "ISS_AMOUNT": "",
+                        "ISS_BASE": "",
+                        "NATUREZA_FRETE": "", //data.conteudo.NFe.infNFe.transp.modFrete,
                         "NUM_NOTA": data.numeroNf,
                         "OBS_ADICIONAIS_COMENTARIOS": data.conteudo.NFe.infNFe.infAdic.infCpl,
-                        "OUTRAS_DESPESAS": "0.00",
+                        "OUTRAS_DESPESAS": "",
                         "OUTRAS_INF_DESCRICAO": "",
-                        "SERIE": data.conteudo.NFe.infNFe.ide.serie,
-                        "TIPO_CREDITO": "",
+                        "SERIE": "1", //data.conteudo.NFe.infNFe.ide.serie,
+                        "TIPO_CREDITO": "NORMAL", // this is required NORMAL or NOT APPLIED (this mirrors the ICMS_TYPE field)
                         "TIPO_DOC": data.tipo,
-                        "TIPO_FRETE": "",
-                        "TIPO_ICMS": "",
+                        "TIPO_FRETE": "OTHERS", // blank or value = OTHERS
+                        "TIPO_ICMS": "NORMAL", // this is required in Oracle. Use NORMAL or NOT APPLIED
                         "TIPO_OBSERVACAO": "",
-                        "TIPO_PAGAMENTO": "",
+                        "TIPO_PAGAMENTO": "", // value = A VISTA (leave blank)
                         "VALOR_FRETE": data.conteudo.NFe.infNFe.total.ICMSTot.vFrete,
-                        "VALOR_ICMS_CAPA": data.conteudo.NFe.infNFe.total.ICMSTot.vICMS,
+                        "VALOR_ICMS_CAPA": "0.00", //data.conteudo.NFe.infNFe.total.ICMSTot.vICMS,
                         "VALOR_INSS_IND_FATURADO": "",
                         "VALOR_INSS_INDIVIDUAL": "",
-                        "VALOR_IPI": data.conteudo.NFe.infNFe.total.ICMSTot.vIPI,
+                        "VALOR_IPI": "0.00", //data.conteudo.NFe.infNFe.total.ICMSTot.vIPI,
                         "VALOR_TOTAL": data.valorNFe,
-                        "VENDOR_IR": "",
+                        "VENDOR_IR": "4", // fill IR = 4 when IR is zero or Null; fill IR = 1 when some value higher than 0 at IR
                     }
                 ]
             }
@@ -301,55 +301,55 @@ async function gerarObjInt(data) {
                 "ACCOUNT_DIGIT": "",
                 "ACCOUNT_NAME": "",
                 "ACCOUNT_NUMBER": "",
-                "ALIQUOTA_COFINS": cofins.pCOFINS,
-                "ALIQUOTA_ICMS": icms.pICMS,
-                "ALIQUOTA_IPI": itens[i].imposto.IPI.IPITrib.pIPI,
+                "ALIQUOTA_COFINS": "", //cofins.pCOFINS, // ok to leave blank. Need to conduct spot checking during testing
+                "ALIQUOTA_ICMS": "0.00", //icms.pICMS,
+                "ALIQUOTA_IPI": "", //itens[i].imposto.IPI.IPITrib.pIPI, // Use fixed values (where applicable). Amount fields can be left blank.
                 "ALIQUOTA_ISS": "",
-                "ALIQUOTA_PIS": pis.pPIS,
+                "ALIQUOTA_PIS": "", //pis.pPIS, // ok to leave blank. Need to conduct spot checking during testing
                 "AWT_NAME": "",
                 "BAIRRO": data.conteudo.NFe.infNFe.emit.enderEmit.xBairro,
                 "BANK_NUMBER": "",
-                "BASE_COFINS": cofins.vBC,
+                "BASE_COFINS": "", //cofins.vBC, // ok to leave blank. Need to conduct spot checking during testing
                 "BASE_ICMS": icms.vBC,
-                "BASE_IPI": itens[i].prod.vProd,
+                "BASE_IPI": "", //itens[i].prod.vProd,
                 "BASE_ISS": "",
-                "BASE_PIS": pis.vBC,
+                "BASE_PIS": "", //pis.vBC, // ok to leave blank. Need to conduct spot checking during testing
                 "BRANCH_NAME": "",
                 "BRANCH_NUMBER": "",
                 "BRANCH_NUMBER_COMPLEMENT": "",
-                "CAMPO_CEST": itens[i].prod.CEST,
+                "CAMPO_CEST": "", //itens[i].prod.CEST,
                 "CATEGORIA_ATIVO": "",
                 "CEP": data.conteudo.NFe.infNFe.emit.enderEmit.CEP,
-                "CFOP": itens[i].prod.CFOP,
-                "CIDADE": data.conteudo.NFe.infNFe.emit.enderEmit.cMun,
+                "CFOP": "1556", //itens[i].prod.CFOP, // see Excel file Oracle mapping table – Use Parameters (as per on-going testing)
+                "CIDADE": "", //data.conteudo.NFe.infNFe.emit.enderEmit.cMun, // Vendor Master – PROVIDE IN THE EXTRACT DURING INITIAL TESTST (check, if possible, to leave blank and default in Oracle)
                 "CLASSIFICACAO_FISCAL": itens[i].prod.NCM,
-                "CNPJ_TERCEIRO": itens[i].prod.CNPJFab,
+                "CNPJ_TERCEIRO": "", //itens[i].prod.CNPJFab,
                 "CODIGO_FORNECEDOR": data.cnpjRaizEmit,
                 "CODIGO_IBGE": "",
-                "COMBINACAO_CONTABIL": "01.000.000000.10101010101000001.3.0000000000.0000000000.0000000000.0000000000",
+                "COMBINACAO_CONTABIL": "01.000.000000.10101010101000001.3.0000000000.0000000000.0000000000.0000000000", // yes, ok to consider this as a fixed value for this time (required for non-PO invoices)
                 "COMPLEMENTO": data.conteudo.NFe.infNFe.emit.enderEmit.xCpl,
-                "CST_COFINS": cofins.CST,
-                "CST_ICMS": icms.CST,
-                "CST_IPI": itens[i].imposto.IPI.IPITrib.CST,
-                "CST_PIS": pis.CST,
-                "DESCONTO": itens[i].vDesc,
+                "CST_COFINS": "98", //cofins.CST, // valid Oracle values required - CONTINUE WITH CSV values (need business confirmation)
+                "CST_ICMS": "", //icms.CST,
+                "CST_IPI": "49", //itens[i].imposto.IPI.IPITrib.CST, // oracle value = 49 only when IPI is taxable (map transaction types)
+                "CST_PIS": "98", //pis.CST, // valid Oracle values required CONTINUE WITH CSV values (need business confirmation)
+                "DESCONTO": "", //itens[i].vDesc,
                 "DESCRICAO": itens[i].prod.xProd,
-                "DV_DOCUMENTO": data.conteudo.NFe.infNFe.ide.cDV,
+                "DV_DOCUMENTO": "8", //data.conteudo.NFe.infNFe.ide.cDV, // valid Oracle values required. Used fixed value for initial testing (need to review the process)
                 "ENDERECO": data.conteudo.NFe.infNFe.emit.enderEmit.xLgr,
-                "ESTADO": data.conteudo.NFe.infNFe.emit.enderEmit.UF,
+                "ESTADO": "", //data.conteudo.NFe.infNFe.emit.enderEmit.UF, // Vendor Master – PROVIDE IN THE EXTRACT (check, if possible, to leave blank and default in Oracle)
                 "FILIAL_DOCUMENTO": "",
-                "FORMA_IMPORTACAO": "0.00",
-                "FRETE": itens[i].prod.vFrete,
-                "ICMS_ST_AMOUNT": icmsSt.vICMSST,
-                "ICMS_ST_AMOUNT_RECOVER": icmsSt.vICMSSTRet,
-                "ICMS_ST_BASE": icmsSt.vBCSTRet,
+                "FORMA_IMPORTACAO": "",
+                "FRETE": "", //itens[i].prod.vFrete,
+                "ICMS_ST_AMOUNT": "0.00", //icmsSt.vICMSST,
+                "ICMS_ST_AMOUNT_RECOVER": "", //icmsSt.vICMSSTRet,
+                "ICMS_ST_BASE": "0.00", //icmsSt.vBCSTRet,
                 "IDENTIFICADOR_BEM_IMOB": "",
-                "INDICADOR_TRIB_ICMS": "",
-                "INDICADOR_TRIB_IPI": "",
-                "INSCRICAO_ESTADUAL": data.conteudo.NFe.infNFe.emit.IE,
-                "INSCRICAO_MUNICIPAL": data.conteudo.NFe.infNFe.emit.IM,
+                "INDICADOR_TRIB_ICMS": "3", // Oracle ICMS_TAX_CODE is 2 = EXEMPT or 3 = TAXABLE
+                "INDICADOR_TRIB_IPI": "3", // values 2 = EXEMPT or 3 = taxable
+                "INSCRICAO_ESTADUAL": "", //data.conteudo.NFe.infNFe.emit.IE,
+                "INSCRICAO_MUNICIPAL": "", //data.conteudo.NFe.infNFe.emit.IM,
                 "ITEM_CODE": itens[i].prod.cProd,
-                "NATUREZA_OPERACAO": "",
+                "NATUREZA_OPERACAO": "E556.01", // this is a required field, list of values to be provided
                 "NATUREZA_BASE_CREDITO": "",
                 "NOME_FORNECEDOR": data.razaoSocial,
                 "NOTA_REFERENCIADA": "",
@@ -357,29 +357,29 @@ async function gerarObjInt(data) {
                 "NUMERO": data.conteudo.NFe.infNFe.emit.enderEmit.nro,
                 "NUMERO_PO": data.po_extraido.replace(/\D+/g, ""),
                 "OPERACAO_CONSUMIDOR": "",
-                "OUTRAS_DESPESAS": itens[i].prod.vOutro,
-                "PAIS": data.conteudo.NFe.infNFe.emit.enderEmit.cPais,
-                "PERCENTUAL_MERCAD_DEVOLVIDA": "0.00",
+                "OUTRAS_DESPESAS": "", //itens[i].prod.vOutro,
+                "PAIS": "", //data.conteudo.NFe.infNFe.emit.enderEmit.cPais, // Vendor Master – PROVIDE IN THE EXTRACT (check, if possible, to leave blank and default in Oracle)
+                "PERCENTUAL_MERCAD_DEVOLVIDA": "",
                 "PIS_PASEP_NIT": "",//itens[i].imposto.PIS.PISNT, *****ERRADO
                 "PO_LINE": "1",//TODO: buscar linha do pedido consumida pelo item (pedido pode ter mais de uma linha)
-                "PRECO_UNITARIO": "",
+                "PRECO_UNITARIO": "1.00",
                 "PRESENCA_COMPRADOR": "",
                 "QUANTIDADE": itens[i].prod.vProd,
                 "RAIZ_DOCUMENTO": "",
-                "RECOPI_NUMBER": itens[i].prod.nRECOPI,
-                "SITE_FORNECEDOR": "",
-                "TIPO_CONTRIBUINTE": "",
+                "RECOPI_NUMBER": "", //itens[i].prod.nRECOPI,
+                "SITE_FORNECEDOR": "320", // this is a required field and should be based on the Oracle Vendor master extracted values
+                "TIPO_CONTRIBUINTE": "CONTRIBUINTE", // use fixed value = CONTRIBUINTE for initial SIT testing
                 "TIPO_INSCRICAO": data.conteudo.NFe.infNFe.emit.CNPJ ? data.conteudo.NFe.infNFe.emit.CNPJ : data.conteudo.NFe.infNFe.emit.CPF,
                 "UF_TERCEIRO": "",
                 "UNIDADE": "EACH",
                 "UTIL_BEM_INC_ATIVO_IMOB": "",
-                "UTILIZACAO_FISCAL": "",
-                "VALOR_AFRMM": "0.00",
-                "VALOR_COFINS": cofins.vCOFINS,
-                "VALOR_ICMS": icms.vICMS,
-                "VALOR_IPI": itens[i].imposto.IPI.IPITrib.vIPI,
+                "UTILIZACAO_FISCAL": "CONSUMO", // this is a required field AND it should be either CONSUMO or SERVICOS
+                "VALOR_AFRMM": "",
+                "VALOR_COFINS": "", //cofins.vCOFINS, // ok to leave blank. Need to conduct spot checking during testing
+                "VALOR_ICMS": "0.00", //icms.vICMS,
+                "VALOR_IPI": "", //itens[i].imposto.IPI.IPITrib.vIPI, // Use fixed values (where applicable). Amount fields can be left blank
                 "VALOR_ISS": "",
-                "VALOR_PIS": pis.vPIS,
+                "VALOR_PIS": "", //pis.vPIS, // ok to leave blank. Need to conduct spot checking during testing
                 "VIA_TRANSPORTE": ""
             };
 
@@ -3088,7 +3088,7 @@ const jsonInput = {
     "cnpjRaizDest": "07986222",
     "cnpjRaizEmit": "03746938",
     "competencia": "11/2022",
-    "copy_doc_id": "b26b0dc2-f7c9-4eb4-af08-60f7479ae527",
+    "copy_doc_id": "d4a87689-3667-4b85-a774-0ee628a471b0",
     "depara_codigo_produto": "Não",
     "depara_codigo_produto_desc": "Não",
     "docManifestado": "nao",
@@ -3101,7 +3101,7 @@ const jsonInput = {
     "erp_type": "ORACLE",
     "eventos": " ",
     "fdtid": "b3cc6335-f322-4863-930d-1a530059a0c8",
-    "fedid": "7abc1574-527e-4737-8f81-e19d578ffe79",
+    "fedid": "db622f6c-91af-4413-a27f-a66e2dbcee9b",
     "forma_integracao": "ativa",
     "forma_integracao_desc": "Onergy envia os dados para outros sistemas",
     "habilitar_btn_validar_registro": "Não",
@@ -3119,11 +3119,11 @@ const jsonInput = {
     "habilitar_workflow_aprovacao": "Sim",
     "habilitar_workflow_aprovacao_desc": "Sim",
     "id_ref_validacoesComercial": "66bed5cb-bf25-ea95-e1e2-c903dcde3186",
-    "id_save_inbox": "99d6725d-14ab-4326-b65b-948e8e4d75a5",
+    "id_save_inbox": "e868bb68-009a-4dd8-9697-db1dce1b412c",
     "id_template_inbox": "fddf0752-3493-4a2c-a5b7-6a1d73d3abaf",
     "inbox_automatico": "sim",
     "inbox_automatico_desc": "Sim",
-    "itensPosValidacao": "dfd918eb-c0fc-4f4b-b960-d1d74fb4dfee",
+    "itensPosValidacao": "c2897615-2e3a-4b85-876d-45e5572028e1",
     "lst_siglas": [
         "OC:",
         "AF:",
@@ -3149,17 +3149,17 @@ const jsonInput = {
     "usrid": "31805071-d12a-43a0-9651-9f67f9ea39e7",
     "onergy_js_ctx": {
         "assid": "f8387e95-c604-454b-820e-e01c8dbedfcf",
-        "fedid": "7abc1574-527e-4737-8f81-e19d578ffe79",
+        "fedid": "db622f6c-91af-4413-a27f-a66e2dbcee9b",
         "fdtid": "b3cc6335-f322-4863-930d-1a530059a0c8",
         "usrid": "31805071-d12a-43a0-9651-9f67f9ea39e7",
-        "insertDt": "2023-05-22T13:51:23.458Z",
-        "updateDt": "2023-05-22T23:23:55.857Z",
+        "insertDt": "2023-05-25T20:01:51.215Z",
+        "updateDt": "2023-05-25T22:19:06.265Z",
         "cur_userid": "31805071-d12a-43a0-9651-9f67f9ea39e7",
         "email": "dev@biogen.com.br",
         "user_name": "dev@biogen.com.br",
         "onergy_rolid": "",
-        "praid": "98170e6b-a9a2-488c-83ea-1c36c119b03e",
-        "pcvid": "70d26cce-3afd-43b6-aa99-9978d99540cc",
+        "praid": "92ab141e-2cf4-4db3-af43-d8fd4eb990ca",
+        "pcvid": "7729c719-e908-4d89-8147-4489484fff71",
         "prcid": "5d88f35c-a996-3b8a-a62e-5f89acf00f44",
         "timezone": null,
         "timezone_value": "-03:00",
@@ -3225,15 +3225,15 @@ const jsonInput = {
     "basis_emp_cnpj__IBX__cnpj_origem_lista": "",
     "btnEscriturar": " ",
     "codigo_produto_validado": "sim",
-    "data_alteracao": "2023-05-22 10:53:13",
-    "data_alteracaoDate": "2023-05-22T13:53:13Z",
+    "data_alteracao": "2023-05-25 19:19:57",
+    "data_alteracaoDate": "2023-05-25T22:19:57Z",
     "det_sugest_escrit": " ",
     "doc_complementar": "",
     "documento_sem_pedido": "",
     "finalid_codigo__ped_finalid_codigo": " ",
     "finalid_descricao": " ",
     "finalid_ped_finalid_codigo_id": " ",
-    "guuidUpdate": "3f549d03-0ad2-43e7-9bfd-1821e8acd413",
+    "guuidUpdate": "3bf4b178-59d4-4fe2-a30a-d00b34d01a2d",
     "habilitar_aprovacao_dinamica": "",
     "habilitar_item_local_entrega": "",
     "histEventManifest": " ",
@@ -3245,6 +3245,7 @@ const jsonInput = {
     "justificativa_manifestacao": " ",
     "motivo_da_liberacao": "",
     "n_item_pedido_cache": "",
+    "n_item_pedido_nfe": " ",
     "ordemCompraRelacionada": " ",
     "pedidoCompraRelacionado": " ",
     "requisicao_compra": "",
@@ -3254,7 +3255,7 @@ const jsonInput = {
     "valor_parcela": 0,
     "checkOldManifest": true,
     "hashOld": "fca27a040a614d2a2494cdab69a9cd61",
-    "id_relation_pedido": "77de5259-e3be-499a-946f-4fd833398105",
+    "id_relation_pedido": "3f63660e-422d-429d-ab70-dd6f0eb95d72",
     "pedidos_relacionados_validados": [
         "4bfa3d41-2c60-479b-80d8-910bc76355a8"
     ],
@@ -3283,23 +3284,7 @@ const jsonInput = {
     "dadosComplementares": " ",
     "pedidos_relacionados_validComerc": "",
     "status_integracao": "aguardando_integracao",
-    "status_integracao_desc": "Aguardando Integração",
-    "respostaIntegracao": [
-        {
-            "STATUS_INT": "E",
-            "FASE": "RI",
-            "MESSAGE": "ERRO NO RETORNO DA INTEGRAÇÃO 404 page not found\n undefined"
-        }
-    ],
-    "message": "SUCCESS",
-    "dtDocFinalizado": "2023-05-22 20:03:24",
-    "dtDocFinalizadoDate": "2023-05-22T23:03:24Z",
-    "customIntegracao": {
-        "condRetornoIntegracao": true,
-        "retornoMsg": "SUCCESS",
-        "waitingWebHookRetornoIntegracao": false
-    },
-    "waitingWebHookRetornoIntegracao": false
+    "status_integracao_desc": "Aguardando Integração"
 };
 
 init(JSON.stringify(jsonInput));
