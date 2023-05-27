@@ -74,6 +74,7 @@ const clienteSitioID = 'a727ac73-7e04-46a3-adb1-1fb06cdfbb34';
 const consumoTelemedidasID = '40e7f11b-8a6c-4190-b004-80196324c2a9';
 const constanteID = 'efb11b9d-58d7-45fb-a8cd-d0ffbc707d0f';
 const passthruCalculoID = 'a8594cca-5f2c-4bcd-b2be-92b5e03d57f3';
+const faturasSelecionadasID = "f4041cad-9968-413f-af5b-6affebe99953";
 
 async function init(json) {
     const data = JSON.parse(json);
@@ -95,9 +96,17 @@ async function init(json) {
 
         let arrayCaculos = [];
 
-        for (let s in data.pstr_ids_faturas_selecionadas) {
+        let objFatReadOnly_all = await getOnergyItem(faturasSelecionadasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('faturas_selecionadas_passthru', data.onergy_js_ctx_ORIGINAL.fedid));
+        let objCDS_all = await getOnergyItem(clienteSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+        let objIDC_all = await getOnergyItem(informacionesDeLaCuentaID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+        let objSujetoPasivo_all = await getOnergyItem(sujetoPasivoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+        let objITS_all = await getOnergyItem(informacionesTecnicasDelSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+        let objConstContribucion_all = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+        let objConstCnac_all = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
+
+        for (let FATURA of objFatReadOnly_all) {
             //========== FATURA =============//
-            let objFatReadOnly = await getOnergyItem(passthruReadOnlyID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('_id', data.pstr_ids_faturas_selecionadas[s]));
+            let objFatReadOnly = [FATURA];
             let assetNumber = objFatReadOnly[0]?.UrlJsonContext?.asset_number;
             let inicioCobro = objFatReadOnly[0]?.UrlJsonContext?.data_inicio_pagamento;
             let finalCobro = objFatReadOnly[0]?.UrlJsonContext?.data_fim_pagamento;
@@ -126,35 +135,39 @@ async function init(json) {
             //========== DADOS MESTRES =============//
 
             // clientes del sitio
-            let objCDS = await getOnergyItem(clienteSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
+            let objCDS = objCDS_all.filter(VALUE => VALUE.UrlJsonContext.asset_number == assetNumber);
             let regionalATC = objCDS[0]?.UrlJsonContext?.regio_regional;
             let regionalCliente = objCDS[0]?.UrlJsonContext?.RCSRCS_nome_regional__clsit__regional_do_cliente;
             let codigoCliente = objCDS[0]?.UrlJsonContext?.clsit__codigo_do_sitio_do_cliente;
             let portafolioCliente = objCDS[0]?.UrlJsonContext?.PCSPCS_portafolio_cliente__clsit__portifolio_cliente;
 
             // informaciones de la cuenta
-            let objIDC = await getOnergyItem(informacionesDeLaCuentaID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
+            let objIDC = objIDC_all.filter(VALUE => VALUE.UrlJsonContext.asset_number == assetNumber);
             let siteName = objIDC[0]?.UrlJsonContext?.site_name;
             let tipoAlumbrado = objIDC[0]?.UrlJsonContext?.tipo_cobr_tipos_cobrancas__tipo_de_cobranca;
             let clasifPassthru = objIDC[0]?.UrlJsonContext?.CPTclassificacao_passthru__prcs__clasificacion_passthru;
             let sujetoPasivo = objIDC[0]?.UrlJsonContext?.suj_pa_sujeito__prcs__sujeito_passivo_alumbrado_publico;
 
             // sujeto pasivo
-            let objSujetoPasivo = await getOnergyItem(sujetoPasivoID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('sujeito', sujetoPasivo));
+            let objSujetoPasivo = objSujetoPasivo_all.filter(VALUE => VALUE.UrlJsonContext.sujeito == sujetoPasivo);
             let valorSujetoPasivo = formatNumber(objSujetoPasivo[0]?.UrlJsonContext?.valor);
 
             // informaciones tecnicas del sitio
-            let objITS = await getOnergyItem(informacionesTecnicasDelSitioID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number', assetNumber));
+            let objITS = objITS_all.filter(VALUE => VALUE.UrlJsonContext.asset_number == assetNumber);
             let qtdProvisionales = formatNumber(objITS[0]?.UrlJsonContext?.qtd_provisionales);
 
             // carga consumo telemedidas
-            let objConsumoSugerido = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('asset_number_TELEMEDIDA', assetNumber));
+            let filtroTelemedida = filtroProvedorContaInterna = JSON.stringify([
+                { FielName: 'asset_number_TELEMEDIDA', Type: 'string', FixedType: 'string', Value1: assetNumber },
+                { FielName: 'CONT_periodo_facturas', Type: 'string', FixedType: 'string', Value1: objFatReadOnly[0].UrlJsonContext.CDE__mes_processo }
+            ]);
+            let objConsumoSugerido = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filtroTelemedida);
             let consumoSugerido = formatNumber(objConsumoSugerido[0]?.UrlJsonContext?.CONT_consumo_sugerido_kwh);
 
             // tabla auxiliar constante
-            let objConstContribucion = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_contribuicao'));
+            let objConstContribucion = objConstContribucion_all.filter(VALUE => VALUE.UrlJsonContext.nome_interno == 'porcentagem_contribuicao');
             let constanteContribucion = formatNumber(objConstContribucion[0]?.UrlJsonContext?.valor);
-            let objConstCnac = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('nome_interno', 'porcentagem_cnac'));
+            let objConstCnac = objConstCnac_all.filter(VALUE => VALUE.UrlJsonContext.nome_interno == 'porcentagem_cnac');
             let constanteCnac = formatNumber(objConstCnac[0]?.UrlJsonContext?.valor);
             //============================//
 
@@ -221,14 +234,7 @@ async function init(json) {
                 data: data,
             })
         );
-
-        let logErro = [];
-        logErro.push('** ERROR **');
-        logErro.push(`Message: ${erro.message}`);
-        logErro.push(`Stack: ${erro.stack}`);
-        result.log = logErro.join('\n');
-        result.status = 'ERROR';
-        return SetObjectResponse(true, result, false);
+        return SetObjectResponse(true, null, false), true;
     }
 }
 
@@ -259,13 +265,30 @@ function SetObjectResponse(cond, json, WaitingWebHook, fimProcesso) {
 }
 
 const getOnergyItem = async (fdtid, assid, usrid, filtro) => {
-    let strResp = await onergy_get({
-        fdtid: fdtid,
-        assid: assid,
-        usrid: usrid,
-        filter: filtro,
-    });
-    return JSON.parse(strResp);
+    let keepSearching = true;
+    let skip = 0;
+    take = 100;
+    let result = [];
+
+    while (keepSearching) {
+        let strPageResp = await onergy_get({
+            fdtid: fdtid,
+            assid: assid,
+            usrid: usrid,
+            filter: filtro,
+            skip: skip,
+            take: take,
+        });
+        skip += take;
+        let pageResp = JSON.parse(strPageResp);
+        if (pageResp != null && pageResp.length > 0) {
+            keepSearching = pageResp.length == take;
+            result = result.concat(pageResp);
+        } else {
+            keepSearching = false;
+        }
+    }
+    return result;
 };
 
 const gerarFiltro = (fielNameP, valueP) => {
