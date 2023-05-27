@@ -100,23 +100,32 @@ async function init(json) {
             linhasCalculo = removeGroupFromArray(linhasCalculo, faturas_STSM);
             linhasCalculo = removeGroupFromArray(linhasCalculo, faturas_STCM);
 
-            let valorMedioReembolsoEnergia = (() => {
+            let valoresPromedio = (() => {
                 let faturas_CTSM = linhasCalculo.filter(VALUE => ["BTS - MLA/CT/SM"].includes(VALUE.UrlJsonContext.pstr_tipologia));
                 let faturas_CTCM = linhasCalculo.filter(VALUE => ["BTS - MLA/CT/CM"].includes(VALUE.UrlJsonContext.pstr_tipologia));
 
-                let valorTotalReembolso_CTSM = faturas_CTSM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_energia).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
-                let valorTotalReembolso_CTCM = faturas_CTCM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_energia).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
+                let valorTotalReembolsoEnergia_CTSM = faturas_CTSM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_energia).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
+                let valorTotalReembolsoEnergia_CTCM = faturas_CTCM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_energia).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
+
+                let valorTotalReembolsoContribuicao_CTSM = faturas_CTSM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_contribucion).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
+                let valorTotalReembolsoContribuicao_CTCM = faturas_CTCM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_contribucion).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
 
                 return {
-                    "media_CTSM": (faturas_CTSM.length > 0 && valorTotalReembolso_CTSM) ? Number((valorTotalReembolso_CTSM / faturas_CTSM.length).toFixed(2)) : 0,
-                    "media_CTCM": (faturas_CTCM.length > 0 && valorTotalReembolso_CTCM) ? Number((valorTotalReembolso_CTCM / faturas_CTCM.length).toFixed(2)) : 0,
+                    "medias_CTSM": {
+                        "mediaEnergia": (faturas_CTSM.length > 0 && valorTotalReembolsoEnergia_CTSM) ? Number((valorTotalReembolsoEnergia_CTSM / faturas_CTSM.length).toFixed(2)) : 0,
+                        "mediaContribuicao": (faturas_CTSM.length > 0 && valorTotalReembolsoContribuicao_CTSM) ? Number((valorTotalReembolsoContribuicao_CTSM / faturas_CTSM.length).toFixed(2)) : 0,
+                    },
+                    "media_CTCM": {
+                        "mediaEnergia": (faturas_CTCM.length > 0 && valorTotalReembolsoEnergia_CTCM) ? Number((valorTotalReembolsoEnergia_CTCM / faturas_CTCM.length).toFixed(2)) : 0,
+                        "mediaContribuicao": (faturas_CTCM.length > 0 && valorTotalReembolsoContribuicao_CTCM) ? Number((valorTotalReembolsoContribuicao_CTCM / faturas_CTCM.length).toFixed(2)) : 0,
+                    }
                 };
             })();
             for (let index in faturas_STSM) {
-                faturas_STSM[index] = await calcularLinha(faturas_STSM[index], valorMedioReembolsoEnergia.media_CTSM);
+                faturas_STSM[index] = await calcularLinha(faturas_STSM[index], valoresPromedio.medias_CTSM);
             }
             for (let index in faturas_STCM) {
-                faturas_STCM[index] = await calcularLinha(faturas_STCM[index], valorMedioReembolsoEnergia.media_CTCM);
+                faturas_STCM[index] = await calcularLinha(faturas_STCM[index], valoresPromedio.media_CTCM);
             }
         }
 
@@ -218,8 +227,9 @@ const removeGroupFromArray = (array, group) => {
     return finalArray;
 };
 
-const calcularLinha = async (LINHA, reembolsoPromedio) => {
+const calcularLinha = async (LINHA, objMediasPromedio) => {
     const linhaContext = LINHA.UrlJsonContext;
+
     //========== PASSTHRU =============//
     // factura valor neto
     // mla-bts: energia + contribucion == valor neto
@@ -231,14 +241,21 @@ const calcularLinha = async (LINHA, reembolsoPromedio) => {
 
     // reembolso energia
     // mla-bts: tarifa energia * consumo sugerido == reembolso energia
-    let passthru__reembolso_energia = await calcReembolsoEnergia(passthru__tarifa_energia, linhaContext.pstr_consumo_sugerido);
-
-    //Reembolso Promedio
-    let passthru__reembolso_promedio = reembolsoPromedio ?? 0;
+    let passthru__reembolso_energia = await (async () => {
+        if (objMediasPromedio) {
+            return objMediasPromedio.mediaEnergia ?? 0;
+        }
+        return await calcReembolsoEnergia(passthru__tarifa_energia, linhaContext.pstr_consumo_sugerido);
+    })();
 
     // reembolso contribucion
     // mla-bts: (contribucion factura * consumo sugerido) / consumo factura == reembolso contribucion
-    let passthru__reembolso_contribucion = await calcReembolsoContribucion(linhaContext.pstr_contribucion_factura, linhaContext.pstr_consumo_sugerido, linhaContext.pstr_consumo_factura);
+    let passthru__reembolso_contribucion = await (async () => {
+        if (objMediasPromedio) {
+            return objMediasPromedio.mediaContribuicao ?? 0;
+        }
+        return await calcReembolsoContribucion(linhaContext.pstr_contribucion_factura, linhaContext.pstr_consumo_sugerido, linhaContext.pstr_consumo_factura);
+    })();
 
     // reembolso alumbrado
     // alumbrado * sujeto pasivo == reembolso alumbrado
@@ -288,7 +305,6 @@ const calcularLinha = async (LINHA, reembolsoPromedio) => {
         "passthru__total_reembolso": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_total_factura.toFixed(0)) : parseFloat(passthru__total_reembolso.toFixed(0)),
         "passthru__total_energ_contrib_cnac": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat((linhaContext.pstr_energia_factura + linhaContext.pstr_contribucion_factura + linhaContext.pstr_cnac_factura).toFixed(0)) : parseFloat(passthru__total_energ_contrib_cnac.toFixed(0)),
         "passthru__costo_atc": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__costo_atc.toFixed(0)),
-        "passthru__reembolso_promedio": isNoCobroFactura || isReembolsoTotalFactura ? 0 : passthru__reembolso_promedio
     };
 
     return LINHA;
