@@ -271,7 +271,10 @@ const calcularLinha = async (LINHA, objMediasPromedio) => {
     // ( cnac * consumo sugerido ) / consumo kwh == reembolso cnac
     // (cnac - cnac tigo) == cnac atc
     // senão, cnac * constante cnac == reembolso cnac
-    let passthru__reembolso_cnac = await calcReembolsoCnac(linhaContext.pstr_cnac_factura, linhaContext.pstr_consumo_factura, linhaContext.pstr_consumo_sugerido, linhaContext.pstr_tipologia, linhaContext.pstr_constante_cnac);
+    // obs: para BTS-MLA e OCCASIO OPERADOR, excluir intereses mora
+    let cnacRevisado = await calcCnacExInteresesMora(linhaContext.pstr_cnac_factura, linhaContext.pstr_aseo_factura, linhaContext.pstr_vigilancia_factura, linhaContext.pstr_intereses_mora_factura, linhaContext.pstr_financiacion_factura, linhaContext.pstr_reconexion_factura, linhaContext.pstr_tarifa_conexion_factura, linhaContext.pstr_alquiler_contadores_factura, linhaContext.pstr_iva_factura, linhaContext.pstr_tipologia);
+
+    let passthru__reembolso_cnac = await calcReembolsoCnac(cnacRevisado, linhaContext.pstr_consumo_factura, linhaContext.pstr_consumo_sugerido, linhaContext.pstr_tipologia, linhaContext.pstr_constante_cnac, linhaContext.pstr_tipologia);
 
     // total reembolso
     // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
@@ -295,15 +298,15 @@ const calcularLinha = async (LINHA, objMediasPromedio) => {
 
     LINHA.UrlJsonContext = {
         ...linhaContext,
+        "passthru__tarifa_energia": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_tarifa_factura.toFixed(3)) : parseFloat(passthru__tarifa_energia.toFixed(3)),
         "passthru__valor_neto": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__valor_neto.toFixed(0)),
-        "passthru__tarifa_energia": isNoCobroFactura || isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_tarifa_factura.toFixed(3)) : parseFloat(passthru__tarifa_energia.toFixed(3)),
-        "passthru__reembolso_energia": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_energia.toFixed(0)),
-        "passthru__reembolso_contribucion": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_contribucion.toFixed(0)),
+        "passthru__reembolso_energia": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_energia_factura.toFixed(0)) : parseFloat(passthru__reembolso_energia.toFixed(0)),
+        "passthru__reembolso_contribucion": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_contribucion_factura.toFixed(0)) : parseFloat(passthru__reembolso_contribucion.toFixed(0)),
         "passthru__reembolso_alumbrado_publico": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_alumbrado_factura.toFixed(0)) : parseFloat(passthru__reembolso_alumbrado_publico.toFixed(0)),
-        "passthru__alumbrado_asumido_atc": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__alumbrado_asumido_atc.toFixed(0)),
-        "passthru__reembolso_cnac": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__reembolso_cnac.toFixed(0)),
+        "passthru__reembolso_cnac": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_cnac_factura.toFixed(0)) : parseFloat(passthru__reembolso_cnac.toFixed(0)),
         "passthru__total_reembolso": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat(linhaContext.pstr_total_factura.toFixed(0)) : parseFloat(passthru__total_reembolso.toFixed(0)),
         "passthru__total_energ_contrib_cnac": isNoCobroFactura ? 0 : isReembolsoTotalFactura ? parseFloat((linhaContext.pstr_energia_factura + linhaContext.pstr_contribucion_factura + linhaContext.pstr_cnac_factura).toFixed(0)) : parseFloat(passthru__total_energ_contrib_cnac.toFixed(0)),
+        "passthru__alumbrado_asumido_atc": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__alumbrado_asumido_atc.toFixed(0)),
         "passthru__costo_atc": isNoCobroFactura || isReembolsoTotalFactura ? 0 : parseFloat(passthru__costo_atc.toFixed(0)),
     };
 
@@ -311,49 +314,30 @@ const calcularLinha = async (LINHA, objMediasPromedio) => {
 };
 
 const calcFacturaValorNeto = async (energiaFactura, contribucionFactura) => {
-    // total factura - contribucion - alumbrado - cnac == valor neto
-    // let totalFatura = formatNumber(objFatReadOnly.UrlJsonContext.valor_total_informado);
-    // let totalContribucion = formatNumber(objFatReadOnly.UrlJsonContext.energia_de_contribuicao);
-    // let totalAlumbrado = formatNumber(objFatReadOnly.UrlJsonContext.taxa_de_iluminacao);
-    // let totalCnac = formatNumber(objFatReadOnly.UrlJsonContext.total_cnac);
-
     // mla-bts: energia + contribucion == valor neto
     let passthru__valor_neto = energiaFactura + contribucionFactura;
     return passthru__valor_neto;
 };
 
 const calcTarifaEnergia = async (energiaFactura, consumoFactura) => {
-    // valor neto / consumo kwh == tarifa energia
-    // let tarifaEnergia = (Number(passthru__valor_neto / consumoFactura) > 0) ? Number((passthru__valor_neto / consumoFactura)) : 0;
-
     // mla-bts: tarifa energia == tarifa energia
     let tarifaEnergia = energiaFactura / consumoFactura;
     return (tarifaEnergia > 0) ? tarifaEnergia : 0;
 };
 
 const calcReembolsoEnergia = async (passthru__tarifa_energia, consumoSugerido) => {
-    // tarifa energia * consumo noc == reembolso energia
-    // let tarifaEnergia = await calcTarifaEnergia(energiaFactura, consumoFactura);
-
     // mla-bts: tarifa energia * consumo sugerido == reembolso energia
     let reembolsoEnergia = passthru__tarifa_energia * consumoSugerido;
     return reembolsoEnergia;
 };
 
 const calcReembolsoContribucion = async (contribucionFactura, consumoSugerido, consumoFactura) => {
-    // reembolso energia * constante contribucion == reembolso contribucion
-    // let reembolsoEnergia = await calcReembolsoEnergia(objFatReadOnly, objConsumoSugerido);
-    // let constanteContribucion = formatNumber(objConstContribucion.UrlJsonContext.valor);
-
     // mla-bts: (contribucion factura * consumo sugerido) / consumo factura == reembolso contribucion
     let reembolsoContribucion = (contribucionFactura * consumoSugerido) / consumoFactura;
     return (reembolsoContribucion > 0) ? reembolsoContribucion : 0;
 };
 
 const calcReembolsoAlumbrado = async (sujetoPasivo, valorSujetoPasivo, qtdProvisionales, alumbradoFactura) => {
-    // let totalAlumbrado = formatNumber(objFatReadOnly.UrlJsonContext.taxa_de_iluminacao);
-    // let qtdProvisionales = formatNumber(objITS.UrlJsonContext.quantidade_provisoria);
-
     // alumbrado * sujeto pasivo == reembolso alumbrado
     // dependendo de qtd provisional, reduz sujeto pasivo
     let calcSujetoPasivo, reembolsoAlumbradoPublico;
@@ -376,6 +360,18 @@ const calcAlumbradoAsumidoAtc = async (alumbradoFactura, reembolsoAlumbradoPubli
     return passthru__alumbrado_asumido_atc;
 };
 
+const calcCnacExInteresesMora = async (cnacFactura, aseoFactura, vigilanciaFactura, interesesMoraFactura, financiacionFactura, reconexionFactura, tarifaConexionFactura, alquilerContadoresFactura, ivaFactura, tipologiaCliente) => {
+    //========== FILTRO =============//
+    let cnacExInteresesMora = ['BTS - MLA/CT/CM', 'BTS - MLA/CT/SM', 'BTS - MLA/ST/CM', 'BTS - MLA/ST/SM', 'OCCASIO POR OPERADOR'];
+    let iscnacExInteresesMora = cnacExInteresesMora.some(i => tipologiaCliente.includes(i));
+    //============================//
+
+    if (iscnacExInteresesMora && interesesMoraFactura > 0) {
+        cnacFactura = aseoFactura + vigilanciaFactura + financiacionFactura + reconexionFactura + tarifaConexionFactura + alquilerContadoresFactura + ivaFactura;
+    }
+    return cnacFactura;
+};
+
 const calcReembolsoCnac = async (cnacFactura, consumoFactura, consumoSugerido, tipologiaCliente, constanteCnac) => {
     // se tipologia cliente == occasio operador,
     // ( cnac * consumo ami ) / consumo kwh == cnac tigo
@@ -383,24 +379,15 @@ const calcReembolsoCnac = async (cnacFactura, consumoFactura, consumoSugerido, t
     // senão, cnac * constante cnac == reembolso cnac
     let cnacTigo, reembolsoCnac;
     if (tipologiaCliente == 'OCCASIO POR OPERADOR') {
-        // let consumoAmi = objConsumoSugerido.UrlJsonContext.CONT_consumo_sugerido_kwh;
-
         cnacTigo = (cnacFactura * consumoSugerido) / consumoFactura;
         reembolsoCnac = cnacTigo;
     } else {
-        // let constanteCnac = formatNumber(objConstCnac.UrlJsonContext.valor);
-
         reembolsoCnac = cnacFactura * (constanteCnac / 100);
     }
     return (reembolsoCnac > 0) ? reembolsoCnac : 0;
 };
 
 const calcTotalReembolso = async (passthru__reembolso_energia, passthru__reembolso_contribucion, passthru__reembolso_alumbrado_publico, passthru__reembolso_cnac) => {
-    // let reembolsoEnergia = await calcReembolsoEnergia(objFatReadOnly, objConsumoSugerido);
-    // let reembolsoContribucion = await calcReembolsoContribucion(contribucionFactura, objConstContribucion);
-    // let reembolsoAlumbradoPublico = await calcReembolsoAlumbrado(objFatReadOnly, objITS, objSujetoPasivo);
-    // let reembolsoCnac = await calcReembolsoCnac(objFatReadOnly, objSitios, objConsumoSugerido, objConstCnac);
-
     // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
     let totalReembolso = passthru__reembolso_energia + passthru__reembolso_contribucion + passthru__reembolso_alumbrado_publico + passthru__reembolso_cnac;
     return totalReembolso;
@@ -412,9 +399,6 @@ const calcTotalEnergContribCnac = async (passthru__reembolso_energia, passthru__
 };
 
 const calcCostoAtc = async (totalFactura, passthru__total_reembolso) => {
-    // let totalFatura = formatNumber(objFatReadOnly.UrlJsonContext.valor_total_informado);
-    // let totalReembolso = await calcTotalReembolso(passthru__reembolso_energia, passthru__reembolso_contribucion, passthru__reembolso_alumbrado_publico, passthru__reembolso_cnac);
-
     // total factura - total reembolso == costo atc
     let costoAtc = totalFactura - passthru__total_reembolso;
     return costoAtc;
