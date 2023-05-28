@@ -66,7 +66,6 @@ function successCallback(result) {
 =============================   SCRIPT    =============================
 */
 
-const passthruReadOnlyID = 'acb34798-0a36-424f-9f0e-619238120d33';
 const informacionesDeLaCuentaID = '1e6d6595-083f-4bb8-b82c-e9054e9dc8f3';
 const sujetoPasivoID = '78352af1-70b2-43a0-ad2a-084cdcf2eacf';
 const informacionesTecnicasDelSitioID = '5ea06f19-d11a-4d61-b4ff-c74610e933cd';
@@ -110,6 +109,8 @@ async function init(json) {
             let assetNumber = objFatReadOnly[0]?.UrlJsonContext?.asset_number;
             let inicioCobro = objFatReadOnly[0]?.UrlJsonContext?.data_inicio_pagamento;
             let finalCobro = objFatReadOnly[0]?.UrlJsonContext?.data_fim_pagamento;
+            let periodoCobro = objFatReadOnly[0]?.UrlJsonContext?.referencia__competencia;
+            let periodoCobroFactura = `${periodoCobro} ${new Date(finalCobro).getFullYear()}`;
             let numeroFactura = objFatReadOnly[0]?.UrlJsonContext?.numero_da_nota_fiscal;
             let consumoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.consumo_kwh);
             let tarifaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_kwh);
@@ -157,9 +158,9 @@ async function init(json) {
             let qtdProvisionales = formatNumber(objITS[0]?.UrlJsonContext?.qtd_provisionales);
 
             // carga consumo telemedidas
-            let filtroTelemedida = filtroProvedorContaInterna = JSON.stringify([
+            let filtroTelemedida = JSON.stringify([
                 { FielName: 'asset_number_TELEMEDIDA', Type: 'string', FixedType: 'string', Value1: assetNumber },
-                { FielName: 'CONT_periodo_facturas', Type: 'string', FixedType: 'string', Value1: objFatReadOnly[0].UrlJsonContext.CDE__mes_processo }
+                { FielName: 'CONT_periodo_facturas', Type: 'string', FixedType: 'string', Value1: periodoCobroFactura }
             ]);
             let objConsumoSugerido = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filtroTelemedida);
             let consumoSugerido = formatNumber(objConsumoSugerido[0]?.UrlJsonContext?.CONT_consumo_sugerido_kwh);
@@ -186,6 +187,7 @@ async function init(json) {
                 "pstr_regional_cliente": regionalCliente,
                 "pstr_inicio_cobro": inicioCobro,
                 "pstr_final_cobro": finalCobro,
+                "pstr_periodo_cobro": periodoCobroFactura,
                 "pstr_numero_de_factura": numeroFactura,
                 "pstr_consumo_factura": parseFloat(consumoFactura.toFixed(0)),
                 "pstr_tarifa_factura": parseFloat(tarifaFactura.toFixed(3)),
@@ -314,26 +316,26 @@ const jsonInput = {
     "facturas_seleccionadas_readonly": " ",
     "pstr_archivos_passthru": " ",
     "pstr_registro_salvo": "sim",
-    "pstr_sequecial_passthru": "PASS202300028",
+    "pstr_sequecial_passthru": "PASS202300030",
     "pstr_usuario_de_criacao": "ADM ATC",
-    "data_de_criacao_pstrDate": "2023-05-27T11:10:39Z",
-    "data_de_criacao_pstr": "2023-05-27 08:10:39",
-    "pstr_hora_criacao": "08:10",
+    "data_de_criacao_pstrDate": "2023-05-27T20:05:17Z",
+    "data_de_criacao_pstr": "2023-05-27 17:05:17",
+    "pstr_hora_criacao": "17:05",
     "pstr_status_processo": "ENVIADO A PROCESO",
     "pstr_ids_faturas_selecionadas": "",
     "onergy_js_ctx_ORIGINAL": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "09603972-6322-ab4a-8646-aff78fd69e6e",
+        "fedid": "23bcc47f-aab1-8bb2-3cd3-71e63ff551e8",
         "fdtid": "06456424-a022-46a3-93b9-67e65eb31726",
         "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-05-27T11:09:30.255Z",
-        "updateDt": "2023-05-27T11:09:30.255Z",
+        "insertDt": "2023-05-27T20:04:05.947Z",
+        "updateDt": "2023-05-27T20:04:05.947Z",
         "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
         "email": "adm@atc.com.br",
         "user_name": "ADM ATC",
         "onergy_rolid": "",
-        "praid": "2161551b-36ae-47fb-b4b5-604689820978",
-        "pcvid": "ff38f450-87c4-40dc-8889-75505abd46e0",
+        "praid": "1513e76f-a9ce-4f1f-a387-207bed950359",
+        "pcvid": "d5d667c9-3937-4e95-a76f-4623f4d86768",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
@@ -352,23 +354,23 @@ const jsonInput = {
     "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
     "email": "adm@atc.com.br",
     "fdtid": "21af8d42-ac4a-4d84-bce9-740192048fb4",
-    "fedid": "5e084f46-701c-4b52-8ab2-927dc0f5e465",
+    "fedid": "619eaf2b-3597-4baf-a99f-fcd2b8269e27",
     "onergy_rolid": "",
     "timezone": null,
     "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
     "onergy_js_ctx": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "5e084f46-701c-4b52-8ab2-927dc0f5e465",
+        "fedid": "619eaf2b-3597-4baf-a99f-fcd2b8269e27",
         "fdtid": "21af8d42-ac4a-4d84-bce9-740192048fb4",
         "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-05-27T11:09:33.243Z",
-        "updateDt": "2023-05-27T11:09:35.589Z",
+        "insertDt": "2023-05-27T20:04:12.45Z",
+        "updateDt": "2023-05-27T20:04:13.756Z",
         "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
         "email": "adm@atc.com.br",
         "user_name": "ADM ATC",
         "onergy_rolid": "",
-        "praid": "c744e87d-c5e7-4008-b1da-203784d4f746",
-        "pcvid": "ff38f450-87c4-40dc-8889-75505abd46e0",
+        "praid": "8cb1db31-7bf2-4890-a698-bdb788da218e",
+        "pcvid": "d5d667c9-3937-4e95-a76f-4623f4d86768",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
