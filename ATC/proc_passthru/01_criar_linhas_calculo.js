@@ -93,7 +93,7 @@ async function init(json) {
 
     try {
 
-        let arrayCaculos = [];
+        let arrayCalculos = [];
 
         let objFatReadOnly_all = await getOnergyItem(faturasSelecionadasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, gerarFiltro('faturas_selecionadas_passthru', data.onergy_js_ctx_ORIGINAL.fedid));
         await atualizaFatura(data, { "pstr_ids_faturas_selecionadas": objFatReadOnly_all.map(VALUE => VALUE.ID) });
@@ -105,6 +105,26 @@ async function init(json) {
         let objConstContribucion_all = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
         let objConstCnac_all = await getOnergyItem(constanteID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, null);
 
+        objFatReadOnly_all = objFatReadOnly_all.map(VALUE => {
+            let faturaSelecionada = VALUE;
+            let finalCobro = faturaSelecionada?.UrlJsonContext?.data_fim_pagamento;
+            let periodoCobro = faturaSelecionada?.UrlJsonContext?.referencia__competencia;
+            faturaSelecionada.UrlJsonContext.periodoCobroFactura = `${periodoCobro} ${new Date(finalCobro).getFullYear()}`;
+            return faturaSelecionada;
+        });
+
+        const mesesEsp = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        let objFatReadOnly_ordenado = objFatReadOnly_all.map(VALUE => {
+            let dateSplit = VALUE.UrlJsonContext.periodoCobroFactura.split(" ");
+            return {
+                'id': VALUE.ID,
+                'numberMonth': new Date(`${dateSplit[1]}-${mesesEsp.indexOf(dateSplit[0]) + 1}-01 00:00:00`).getTime()
+            };
+        }).sort((a, b) => b.numberMonth - a.numberMonth).map(VALUE1 => {
+            return objFatReadOnly_all.find(VALUE2 => VALUE2.ID == VALUE1.id);
+        });
+        objFatReadOnly_all = objFatReadOnly_ordenado;
+
         for (let FATURA of objFatReadOnly_all) {
             //========== FATURA =============//
             let objFatReadOnly = [FATURA];
@@ -112,8 +132,8 @@ async function init(json) {
             let profitCostCenter = objFatReadOnly[0]?.UrlJsonContext?.profit_cost_center;
             let inicioCobro = objFatReadOnly[0]?.UrlJsonContext?.data_inicio_pagamento;
             let finalCobro = objFatReadOnly[0]?.UrlJsonContext?.data_fim_pagamento;
-            let periodoCobro = objFatReadOnly[0]?.UrlJsonContext?.referencia__competencia;
-            let periodoCobroFactura = `${periodoCobro} ${new Date(finalCobro).getFullYear()}`;
+            let periodoCobroFactura = objFatReadOnly[0]?.UrlJsonContext?.periodoCobroFactura;
+            let mesProceso = objFatReadOnly[0]?.UrlJsonContext?.CDE__mes_processo;
             let numeroFactura = objFatReadOnly[0]?.UrlJsonContext?.numero_da_nota_fiscal;
             let consumoFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.consumo_kwh);
             let tarifaFactura = formatNumber(objFatReadOnly[0]?.UrlJsonContext?.valor_kwh);
@@ -161,9 +181,20 @@ async function init(json) {
             let qtdProvisionales = formatNumber(objITS[0]?.UrlJsonContext?.qtd_provisionales);
 
             // carga consumo telemedidas
+            let count = arrayCalculos.filter(VALUE => VALUE.pstr_asset_number == assetNumber).length;
+
+            if (count > 0) {
+                let dateSplit = mesProceso.split(' ');
+                let numberMonth = new Date(`${dateSplit[1]}-${mesesEsp.indexOf(dateSplit[0]) + 1}-01 00:00:00`);
+                numberMonth.setMonth(numberMonth.getMonth() - count);
+                let newMonth = mesesEsp[numberMonth.getMonth()];
+                let newYear = numberMonth.getFullYear();
+                mesProceso = `${newMonth} ${newYear}`;
+            }
+
             let filtroTelemedida = JSON.stringify([
                 { FielName: 'asset_number_TELEMEDIDA', Type: 'string', FixedType: 'string', Value1: assetNumber },
-                { FielName: 'CONT_periodo_facturas', Type: 'string', FixedType: 'string', Value1: periodoCobroFactura }
+                { FielName: 'CONT_periodo_facturas', Type: 'string', FixedType: 'string', Value1: mesProceso },
             ]);
             let objConsumoSugerido = await getOnergyItem(consumoTelemedidasID, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filtroTelemedida);
             let consumoSugerido = formatNumber(objConsumoSugerido[0]?.UrlJsonContext?.CONT_consumo_sugerido_kwh);
@@ -183,7 +214,7 @@ async function init(json) {
             let isNoCobroFactura = noCobroFactura.some(i => clasifPassthru.includes(i));
             //============================//
 
-            arrayCaculos.push({
+            arrayCalculos.push({
                 "pstr_asset_number": assetNumber,
                 "pstr_profit_cost_center": profitCostCenter,
                 "pstr_nombre_sitio": siteName,
@@ -192,6 +223,7 @@ async function init(json) {
                 "pstr_inicio_cobro": inicioCobro,
                 "pstr_final_cobro": finalCobro,
                 "pstr_periodo_cobro": periodoCobroFactura,
+                "pstr_mes_proceso": mesProceso,
                 "pstr_numero_de_factura": numeroFactura,
                 "pstr_consumo_factura": parseFloat(consumoFactura.toFixed(0)),
                 "pstr_tarifa_factura": parseFloat(tarifaFactura.toFixed(3)),
@@ -227,7 +259,7 @@ async function init(json) {
             });
         }
 
-        await onergy.InsertManyOnergy(arrayCaculos, passthruCalculoID, data.onergy_js_ctx.usrid);
+        await onergy.InsertManyOnergy(arrayCalculos, passthruCalculoID, data.onergy_js_ctx.usrid);
 
         return SetObjectResponse(false, null, false);
     } catch (erro) {
@@ -332,26 +364,26 @@ const jsonInput = {
     "facturas_seleccionadas_readonly": " ",
     "pstr_archivos_passthru": " ",
     "pstr_registro_salvo": "sim",
-    "pstr_sequecial_passthru": "PASS202300035",
+    "pstr_sequecial_passthru": "PASS202300043",
     "pstr_usuario_de_criacao": "ADM ATC",
-    "data_de_criacao_pstrDate": "2023-06-05T17:54:26Z",
-    "data_de_criacao_pstr": "2023-06-05 14:54:26",
-    "pstr_hora_criacao": "14:54",
+    "data_de_criacao_pstrDate": "2023-06-07T02:38:05Z",
+    "data_de_criacao_pstr": "2023-06-06 23:38:05",
+    "pstr_hora_criacao": "23:38",
     "pstr_status_processo": "ENVIADO A PROCESO",
     "pstr_ids_faturas_selecionadas": "",
     "onergy_js_ctx_ORIGINAL": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "e7c737ae-e12a-4850-aca7-4288ae3b2d0f",
+        "fedid": "4766954d-e014-d201-c391-b6725d269f16",
         "fdtid": "06456424-a022-46a3-93b9-67e65eb31726",
         "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-06-05T17:54:23.636Z",
-        "updateDt": "2023-06-05T17:54:23.636Z",
+        "insertDt": "2023-06-07T02:38:02.217Z",
+        "updateDt": "2023-06-07T02:38:02.217Z",
         "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
         "email": "adm@atc.com.br",
         "user_name": "ADM ATC",
         "onergy_rolid": "",
-        "praid": "c5384b3c-6883-4f14-a459-f4ed2dd717c5",
-        "pcvid": "47d99f82-1fa5-4d87-ab86-b994afa11fef",
+        "praid": "0dff4551-ad98-4572-8284-3bc21aea8ae2",
+        "pcvid": "8def3add-4292-4905-800a-19201b073f1f",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
@@ -370,23 +402,23 @@ const jsonInput = {
     "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
     "email": "adm@atc.com.br",
     "fdtid": "21af8d42-ac4a-4d84-bce9-740192048fb4",
-    "fedid": "75e2d8ce-480b-4080-96b3-8bb795085000",
+    "fedid": "080ff1f3-a51e-4de5-872b-e2bb61afa6c4",
     "onergy_rolid": "",
     "timezone": null,
     "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
     "onergy_js_ctx": {
         "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "75e2d8ce-480b-4080-96b3-8bb795085000",
+        "fedid": "080ff1f3-a51e-4de5-872b-e2bb61afa6c4",
         "fdtid": "21af8d42-ac4a-4d84-bce9-740192048fb4",
         "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-06-05T17:54:28.637Z",
-        "updateDt": "2023-06-05T17:54:31.027Z",
+        "insertDt": "2023-06-07T02:38:03.86Z",
+        "updateDt": "2023-06-07T02:38:05.323Z",
         "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
         "email": "adm@atc.com.br",
         "user_name": "ADM ATC",
         "onergy_rolid": "",
-        "praid": "0fc2936c-3184-4886-bba6-7443489fd0cd",
-        "pcvid": "47d99f82-1fa5-4d87-ab86-b994afa11fef",
+        "praid": "69919469-bb8c-494c-bcbc-3a1cc0ee0f92",
+        "pcvid": "8def3add-4292-4905-800a-19201b073f1f",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
