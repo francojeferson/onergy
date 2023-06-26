@@ -132,89 +132,89 @@ async function init(json) {
                     );
 
                     //*estado_captura_cuenta
-                    if (isEstadoCapturaCuenta.length > 0) {
-                        let hoje = new Date();
+                    // if (isEstadoCapturaCuenta.length > 0) {
+                    let hoje = new Date();
 
-                        //*DiaDePago
-                        let isDiaDePago = objPost.prcs__dia_de_pagamento;
-                        let strDiaDePago = JSON.stringify(isDiaDePago);
-                        let hojeDiaDePago = gerarData(hoje);
-                        let newDiaDePago = hojeDiaDePago.slice(0, -2) + strDiaDePago;
-                        let setDiaDePago = new Date(newDiaDePago + ' 00:00:00');
+                    //*DiaDePago
+                    let isDiaDePago = objPost.prcs__dia_de_pagamento;
+                    let strDiaDePago = JSON.stringify(isDiaDePago);
+                    let hojeDiaDePago = gerarData(hoje);
+                    let newDiaDePago = hojeDiaDePago.slice(0, -2) + strDiaDePago;
+                    let setDiaDePago = new Date(newDiaDePago + ' 00:00:00');
 
-                        //*ProximoPago
-                        let isProximoPago = objPost.data_proximo_pagamento;
-                        let defProximoPago = isProximoPago == null ? hoje : isProximoPago;
-                        let strProximoPago = JSON.stringify(defProximoPago);
-                        strProximoPago.includes(' 00:00:00') == true ? strProximoPago : strProximoPago + ' 00:00:00';
-                        let objProximoPago = JSON.parse(strProximoPago);
-                        let validProximoPago = objProximoPago;
-                        let setProximoPago = new Date(validProximoPago);
+                    //*ProximoPago
+                    let isProximoPago = objPost.data_proximo_pagamento;
+                    let defProximoPago = isProximoPago == null ? hoje : isProximoPago;
+                    let strProximoPago = JSON.stringify(defProximoPago);
+                    strProximoPago.includes(' 00:00:00') == true ? strProximoPago : strProximoPago + ' 00:00:00';
+                    let objProximoPago = JSON.parse(strProximoPago);
+                    let validProximoPago = objProximoPago;
+                    let setProximoPago = new Date(validProximoPago);
 
-                        //*se ProximoPago <= ontem, calcula novo ProximoPago e ProximaCaptura
-                        let isHoje = new Date(hoje);
-                        let ontem = new Date(isHoje.setDate(isHoje.getDate() - 1));
-                        if (setProximoPago.getTime() <= ontem.getTime()) {
-                            //*calcula ProximoPago
-                            let valFrecuenciaPago = isFrecuenciaPago[0].UrlJsonContext.frequencia_em_meses;
-                            let thisProximoPago = setProximoPago;
-                            let newProximoPago = new Date(thisProximoPago.setMonth(thisProximoPago.getMonth() + valFrecuenciaPago));
-                            let ajustProximoPago = new Date(newProximoPago.setDate(setDiaDePago.getDate()));
+                    //*se ProximoPago <= ontem, calcula novo ProximoPago e ProximaCaptura
+                    let isHoje = new Date(hoje);
+                    let ontem = new Date(isHoje.setDate(isHoje.getDate() - 1));
+                    if (setProximoPago.getTime() <= ontem.getTime()) {
+                        //*calcula ProximoPago
+                        let valFrecuenciaPago = isFrecuenciaPago[0].UrlJsonContext.frequencia_em_meses;
+                        let thisProximoPago = setProximoPago;
+                        let newProximoPago = new Date(thisProximoPago.setMonth(thisProximoPago.getMonth() + valFrecuenciaPago));
+                        let ajustProximoPago = new Date(newProximoPago.setDate(setDiaDePago.getDate()));
 
-                            //*calcula ProximaCaptura
-                            let valConstBuscaCaptura = JSON.parse(isConstBuscaCaptura[0].UrlJsonContext.valor);
-                            let isProximaCaptura = new Date(ajustProximoPago);
-                            let newProximaCaptura = new Date(isProximaCaptura.setDate(isProximaCaptura.getDate() - valConstBuscaCaptura));
+                        //*calcula ProximaCaptura
+                        let valConstBuscaCaptura = JSON.parse(isConstBuscaCaptura[0].UrlJsonContext.valor);
+                        let isProximaCaptura = new Date(ajustProximoPago);
+                        let newProximaCaptura = new Date(isProximaCaptura.setDate(isProximaCaptura.getDate() - valConstBuscaCaptura));
 
-                            //*estado_captura_cuenta == EN ESPERA
+                        //*estado_captura_cuenta == EN ESPERA
+                        let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
+                        newEstadoCapturaCuenta = 'EN ESPERA';
+
+                        //*envia resultado
+                        objPost.data_proximo_pagamento = gerarData(ajustProximoPago);
+                        objPost.prcs__proxima_captura = gerarData(newProximaCaptura);
+                        objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
+
+                        let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data, isInformacionCuenta[i].ID);
+                    } else if (objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == 'CAPTURADA') {
+                        //*else if, estado_captura_cuenta == CAPTURADA
+                        continue;
+                    } else {
+                        //*else, check hoje > (ProximoPago - constAtraso)
+                        let valConstAtraso = JSON.parse(isConstAtrasoCaptura[0].UrlJsonContext.valor);
+                        let thisProximoPago = setProximoPago;
+                        let atrasoProximoPago = new Date(thisProximoPago.setDate(thisProximoPago.getDate() - valConstAtraso)); // constAtraso == 15
+
+                        //*hoje > (ProximoPago - constAtraso)
+                        if (hoje.getTime() > atrasoProximoPago.getTime()) {
+                            //*estado_captura_cuenta == ATRASADA
                             let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
-                            newEstadoCapturaCuenta = 'EN ESPERA';
+                            newEstadoCapturaCuenta = 'ATRASADA';
 
                             //*envia resultado
-                            objPost.data_proximo_pagamento = gerarData(ajustProximoPago);
-                            objPost.prcs__proxima_captura = gerarData(newProximaCaptura);
                             objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
 
-                            let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
-                        } else if (objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago == 'CAPTURADA') {
-                            //*else if, estado_captura_cuenta == CAPTURADA
-                            continue;
+                            let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data, isInformacionCuenta[i].ID);
                         } else {
-                            //*else, check hoje > (ProximoPago - constAtraso)
-                            let valConstAtraso = JSON.parse(isConstAtrasoCaptura[0].UrlJsonContext.valor);
+                            //*check hoje >= (ProximoPago - constAlerta)
+                            let valConstAlerta = JSON.parse(isConstAlertaCaptura[0].UrlJsonContext.valor);
                             let thisProximoPago = setProximoPago;
-                            let atrasoProximoPago = new Date(thisProximoPago.setDate(thisProximoPago.getDate() - valConstAtraso)); // constAtraso == 15
+                            let alertaProximoPago = new Date(thisProximoPago.setDate(thisProximoPago.getDate() - valConstAlerta)); // constAlerta == 5
 
-                            //*hoje > (ProximoPago - constAtraso)
-                            if (hoje.getTime() > atrasoProximoPago.getTime()) {
-                                //*estado_captura_cuenta == ATRASADA
+                            //*hoje >= (ProximoPago - constAlerta)
+                            if (hoje.getTime() > alertaProximoPago.getTime()) {
+                                //*estado_captura_cuenta == ALERTA
                                 let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
-                                newEstadoCapturaCuenta = 'ATRASADA';
+                                newEstadoCapturaCuenta = 'ALERTA';
 
                                 //*envia resultado
                                 objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
 
-                                let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
-                            } else {
-                                //*check hoje >= (ProximoPago - constAlerta)
-                                let valConstAlerta = JSON.parse(isConstAlertaCaptura[0].UrlJsonContext.valor);
-                                let thisProximoPago = setProximoPago;
-                                let alertaProximoPago = new Date(thisProximoPago.setDate(thisProximoPago.getDate() - valConstAlerta)); // constAlerta == 5
-
-                                //*hoje >= (ProximoPago - constAlerta)
-                                if (hoje.getTime() > alertaProximoPago.getTime()) {
-                                    //*estado_captura_cuenta == ALERTA
-                                    let newEstadoCapturaCuenta = objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
-                                    newEstadoCapturaCuenta = 'ALERTA';
-
-                                    //*envia resultado
-                                    objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago = newEstadoCapturaCuenta;
-
-                                    let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
-                                }
+                                let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data, isInformacionCuenta[i].ID);
                             }
                         }
                     }
+                    // }
                 }
             } else if (
                 isTipoCuenta.length > 0 &&
@@ -231,7 +231,7 @@ async function init(json) {
                     objPost.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago =
                         strInformacionCuenta[0].UrlJsonContext.ECCUECCU_estado_da_captura_da_conta__status_de_capturapago;
 
-                    let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data);
+                    let resultPost = await gravarRegistro('asset_number', objPost.asset_number, idInformacionCuenta, objPost, data, isInformacionCuenta[i].ID);
                 } else {
                     logStatus.push(`JFS ~ verifica_captura ~ Cuenta Padre no encontrada para Asset Number ${objPost.asset_number}\n`);
                 }
@@ -263,37 +263,38 @@ function SetObjectResponse(cond, json, WaitingWebHook) {
     };
     return obj;
 }
+var cacheValues = [];
 async function getOnergyItem(fdtid, assid, usrid, filtro) {
-    let keepSearching = true;
-    let skip = 0;
-    let take = 500;
-    let result = [];
-    while (keepSearching) {
-        let strPageResp = await onergy_get({
-            fdtid: fdtid,
-            assid: assid,
-            usrid: usrid,
-            filter: filtro,
-            skip: skip,
-            take: take,
-        });
-        skip += take;
-        let pageResp = JSON.parse(strPageResp);
-        if (pageResp != null && pageResp.length > 0) {
-            keepSearching = pageResp.length == take;
-            result = result.concat(pageResp);
-        } else {
-            keepSearching = false;
+    let cache = cacheValues.find(VALUE => VALUE.fdtid == fdtid && VALUE.filter == filtro);
+    if (cache) {
+        return cache.values;
+    } else {
+        let result = await (async () => {
+            let strResp = await onergy_get({
+                fdtid: fdtid,
+                assid: assid,
+                usrid: usrid,
+                filter: filtro,
+            });
+            return JSON.parse(strResp);
+        })();
+        if (result.length > 0) {
+            cacheValues.push({
+                "fdtid": fdtid,
+                "filter": filtro,
+                "values": result
+            });
         }
+        return result;
     }
-    return result;
 }
-async function gravarRegistro(fielNameQ, valueQ, idTabExcel, objPost, data) {
+async function gravarRegistro(fielNameQ, valueQ, idTabExcel, objPost, data, id) {
     //*consulta registro
-    let filItem = gerarFiltro(fielNameQ, valueQ);
-    let getItem = await getOnergyItem(idTabExcel, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filItem);
+    // let filItem = gerarFiltro(fielNameQ, valueQ);
+    // let getItem = await getOnergyItem(idTabExcel, data.onergy_js_ctx.assid, data.onergy_js_ctx.usrid, filItem);
     if (getItem.length > 0) {
         //*se houver registro, atualizar
+        return console.log(`${postInfo}`);
         let postInfo = {
             UrlJsonContext: objPost,
         };
@@ -301,17 +302,8 @@ async function gravarRegistro(fielNameQ, valueQ, idTabExcel, objPost, data) {
             fdtid: idTabExcel,
             assid: data.onergy_js_ctx.assid,
             usrid: data.onergy_js_ctx.usrid,
-            id: getItem[0].ID,
+            id: id,
             data: JSON.stringify(postInfo),
-        });
-        return result;
-    } else {
-        //*se não houver registro, criar
-        let result = await onergy_save({
-            fdtid: idTabExcel,
-            usrid: data.onergy_js_ctx.usrid,
-            assid: data.onergy_js_ctx.assid,
-            data: JSON.stringify(objPost),
         });
         return result;
     }
@@ -335,33 +327,36 @@ function gerarData(dataHoje) {
 /**MET_PADRAO =====================================================================================
  */
 let json = {
-    a: 1,
-    oneTemplateTitle: '',
-    ass_id: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-    fedid: '62e956e5-f2eb-4643-bcfb-f73dd7eb955c',
-    fdtid: '51f0ba7e-35cc-4167-8e4e-da9f52972822',
-    usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-    email: 'admin-colombia@atc.com.co',
-    onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-    timezone: null,
-    onergy_js_ctx: {
-        assid: '67c0b77d-abae-4c48-ba4b-6c8faf27e14a',
-        fedid: '62e956e5-f2eb-4643-bcfb-f73dd7eb955c',
-        fdtid: '51f0ba7e-35cc-4167-8e4e-da9f52972822',
-        usrid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        insertDt: '2022-12-06T12:54:27.035Z',
-        updateDt: '2022-12-06T12:54:27.035Z',
-        cur_userid: '0c44d4fc-d654-405b-9b8f-7fea162948b5',
-        email: 'admin-colombia@atc.com.co',
-        user_name: 'Administrador Colômbia',
-        onergy_rolid: 'e4d0298c-245e-454a-89d4-8f27aef8645b',
-        praid: '25dd5bdb-2c5c-4df0-9810-f8eb8d244b87',
-        pcvid: '388b1790-14b8-4312-a249-ec36040e298b',
-        prcid: '0a17be9c-1247-2f1e-b91c-15740976f2c5',
-        timezone: null,
-        timezone_value: '-03:00',
-        pubNubHook: null,
-    },
+    "schedule": 1,
+    "oneTemplateTitle": "Verifica Captura",
+    "ass_id": "88443605-74d6-4ea4-b426-a6c3e26aa615",
+    "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
+    "email": "prod@atc.com.br",
+    "fdtid": "51f0ba7e-35cc-4167-8e4e-da9f52972822",
+    "fedid": "cdd7621c-cc7a-4863-8440-2944c033adc2",
+    "onergy_rolid": "",
+    "timezone": null,
+    "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+    "dtJobScheduleExecDate": "2023-06-12T09:00:00Z",
+    "dtJobScheduleExec": "2023-06-12 06:00:00",
+    "onergy_js_ctx": {
+        "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
+        "fedid": "cdd7621c-cc7a-4863-8440-2944c033adc2",
+        "fdtid": "51f0ba7e-35cc-4167-8e4e-da9f52972822",
+        "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+        "insertDt": "2022-10-26T23:49:39.022Z",
+        "updateDt": "2023-06-12T06:00:00.688Z",
+        "cur_userid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+        "email": "prod@atc.com.br",
+        "user_name": "prod@atc.com.br",
+        "onergy_rolid": "",
+        "praid": "e5ef0ec6-3860-4c50-b73f-9edb7df79ec4",
+        "pcvid": "9919daa2-e2ec-43c2-b3cd-82e415b5203f",
+        "prcid": "0a17be9c-1247-2f1e-b91c-15740976f2c5",
+        "timezone": null,
+        "timezone_value": "-03:00",
+        "pubNubHook": null
+    }
 };
+
 init(JSON.stringify(json));

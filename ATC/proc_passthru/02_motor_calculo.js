@@ -102,7 +102,10 @@ async function init(json) {
 
             let valoresPromedio = (() => {
                 let faturas_CTSM = linhasCalculo.filter(VALUE => ["BTS - MLA/CT/SM"].includes(VALUE.UrlJsonContext.pstr_tipologia));
+                let quantidadesSitios_CTSM = faturas_CTSM.map(VALUE => VALUE.UrlJsonContext.pstr_asset_number).filter((VALUE, INDEX, SELF) => SELF.indexOf(VALUE) === INDEX).length;
+
                 let faturas_CTCM = linhasCalculo.filter(VALUE => ["BTS - MLA/CT/CM"].includes(VALUE.UrlJsonContext.pstr_tipologia));
+                let quantidadesSitios_CTCM = faturas_CTCM.map(VALUE => VALUE.UrlJsonContext.pstr_asset_number).filter((VALUE, INDEX, SELF) => SELF.indexOf(VALUE) === INDEX).length;
 
                 let valorTotalReembolsoEnergia_CTSM = faturas_CTSM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_energia).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
                 let valorTotalReembolsoEnergia_CTCM = faturas_CTCM.map(VALUE => VALUE.UrlJsonContext.passthru__reembolso_energia).reduce((previousValue, currentValue) => Number(previousValue) + Number(currentValue));
@@ -112,12 +115,12 @@ async function init(json) {
 
                 return {
                     "medias_CTSM": {
-                        "mediaEnergia": (faturas_CTSM.length > 0 && valorTotalReembolsoEnergia_CTSM) ? Number((valorTotalReembolsoEnergia_CTSM / faturas_CTSM.length).toFixed(2)) : 0,
-                        "mediaContribuicao": (faturas_CTSM.length > 0 && valorTotalReembolsoContribuicao_CTSM) ? Number((valorTotalReembolsoContribuicao_CTSM / faturas_CTSM.length).toFixed(2)) : 0,
+                        "mediaEnergia": (faturas_CTSM.length > 0 && valorTotalReembolsoEnergia_CTSM) ? Number((valorTotalReembolsoEnergia_CTSM / quantidadesSitios_CTSM).toFixed(2)) : 0,
+                        "mediaContribuicao": (faturas_CTSM.length > 0 && valorTotalReembolsoContribuicao_CTSM) ? Number((valorTotalReembolsoContribuicao_CTSM / quantidadesSitios_CTSM).toFixed(2)) : 0,
                     },
                     "media_CTCM": {
-                        "mediaEnergia": (faturas_CTCM.length > 0 && valorTotalReembolsoEnergia_CTCM) ? Number((valorTotalReembolsoEnergia_CTCM / faturas_CTCM.length).toFixed(2)) : 0,
-                        "mediaContribuicao": (faturas_CTCM.length > 0 && valorTotalReembolsoContribuicao_CTCM) ? Number((valorTotalReembolsoContribuicao_CTCM / faturas_CTCM.length).toFixed(2)) : 0,
+                        "mediaEnergia": (faturas_CTCM.length > 0 && valorTotalReembolsoEnergia_CTCM) ? Number((valorTotalReembolsoEnergia_CTCM / quantidadesSitios_CTCM).toFixed(2)) : 0,
+                        "mediaContribuicao": (faturas_CTCM.length > 0 && valorTotalReembolsoContribuicao_CTCM) ? Number((valorTotalReembolsoContribuicao_CTCM / quantidadesSitios_CTCM).toFixed(2)) : 0,
                     }
                 };
             })();
@@ -135,6 +138,7 @@ async function init(json) {
 
         /* Atualiza as linhas */
         for (let LINHA of linhasCalculo) {
+            // console.log(LINHA.ID, LINHA.UrlJsonContext.pstr_asset_number);
             await onergy_updatemany({
                 "fdtid": LINHA.templateid,
                 "assid": data.onergy_js_ctx.assid,
@@ -289,7 +293,7 @@ const calcularLinha = async (LINHA, objMediasPromedio) => {
     //============================//
 
     //========== FILTRO =============//
-    let reembolsoTotalFactura = ['VMLA', 'OCCASIO REINTEGRO'];
+    let reembolsoTotalFactura = ['OCCASIO REINTEGRO'];
     let isReembolsoTotalFactura = reembolsoTotalFactura.some(i => linhaContext.pstr_tipologia.includes(i));
 
     let noCobroFactura = ['Desmantelado', 'Otros Operadores', 'DAS', 'SIN INFORMACIÓN', 'Equipos Apagados', 'Sin Equipos sin Consumo'];
@@ -342,14 +346,16 @@ const calcReembolsoAlumbrado = async (sujetoPasivo, valorSujetoPasivo, qtdProvis
     // dependendo de qtd provisional, reduz sujeto pasivo
     let calcSujetoPasivo, reembolsoAlumbradoPublico;
     if (sujetoPasivo == 'TIGO') {
-        calcSujetoPasivo = valorSujetoPasivo / (qtdProvisionales + 1);
-        reembolsoAlumbradoPublico = alumbradoFactura * (calcSujetoPasivo / 100);
+        calcSujetoPasivo = ((valorSujetoPasivo / qtdProvisionales) + 1) / 1;
+        isNaN(calcSujetoPasivo) ? calcSujetoPasivo = 1 : calcSujetoPasivo;
+        reembolsoAlumbradoPublico = alumbradoFactura * calcSujetoPasivo;
     } else if (sujetoPasivo == 'TIGO-ATC 50%-50%') {
-        calcSujetoPasivo = valorSujetoPasivo / (qtdProvisionales + 1);
-        reembolsoAlumbradoPublico = alumbradoFactura * (calcSujetoPasivo / 100);
+        calcSujetoPasivo = ((valorSujetoPasivo / qtdProvisionales) + 1) / 2;
+        isNaN(calcSujetoPasivo) ? calcSujetoPasivo = 0.5 : calcSujetoPasivo;
+        reembolsoAlumbradoPublico = alumbradoFactura * calcSujetoPasivo;
     } else {
-        calcSujetoPasivo = valorSujetoPasivo;
-        reembolsoAlumbradoPublico = alumbradoFactura * (calcSujetoPasivo / 100);
+        calcSujetoPasivo = (valorSujetoPasivo + 1) / 1;
+        reembolsoAlumbradoPublico = alumbradoFactura * calcSujetoPasivo;
     }
     return (reembolsoAlumbradoPublico > 0) ? reembolsoAlumbradoPublico : 0;
 };
@@ -382,7 +388,9 @@ const calcReembolsoCnac = async (cnacFactura, consumoFactura, consumoSugerido, t
         cnacTigo = (cnacFactura * consumoSugerido) / consumoFactura;
         reembolsoCnac = cnacTigo;
     } else {
-        reembolsoCnac = cnacFactura * (constanteCnac / 100);
+        let isConstanteCnac = constanteCnac > 0 ? true : false;
+        let calculoConstanteCnac = isConstanteCnac ? (constanteCnac / 100) : 1;
+        reembolsoCnac = cnacFactura * calculoConstanteCnac;
     }
     return (reembolsoCnac > 0) ? reembolsoCnac : 0;
 };
@@ -411,26 +419,26 @@ const jsonInput = {
     "facturas_seleccionadas_readonly": " ",
     "pstr_archivos_passthru": " ",
     "pstr_registro_salvo": "sim",
-    "pstr_sequecial_passthru": "PASS202300038",
-    "pstr_usuario_de_criacao": "ADM ATC",
-    "data_de_criacao_pstrDate": "2023-06-06T15:30:39Z",
-    "data_de_criacao_pstr": "2023-06-06 12:30:39",
-    "pstr_hora_criacao": "12:30",
+    "pstr_sequecial_passthru": "PASS202300011",
+    "pstr_usuario_de_criacao": "prod@atc.com.br",
+    "data_de_criacao_pstrDate": "2023-06-25T21:34:34Z",
+    "data_de_criacao_pstr": "2023-06-25 18:34:34",
+    "pstr_hora_criacao": "18:34",
     "pstr_status_processo": "ENVIADO A PROCESO",
     "pstr_ids_faturas_selecionadas": "",
     "onergy_js_ctx_ORIGINAL": {
-        "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "6b869ac9-0013-d696-0899-5680dca39ca5",
+        "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
+        "fedid": "70c26e55-6599-2ed8-35c2-b07c2a642328",
         "fdtid": "06456424-a022-46a3-93b9-67e65eb31726",
-        "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-06-06T15:30:34.148Z",
-        "updateDt": "2023-06-06T15:30:34.148Z",
-        "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "email": "adm@atc.com.br",
-        "user_name": "ADM ATC",
+        "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+        "insertDt": "2023-06-25T21:34:31.945Z",
+        "updateDt": "2023-06-25T21:34:31.945Z",
+        "cur_userid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+        "email": "prod@atc.com.br",
+        "user_name": "prod@atc.com.br",
         "onergy_rolid": "",
-        "praid": "64abc4e4-c34e-48d6-aa31-e318cc5c1d8a",
-        "pcvid": "d61ab025-936c-46e1-8e1e-b3ea12a085bc",
+        "praid": "7df608f3-4016-437a-9950-2195d90aee5c",
+        "pcvid": "9e27e7cd-5708-4c8f-967c-3ef1369fbf6e",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
@@ -445,27 +453,27 @@ const jsonInput = {
             "criacao_de_excel": true
         }
     },
-    "ass_id": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-    "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-    "email": "adm@atc.com.br",
+    "ass_id": "88443605-74d6-4ea4-b426-a6c3e26aa615",
+    "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
+    "email": "prod@atc.com.br",
     "fdtid": "212fa4a8-2628-4159-a3eb-5b45cdc0c20a",
-    "fedid": "a0e91ef4-b99d-40cc-8990-6aefdb0dc5cd",
+    "fedid": "2495cf6f-d1a6-4d78-8fd7-a81bffe2ebe9",
     "onergy_rolid": "",
     "timezone": null,
-    "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
+    "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
     "onergy_js_ctx": {
-        "assid": "67c0b77d-abae-4c48-ba4b-6c8faf27e14a",
-        "fedid": "a0e91ef4-b99d-40cc-8990-6aefdb0dc5cd",
+        "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
+        "fedid": "2495cf6f-d1a6-4d78-8fd7-a81bffe2ebe9",
         "fdtid": "212fa4a8-2628-4159-a3eb-5b45cdc0c20a",
-        "usrid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "insertDt": "2023-06-06T15:30:38.403Z",
-        "updateDt": "2023-06-06T15:32:38.943Z",
-        "cur_userid": "1ec86197-d331-483a-b325-62cc26433ea5",
-        "email": "adm@atc.com.br",
-        "user_name": "ADM ATC",
+        "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+        "insertDt": "2023-06-25T21:34:36.841Z",
+        "updateDt": "2023-06-25T21:37:14.24Z",
+        "cur_userid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+        "email": "prod@atc.com.br",
+        "user_name": "prod@atc.com.br",
         "onergy_rolid": "",
-        "praid": "b87c58ed-b537-4c4d-85cb-4ae6057dcf07",
-        "pcvid": "d61ab025-936c-46e1-8e1e-b3ea12a085bc",
+        "praid": "a7765d1a-cf34-4bc0-bcba-d35dca0d96a4",
+        "pcvid": "9e27e7cd-5708-4c8f-967c-3ef1369fbf6e",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
