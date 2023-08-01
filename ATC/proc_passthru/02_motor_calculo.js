@@ -258,7 +258,7 @@ const calcularLinha = async (LINHA, objMediasPromedio) => {
         if (objMediasPromedio) {
             return objMediasPromedio.mediaContribuicao ?? 0;
         }
-        return await calcReembolsoContribucion(linhaContext.pstr_contribucion_factura, linhaContext.pstr_consumo_sugerido, linhaContext.pstr_consumo_factura);
+        return await calcReembolsoContribucion(passthru__reembolso_energia, linhaContext.pstr_constante_contribucion);
     })();
 
     // reembolso alumbrado
@@ -335,9 +335,11 @@ const calcReembolsoEnergia = async (passthru__tarifa_energia, consumoSugerido) =
     return reembolsoEnergia;
 };
 
-const calcReembolsoContribucion = async (contribucionFactura, consumoSugerido, consumoFactura) => {
-    // mla-bts: (contribucion factura * consumo sugerido) / consumo factura == reembolso contribucion
-    let reembolsoContribucion = (contribucionFactura * consumoSugerido) / consumoFactura;
+const calcReembolsoContribucion = async (reembolsoEnergia, constanteContribucion) => {
+    // reembolsoEnergia * constanteContribucion == reembolsoContribucion
+    let isConstanteContribucion = constanteContribucion > 0 ? true : false;
+    let calculoConstanteContribucion = isConstanteContribucion ? (constanteContribucion / 100) : 1;
+    let reembolsoContribucion = (reembolsoEnergia * calculoConstanteContribucion);
     return (reembolsoContribucion > 0) ? reembolsoContribucion : 0;
 };
 
