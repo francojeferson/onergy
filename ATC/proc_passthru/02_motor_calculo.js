@@ -278,7 +278,7 @@ const calcularLinha = async (LINHA, objMediasPromedio) => {
     // obs: para BTS-MLA e OCCASIO OPERADOR, excluir intereses mora
     let cnacRevisado = await calcCnacExInteresesMora(linhaContext.pstr_cnac_factura, linhaContext.pstr_aseo_factura, linhaContext.pstr_vigilancia_factura, linhaContext.pstr_intereses_mora_factura, linhaContext.pstr_financiacion_factura, linhaContext.pstr_reconexion_factura, linhaContext.pstr_tarifa_conexion_factura, linhaContext.pstr_alquiler_contadores_factura, linhaContext.pstr_iva_factura, linhaContext.pstr_tipologia);
 
-    let passthru__reembolso_cnac = await calcReembolsoCnac(cnacRevisado, linhaContext.pstr_consumo_factura, linhaContext.pstr_consumo_sugerido, linhaContext.pstr_tipologia, linhaContext.pstr_constante_cnac, linhaContext.pstr_tipologia);
+    let passthru__reembolso_cnac = await calcReembolsoCnac(cnacRevisado, linhaContext.pstr_consumo_factura, linhaContext.pstr_consumo_sugerido, linhaContext.pstr_tipologia, linhaContext.pstr_constante_cnac);
 
     // total reembolso
     // reembolso energia + reembolso contribucion + reembolso alumbrado publico + reembolso cnac == total reembolso
@@ -368,12 +368,12 @@ const calcAlumbradoAsumidoAtc = async (alumbradoFactura, reembolsoAlumbradoPubli
 
 const calcCnacExInteresesMora = async (cnacFactura, aseoFactura, vigilanciaFactura, interesesMoraFactura, financiacionFactura, reconexionFactura, tarifaConexionFactura, alquilerContadoresFactura, ivaFactura, tipologiaCliente) => {
     //========== FILTRO =============//
-    let cnacExInteresesMora = ['BTS - MLA/CT/CM', 'BTS - MLA/CT/SM', 'BTS - MLA/ST/CM', 'BTS - MLA/ST/SM', 'OCCASIO POR OPERADOR'];
+    let cnacExInteresesMora = ['BTS - MLA/CT/CM', 'BTS - MLA/CT/SM', 'BTS - MLA/ST/CM', 'BTS - MLA/ST/SM', 'OCCASIO POR OPERADOR', 'VMLA'];
     let iscnacExInteresesMora = cnacExInteresesMora.some(i => tipologiaCliente.includes(i));
     //============================//
 
     if (iscnacExInteresesMora && interesesMoraFactura > 0) {
-        cnacFactura = aseoFactura + vigilanciaFactura + financiacionFactura + reconexionFactura + tarifaConexionFactura + alquilerContadoresFactura + ivaFactura;
+        cnacFactura = aseoFactura + vigilanciaFactura + financiacionFactura + tarifaConexionFactura + alquilerContadoresFactura + ivaFactura;
     }
     return cnacFactura;
 };
@@ -383,8 +383,13 @@ const calcReembolsoCnac = async (cnacFactura, consumoFactura, consumoSugerido, t
     // ( cnac * consumo ami ) / consumo kwh == cnac tigo
     // (cnac - cnac tigo) == cnac atc
     // senão, cnac * constante cnac == reembolso cnac
+    //========== FILTRO =============//
+    let cnacTotal = ['BTS - MLA/CT/CM', 'BTS - MLA/CT/SM', 'BTS - MLA/ST/CM', 'BTS - MLA/ST/SM', 'OCCASIO POR OPERADOR', 'VMLA'];
+    let iscnacTotal = cnacTotal.some(i => tipologiaCliente.includes(i));
+    //============================//
+
     let cnacTigo, reembolsoCnac;
-    if (tipologiaCliente == 'OCCASIO POR OPERADOR') {
+    if (iscnacTotal) {
         cnacTigo = (cnacFactura * consumoSugerido) / consumoFactura;
         reembolsoCnac = cnacTigo;
     } else {
@@ -419,30 +424,31 @@ const jsonInput = {
     "facturas_seleccionadas_readonly": " ",
     "pstr_archivos_passthru": " ",
     "pstr_registro_salvo": "sim",
-    "pstr_sequecial_passthru": "PASS202300011",
-    "pstr_usuario_de_criacao": "prod@atc.com.br",
-    "data_de_criacao_pstrDate": "2023-06-25T21:34:34Z",
-    "data_de_criacao_pstr": "2023-06-25 18:34:34",
-    "pstr_hora_criacao": "18:34",
+    "pstr_sequecial_passthru": "PASS202300020",
+    "pstr_usuario_de_criacao": "Oscar Jimenez (Prod)",
+    "data_de_criacao_pstrDate": "2023-07-24T18:45:55Z",
+    "data_de_criacao_pstr": "2023-07-24 15:45:55",
+    "pstr_hora_criacao": "15:45",
     "pstr_status_processo": "ENVIADO A PROCESO",
     "pstr_ids_faturas_selecionadas": "",
     "onergy_js_ctx_ORIGINAL": {
         "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
-        "fedid": "70c26e55-6599-2ed8-35c2-b07c2a642328",
+        "fedid": "2e3d1dcd-89b0-8151-94f5-41e3fe329d2e",
         "fdtid": "06456424-a022-46a3-93b9-67e65eb31726",
-        "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
-        "insertDt": "2023-06-25T21:34:31.945Z",
-        "updateDt": "2023-06-25T21:34:31.945Z",
-        "cur_userid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
-        "email": "prod@atc.com.br",
-        "user_name": "prod@atc.com.br",
-        "onergy_rolid": "",
-        "praid": "7df608f3-4016-437a-9950-2195d90aee5c",
-        "pcvid": "9e27e7cd-5708-4c8f-967c-3ef1369fbf6e",
+        "usrid": "90657627-ca04-4b6f-a97b-43632dee8063",
+        "insertDt": "2023-07-24T20:45:53.361Z",
+        "updateDt": "2023-07-24T20:45:53.361Z",
+        "cur_userid": "90657627-ca04-4b6f-a97b-43632dee8063",
+        "email": "oscar.jimenez-prod@AmericanTower.com",
+        "user_name": "Oscar Jimenez (Prod)",
+        "onergy_rolid": "e4d0298c-245e-454a-89d4-8f27aef8645b",
+        "praid": "70ecc826-f575-4d4d-b419-bd6745bf58d0",
+        "pcvid": "60dd2b9c-5fc8-41b7-90db-43a1bbbece50",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
-        "pubNubHook": null
+        "pubNubHook": null,
+        "isnew": false
     },
     "oneTemplateTitle": "Motor Calculo",
     "onergyLog": {
@@ -455,30 +461,31 @@ const jsonInput = {
     },
     "ass_id": "88443605-74d6-4ea4-b426-a6c3e26aa615",
     "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
-    "email": "prod@atc.com.br",
+    "email": "oscar.jimenez-prod@AmericanTower.com",
     "fdtid": "212fa4a8-2628-4159-a3eb-5b45cdc0c20a",
-    "fedid": "2495cf6f-d1a6-4d78-8fd7-a81bffe2ebe9",
-    "onergy_rolid": "",
+    "fedid": "9ae4cdc4-f633-4d52-ae3e-2bd3b697f8d3",
+    "onergy_rolid": "e4d0298c-245e-454a-89d4-8f27aef8645b",
     "timezone": null,
-    "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
+    "usrid": "90657627-ca04-4b6f-a97b-43632dee8063",
     "onergy_js_ctx": {
         "assid": "88443605-74d6-4ea4-b426-a6c3e26aa615",
-        "fedid": "2495cf6f-d1a6-4d78-8fd7-a81bffe2ebe9",
+        "fedid": "9ae4cdc4-f633-4d52-ae3e-2bd3b697f8d3",
         "fdtid": "212fa4a8-2628-4159-a3eb-5b45cdc0c20a",
-        "usrid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
-        "insertDt": "2023-06-25T21:34:36.841Z",
-        "updateDt": "2023-06-25T21:37:14.24Z",
-        "cur_userid": "40ddc5fc-2ef7-4b78-bcc4-5e2048d22331",
-        "email": "prod@atc.com.br",
-        "user_name": "prod@atc.com.br",
-        "onergy_rolid": "",
-        "praid": "a7765d1a-cf34-4bc0-bcba-d35dca0d96a4",
-        "pcvid": "9e27e7cd-5708-4c8f-967c-3ef1369fbf6e",
+        "usrid": "90657627-ca04-4b6f-a97b-43632dee8063",
+        "insertDt": "2023-07-24T20:45:57.894Z",
+        "updateDt": "2023-07-24T20:47:25.887Z",
+        "cur_userid": "90657627-ca04-4b6f-a97b-43632dee8063",
+        "email": "oscar.jimenez-prod@AmericanTower.com",
+        "user_name": "Oscar Jimenez (Prod)",
+        "onergy_rolid": "e4d0298c-245e-454a-89d4-8f27aef8645b",
+        "praid": "3d99c811-7a92-4406-8703-01431d5b6e24",
+        "pcvid": "60dd2b9c-5fc8-41b7-90db-43a1bbbece50",
         "prcid": "3c17d734-8235-914f-9382-75e79ec29b16",
         "timezone": null,
         "timezone_value": "-03:00",
-        "pubNubHook": null
+        "pubNubHook": null,
+        "isnew": false
     }
-};
+}
 
 init(JSON.stringify(jsonInput));
