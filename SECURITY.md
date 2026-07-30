@@ -1,21 +1,28 @@
 # Security Policy
 
-## Supported Versions
+## Scope
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+This repository holds Node.js automation and integration scripts targeting the
+Onergy, OneTech, and Taxfy APIs. It is not a published, versioned package: there
+are no tagged releases or maintenance branches, so security fixes apply only to
+the current state of the default branch (`main`).
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+Please report privately rather than opening a public issue.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Private vulnerability reporting is enabled on this repository:
+**[Report a vulnerability](https://github.com/francojeferson/onergy/security/advisories/new)**
+
+Where you can, include:
+
+- the affected file and line
+- what an attacker could reach or do
+- steps to reproduce
+
+## What to Expect
+
+This is a personal project, maintained on a best-effort basis. Expect an initial
+response within about two weeks. Valid reports are fixed on `main` and credited
+if you would like to be named; reports that fall outside the scope above get a
+short explanation instead.
