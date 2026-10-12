@@ -1,0 +1,88 @@
+<!-- saved from url=(0081)https://plugandcare.blob.core.windows.net/templates/PlugAndCar-EmailTemplate.html -->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>Onetech</title>
+<style>
+    body {
+        background-color: #fafafa;
+    }
+
+    #container {
+        position: relative;
+        width: 600px;
+        background-color: #fff;
+        margin: auto;
+        padding: 15px;
+    }
+
+    #header {
+        position: relative;
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    #header img {
+        height: 90px;
+        margin: auto;
+        display: block;
+    }
+
+    #section {
+        margin: 10px 0;
+        padding: 0 0 20px 0;
+        color: #202020;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        line-height: 150%;
+        text-align: left;
+    }
+
+    #section .bee-btn {
+        padding: 10px;
+        background-color: #0062a1;
+        color: #fff;
+        font-weight: 100;
+        text-decoration: none;
+        border-radius: 3px;
+    }
+
+    #section .bee-btn:hover {
+        background-color: #999;
+    }
+
+    .footer {
+        position: relative;
+        width: 100%;
+        border-top: 2px solid #eaeaea;
+        text-align: center;
+        padding: 30px 0;
+        color: #656565;
+        font-family: Helvetica;
+        font-size: 12px;
+    }
+
+    .footer a {
+        color: #656565;
+        text-decoration: underline;
+    }
+</style>
+<div id="container">
+    <div id="section">
+        <h2>Demanda Interna:&nbsp; {{cod_demanda_interna}}</h2>
+        <p><br /></p>
+        <div style="margin-bottom: 10px">
+            <p>
+                Prezado(a) {{nome_agente}} {{sobrenome_agente}},<br /><br />Para que possamos atender a demanda de protocolo:&nbsp; {{cod_demanda_externa}}
+                recebida do titular: {{nome_portal}} {{sobrenome_portal}}, solicito suas providências conforme abaixo, até a data de: {{str_dt_format_email}}.
+            </p>
+            <p><br /></p>
+            <p>Providências: {{mensagem_intermediaria}}.</p>
+            <p><br /></p>
+            <p>Por favor responda este e-mail assim que houver a conclusão da atividade, com os detalhes do que foi realizado.</p>
+            <p>Atenciosamente,</p>
+            <p>{{MPNGusuario_dpo_cliente}}</p>
+        </div>
+    </div>
+</div>
