@@ -4,7 +4,7 @@ function init() {
     var json = JSON.parse(context.GetContext());
 
     if (json.init === 'mail') {
-        //var cb = "https://gateway.taxfy.com.br/cb/hook/nfse/" + json.subid + "/1/docsia?subscription-key=7a6d55a072cf409982d762fa0a6f08c1";
+        //var cb = "https://gateway.taxfy.com.br/cb/hook/nfse/" + json.subid + "/1/docsia?subscription-key=<taxfy_subscription_key>";
         var cb = 'https://fntaxfyweb.azurewebsites.net/api/hook/nfse/' + json.subid + '/1/docsia';
 
         log.write(JSON.stringify(json.nfse_tela));

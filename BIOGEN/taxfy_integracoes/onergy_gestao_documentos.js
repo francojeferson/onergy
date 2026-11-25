@@ -6,7 +6,7 @@ function init() {
     //ALTERAR POR AMBIENTE
     var assid = "f8387e95-c604-454b-820e-e01c8dbedfcf"; // Exemplo: assid = "544be861-f217-4d4e-9daa-8a22094948f6"
     var usrid = "31805071-d12a-43a0-9651-9f67f9ea39e7"; // Exemplo: usrid = "0a9a1a73-b9bc-4489-bb94-790b3173f382"
-    var subscriptionKey = "a17aed784f454e84b04723adab9484cf"; // Exemplo: Ocp-Apim-Subscription-Key = "175ec1230b7145f4a1f5289fff5086a9" fornecido pelo TAXFY LINK
+    var subscriptionKey = onergy.GetSubscriptionConfig("taxfy_subscription_key"); // Config da assinatura: Ocp-Apim-Subscription-Key fornecido pelo TAXFY LINK
 
     //NFE, NFSE e CTE Envia:
     const fdtPROCxRESP = "968cf322-ea7b-4c59-96f9-f278fe8b5bfc"; // PROC RESP X CNPJ

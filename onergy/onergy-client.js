@@ -3,6 +3,7 @@ const fs = require('fs');
 const md5 = require('md5');
 const request = require('request');
 const Uri = 'https://gateway.onetech.com.br/v1';
+const SubscriptionKey = process.env.ONERGY_SUBSCRIPTION_KEY;
 
 function Read(filename) {
     return new Promise((resolve, reject) => {
@@ -105,7 +106,7 @@ exports.DowloadFile = async function (url, filename, file) {
 exports.getInMemory = function (args) {
     return new Promise((resolve, reject) => {
         request(
-            'https://gateway.onetech.com.br/ocs/api/cache?subscription-key=b30026bf1e1c40bda7777c64050fceb6&key=' + args.key,
+            'https://gateway.onetech.com.br/ocs/api/cache?subscription-key=' + SubscriptionKey + '&key=' + args.key,
             { json: false },
             (err, res, body) => {
                 if (err) {
@@ -168,7 +169,7 @@ exports.LogConsole = function (message) {
 };
 
 exports.MetaDados = function (usrid, fdtid, assid, complete) {
-    var url = Uri + '/api/Feed/GetFeedTemplateByID?subscription-key=f8da69f006064cb69814963c3f768715&?usr_id=' + usrid + '&ass_id=' + assid + '&fdtid=' + fdtid;
+    var url = Uri + '/api/Feed/GetFeedTemplateByID?subscription-key=' + SubscriptionKey + '&?usr_id=' + usrid + '&ass_id=' + assid + '&fdtid=' + fdtid;
     request(url, { json: true }, (err, res, body) => {
         if (err) {
             return console.log(err);
@@ -214,7 +215,7 @@ exports.onergy_get_internal = function (usrid, fdtid, assid, filter, vtake, vski
     if (fedid != null && fedid != undefined)
         url =
             Uri +
-            '/api/Feed/OpenFeedMongo?subscription-key=f8da69f006064cb69814963c3f768715&usrID=' +
+            '/api/Feed/OpenFeedMongo?subscription-key=' + SubscriptionKey + '&usrID=' +
             usrid +
             '&assId=' +
             assid +
@@ -225,7 +226,7 @@ exports.onergy_get_internal = function (usrid, fdtid, assid, filter, vtake, vski
     else
         url =
             Uri +
-            '/api/Feed/GetMongo?subscription-key=f8da69f006064cb69814963c3f768715&usr_id=' +
+            '/api/Feed/GetMongo?subscription-key=' + SubscriptionKey + '&usr_id=' +
             usrid +
             '&ass_id=' +
             assid +
@@ -291,7 +292,7 @@ exports.onergy_save = function (args) {
             request.post(
                 {
                     headers: { 'content-type': 'application/json' },
-                    url: Uri + '/api/Analytics/SaveDataByTemplateRule?subscription-key=f8da69f006064cb69814963c3f768715',
+                    url: Uri + '/api/Analytics/SaveDataByTemplateRule?subscription-key=' + SubscriptionKey,
                     body: JSON.stringify(SaveDataByTemplate),
                 },
                 function (error, response, body) {
@@ -377,7 +378,7 @@ exports.saveInMemory = function (args) {
             request.post(
                 {
                     headers: { 'content-type': 'application/json' },
-                    url: 'https://gateway.onetech.com.br/ocs/api/cache/' + args.key + '/' + args.time + '?subscription-key=b30026bf1e1c40bda7777c64050fceb6',
+                    url: 'https://gateway.onetech.com.br/ocs/api/cache/' + args.key + '/' + args.time + '?subscription-key=' + SubscriptionKey,
                     body: JSON.stringify(args.data),
                 },
                 function (error, response, body) {

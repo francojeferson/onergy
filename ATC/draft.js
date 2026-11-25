@@ -106,7 +106,7 @@ async function init(strData) {
         tipo_acceso: 'USUARIO/CONTRASEÑA',
         link_web: 'http://190.107.23.34:8091/websolin/',
         usuario: 'edwin.nieto@americantower.com',
-        contrasena: 'Colombia2021',
+        contrasena: '<password>',
         nit_provedor: 800089809,
         nome_provedor: 'IBAL SA ESP',
         beneficiario: 'IBAL SA ESP',
@@ -122,7 +122,7 @@ async function init(strData) {
 }
 
 async function DeletarRegistro(data, usrid, fedid) {
-    const Ocp_Apim_Subscription_Key = 'e2dc35dfcc8048eeba0805b090ab9f97'; //Excluir registro, feedView, ocp-apim-subscription-key
+    const Ocp_Apim_Subscription_Key = process.env.ONERGY_SUBSCRIPTION_KEY; //Excluir registro, feedView, ocp-apim-subscription-key
 
     await axios({
         url: `https://gateway.onergy.com.br/homol/api/Feed/FeedView?usr_id=${usrid}&fedid=[%22${fedid}%22]`,

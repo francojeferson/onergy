@@ -131,7 +131,7 @@ async function getOnergyItem(fdtid, assid, usrid, filtro) {
 }
 async function DeletarRegistro(data, usrid, fedid) {
     //*browser, f12, console, cabeçalho(header), pegar o valor do "ocp-apim-subscription-key" em algum "GetMongo" gerado
-    const Ocp_Apim_Subscription_Key = '1ae92442465648cf8607540e41376936'; //Excluir registro, feedView, ocp-apim-subscription-key
+    const Ocp_Apim_Subscription_Key = process.env.ONERGY_SUBSCRIPTION_KEY; //Excluir registro, feedView, ocp-apim-subscription-key
 
     await axios({
         url: `https://gateway.onergy.com.br/homol/api/Feed/FeedView?usr_id=${usrid}&fedid=[%22${fedid}%22]`,

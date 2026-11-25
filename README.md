@@ -145,7 +145,7 @@ Os testes estão em `__tests__/`.
 
 - Os scripts executam no motor de automação do Onergy (Node.js server-side)
 - As chamadas de API dependem da disponibilidade do gateway Onergy e estão sujeitas a limites de taxa
-- Chaves de assinatura (`subscription-key`) estão embutidas no código-fonte — considere mover para variáveis de ambiente se seguro for requisito
+- Chaves de assinatura (`subscription-key`) não ficam mais no código-fonte. O cliente Node (`onergy/onergy-client.js`) e os scripts Node locais (`METODOS/deletarRegistroEmLote.js`, `METODOS/limpar_registros.js`, `ATC/draft.js`) leem a variável de ambiente `ONERGY_SUBSCRIPTION_KEY`. Os scripts do motor em `BIOGEN/taxfy_integracoes/` leem a configuração da assinatura `taxfy_subscription_key` com `onergy.GetSubscriptionConfig("taxfy_subscription_key")`. Defina os dois valores antes de executar
 - O pacote `request` (legado, callback-based) é o principal HTTP client; o projeto ainda não migrou para `axios` ou `fetch` nativo
 - Cada script de processo executa como um passo de automação isolado dentro do motor do Onergy
 

@@ -9,7 +9,8 @@ function init() {
             json.config.CUS_ID +
             '/' +
             json.config.SUB_ID +
-            '?subscription-key=7a6d55a072cf409982d762fa0a6f08c1';
+            '?subscription-key=' +
+            onergy.GetSubscriptionConfig('taxfy_subscription_key');
 
         var datatosend = {
             ContribuinteIpi: json.config.ContribuinteIpi,

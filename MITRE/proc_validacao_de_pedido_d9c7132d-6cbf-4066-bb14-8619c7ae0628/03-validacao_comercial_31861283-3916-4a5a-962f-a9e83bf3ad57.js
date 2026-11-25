@@ -255,7 +255,7 @@ async function consumirApi(assid, usrid, fedid, pedido, documento, regra, itemDo
                 let he = params_chamada_api.headers;
                 params_chamada_api.url = url;
                 params_chamada_api.headers;
-                //params_chamada_api.data = JSON.stringify({ user_key: "856211e607a528fd9655cec646b7cb7e" });
+                //params_chamada_api.data = JSON.stringify({ user_key: "<user_key>" });
                 params_chamada_api.async = false;
                 params_chamada_api.assid = assid;
                 params_chamada_api.usrid = usrid;

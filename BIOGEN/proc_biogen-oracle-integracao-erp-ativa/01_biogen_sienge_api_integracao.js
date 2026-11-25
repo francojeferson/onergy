@@ -584,7 +584,7 @@ const jsonInput = {
     "dest_cnpj": "07986222000174",
     "razao_social_tomador": "BIOGEN BRASIL PRODUTOS FARMACEUTICOSLTDA",
     "valorNFe": 1516.39,
-    "urlpdf": "https://gateway.taxfy.com.br/v1/api/nfe/danfe?subscription-key=4220c09ea0dd470cb3c130dbbf0863d2&cusid=be927d44-32c9-4263-b00f-bc3c674c6adb&id=6453a7016636e198167b3b67&subid=d9ad1203-b64d-dfbe-b067-17fffb495194",
+    "urlpdf": "https://gateway.taxfy.com.br/v1/api/nfe/danfe?subscription-key=<taxfy_subscription_key>&cusid=be927d44-32c9-4263-b00f-bc3c674c6adb&id=6453a7016636e198167b3b67&subid=d9ad1203-b64d-dfbe-b067-17fffb495194",
     "dtEmissaoNfDate": "2022-11-05T04:40:16Z",
     "dtEmissaoNf": "2022-11-05 01:40:16",
     "dtEntradaDate": "2023-05-04T12:37:21Z",
@@ -3071,7 +3071,7 @@ const jsonInput = {
         "versao": "4.00",
         "indexedES": false
     },
-    "urlxml": "https://iapi.taxfy.com.br/api/Storage?subid=d9ad1203-b64d-dfbe-b067-17fffb495194&key=912A3C89C982A1522D59DD0E6F1F00CB&tipo=NFE",
+    "urlxml": "https://iapi.taxfy.com.br/api/Storage?subid=d9ad1203-b64d-dfbe-b067-17fffb495194&key=<taxfy_storage_key>&tipo=NFE",
     "cancelada": null,
     "dtCancelada": null,
     "oneTemplateTitle": "BIOGEN - SIENGE - API - INTEGRAÇÃO",
